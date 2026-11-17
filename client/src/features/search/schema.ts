@@ -50,6 +50,15 @@ export interface District {
   storeCount: number
 }
 
+/** 서울특별시 자치구 25곳 (가나다 순) — 서버 District.SEOUL 과 같음 */
+export const SEOUL_DISTRICTS = [
+  '강남구', '강동구', '강북구', '강서구', '관악구',
+  '광진구', '구로구', '금천구', '노원구', '도봉구',
+  '동대문구', '동작구', '마포구', '서대문구', '서초구',
+  '성동구', '성북구', '송파구', '양천구', '영등포구',
+  '용산구', '은평구', '종로구', '중구', '중랑구',
+] as const
+
 /** 주소에서 자치구 (서버 District.of 와 같은 규칙). 없으면 null */
 export function districtOf(address: string): string | null {
   return address.trim().match(/(?:^|\s)([가-힣]{1,5}구)(?=\s|$)/)?.[1] ?? null

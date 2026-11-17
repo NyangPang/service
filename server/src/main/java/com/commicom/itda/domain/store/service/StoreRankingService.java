@@ -23,7 +23,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 /**
@@ -54,6 +53,9 @@ public class StoreRankingService {
             throw new BusinessException(ErrorCode.INVALID_INPUT);
         }
         String districtFilter = blankToNull(district);
+        if (districtFilter != null && !District.isSeoul(districtFilter)) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT);
+        }
         String query = blankToNull(q);
         LocalDate to = KstTime.today();
         LocalDate from = to.minusDays(days - 1L);
@@ -89,13 +91,13 @@ public class StoreRankingService {
         return new StoreRankingResponse(districtFilter, category, query, days, from, to, ranked);
     }
 
-    /** 가게가 있는 자치구 목록 (가나다 순) */
+    /** 서울 자치구 25곳 전부 (가나다 순) + 구마다 등록된 가게 수 (없으면 0) */
     public List<DistrictResponse> getDistricts() {
         Map<String, Long> counts = storeRepository.findAll().stream()
                 .map(s -> District.of(s.getAddress()))
                 .filter(Objects::nonNull)
-                .collect(Collectors.groupingBy(d -> d, TreeMap::new, Collectors.counting()));
-        return counts.entrySet().stream().map(e -> new DistrictResponse(e.getKey(), e.getValue())).toList();
+                .collect(Collectors.groupingBy(d -> d, Collectors.counting()));
+        return District.SEOUL.stream().map(d -> new DistrictResponse(d, counts.getOrDefault(d, 0L))).toList();
     }
 
     private static String blankToNull(String s) {

@@ -21,4 +21,11 @@ class DistrictTest {
         // "구"로 끝나지만 단어 중간인 경우는 무시 (예: 구로 시작하는 도로명)
         assertThat(District.of("서울 구로구 구로동로 1")).isEqualTo("구로구");
     }
+
+    @Test
+    void 서울_자치구는_25곳이고_가나다_순() {
+        assertThat(District.SEOUL).hasSize(25).doesNotHaveDuplicates().isSorted();
+        assertThat(District.isSeoul("노원구")).isTrue();
+        assertThat(District.isSeoul("해운대구")).isFalse();
+    }
 }

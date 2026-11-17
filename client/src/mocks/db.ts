@@ -46,7 +46,7 @@ import {
   type VisitRequest,
   type VisitResult,
 } from '@/features/quest/schema'
-import { districtOf, type District, type RankingParams, type RankedStore, type StoreRankingResult } from '@/features/search/schema'
+import { districtOf, SEOUL_DISTRICTS, type District, type RankingParams, type RankedStore, type StoreRankingResult } from '@/features/search/schema'
 
 /** true면 모든 기능을 목업으로 (서버 없이 시연) */
 export const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true'
@@ -920,6 +920,7 @@ export const mockRankingApi = {
       return { district, category, q: query || null, days, from, to, stores }
     }),
 
+  /** 서울 자치구 25곳 전부 + 구마다 가게 수 (없으면 0) */
   districts: () =>
     respond<District[]>(() => {
       const counts = new Map<string, number>()
@@ -927,6 +928,6 @@ export const mockRankingApi = {
         const d = districtOf(s.address)
         if (d) counts.set(d, (counts.get(d) ?? 0) + 1)
       })
-      return [...counts.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([name, storeCount]) => ({ name, storeCount }))
+      return SEOUL_DISTRICTS.map((name) => ({ name, storeCount: counts.get(name) ?? 0 }))
     }),
 }

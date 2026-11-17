@@ -5,8 +5,16 @@ import { STORE_CATEGORIES } from '@/features/map/schema'
 import { errorMessage } from '@/shared/lib/error'
 import { CloseIcon, SearchIcon } from '@/shared/ui/icons'
 import { StoreAvatar } from '@/shared/ui/StoreAvatar'
-import { useDebounced, useDistricts, useRanking } from '../hooks'
-import { isRankingPeriod, RANKING_PERIODS, shortDate, type RankedStore, type RankingPeriod } from '../schema'
+import { useDebounced, useRanking } from '../hooks'
+import {
+  isRankingPeriod,
+  RANKING_PERIODS,
+  SEOUL_DISTRICTS,
+  shortDate,
+  type RankedStore,
+  type RankingPeriod,
+} from '../schema'
+import { DistrictPicker } from './DistrictPicker'
 
 /**
  * 가게 검색 · 동네 랭킹.
@@ -15,7 +23,9 @@ import { isRankingPeriod, RANKING_PERIODS, shortDate, type RankedStore, type Ran
  */
 export function StoreSearch() {
   const [params, setParams] = useSearchParams()
-  const district = params.get('district') || null
+  // 주소에 서울 자치구가 아닌 값이 들어오면 서울 전체로 (서버는 400)
+  const districtParam = params.get('district')
+  const district = (SEOUL_DISTRICTS as readonly string[]).includes(districtParam ?? '') ? districtParam : null
   const category = params.get('category') || null
   const daysParam = Number(params.get('days'))
   const days: RankingPeriod = isRankingPeriod(daysParam) ? daysParam : RANKING_PERIODS[0]
@@ -31,7 +41,6 @@ export function StoreSearch() {
     q,
     days,
   })
-  const { data: districts } = useDistricts()
 
   const update = (patch: Record<string, string | null>) => {
     const next = new URLSearchParams(params)
@@ -44,7 +53,7 @@ export function StoreSearch() {
   }
 
   const categoryName = STORE_CATEGORIES.find((c) => c.code === category)?.name
-  const scope = [district ?? '전체 지역', searching ? null : (categoryName ?? '모든 업종')].filter(Boolean).join(' · ')
+  const scope = [district ?? '서울 전체', searching ? null : (categoryName ?? '모든 업종')].filter(Boolean).join(' · ')
 
   return (
     <div className="h-full overflow-y-auto pb-8">
@@ -68,22 +77,8 @@ export function StoreSearch() {
         </label>
 
         <div className="mt-2.5 flex items-center gap-2">
-          <select
-            value={district ?? ''}
-            onChange={(e) => update({ district: e.target.value || null })}
-            aria-label="지역 선택"
-            className="h-9 min-w-0 flex-1 rounded-full border border-q-line bg-white px-3 text-[13px] font-medium text-q-text outline-none focus:border-q-green"
-          >
-            <option value="">전체 지역</option>
-            {districts?.map((d) => (
-              <option key={d.name} value={d.name}>
-                {d.name} ({d.storeCount})
-              </option>
-            ))}
-            {/* 주소로 들어온 지역이 목록에 없을 때도 선택된 값이 보이게 */}
-            {district && districts && !districts.some((d) => d.name === district) && <option value={district}>{district}</option>}
-          </select>
-          <div role="radiogroup" aria-label="집계 기간" className="flex shrink-0 rounded-full bg-q-panel p-0.5">
+          <DistrictPicker value={district} onChange={(d) => update({ district: d })} />
+          <div role="radiogroup" aria-label="집계 기간" className="ml-auto flex shrink-0 rounded-full bg-q-panel p-0.5">
             {RANKING_PERIODS.map((p) => (
               <button
                 key={p}

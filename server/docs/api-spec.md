@@ -471,7 +471,7 @@ Response 예시 (200, 일부 생략)
 | API | Method · Path | 인증 | 설명 |
 | --- | --- | --- | --- |
 | 가게 검색·랭킹 | `GET /api/stores/ranking?district=&category=&q=&days=` | 없음 | 모두 선택. `district` 자치구, `category` 업종 코드, `q` 가게 이름(띄어쓰기·대소문자 무시), `days` 7(기본)·14·31. 방문 많은 순, 같으면 이름 순. 방문 0인 가게도 뒤에 포함 |
-| 지역 목록 | `GET /api/stores/districts` | 없음 | 가게가 있는 자치구, 가나다 순. `[{name, storeCount}]` |
+| 지역 목록 | `GET /api/stores/districts` | 없음 | 서울 자치구 25곳 전부, 가나다 순. `[{name, storeCount}]` (가게가 없는 구는 0) |
 
 랭킹 Response 예시 (200)
 
@@ -496,7 +496,7 @@ Response 예시 (200, 일부 생략)
 
 | 상태코드 | 의미 |
 | --- | --- |
-| COMMON400 | `days`가 7·14·31이 아님, 없는 업종 코드 |
+| COMMON400 | `days`가 7·14·31이 아님, 없는 업종 코드, `district`가 서울 자치구가 아님 |
 
 ### 가게 상세 조회
 
