@@ -1,4 +1,4 @@
-# 월계ON-AI API 명세서
+# ITs API 명세서
 
 - Base URL (로컬): `http://localhost:8080`
 - Swagger: `http://localhost:8080/swagger-ui.html`
