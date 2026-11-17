@@ -2,7 +2,7 @@ import pigeonCouponBox from '@/assets/user/pigeon-coupon-box.png'
 import pigeonGrowth from '@/assets/user/pigeon-growth.png'
 import pigeonQuest from '@/assets/user/pigeon-quest.png'
 import { OWNER_ILLUST } from '@/features/owner/illustrations'
-import { FlagNavIcon, MapNavIcon, PhotoNavIcon } from '@/shared/ui/icons'
+import { FlagNavIcon, MapNavIcon, PhotoNavIcon, SearchNavIcon } from '@/shared/ui/icons'
 import { AppShell, type TabItem } from './AppShell'
 import type { MenuItem } from './SettingsDrawer'
 
@@ -11,6 +11,7 @@ export type { RouteHandle } from './AppShell'
 const TABS: TabItem[] = [
   { to: '/', label: '피드', Icon: PhotoNavIcon, end: true },
   { to: '/map', label: '지도', Icon: MapNavIcon },
+  { to: '/search', label: '검색', Icon: SearchNavIcon },
   { to: '/quest', label: '퀘스트', Icon: FlagNavIcon },
 ]
 
