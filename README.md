@@ -90,7 +90,7 @@
 
 ## 로컬 실행
 
-서버·화면을 내 컴퓨터에서 띄우는 방법은 [SETUP.md](SETUP.md)를, 신규 기능을 어디에 만들지는 [docs/new-features.md](docs/new-features.md)를 참고하세요.
+서버·화면을 내 컴퓨터에서 띄우는 방법은 [SETUP.md](SETUP.md)를, 신규 기능을 어디에 만들지는 [docs/new-features.md](docs/new-features.md)를, 외부 API·키·오픈소스는 [docs/public-apis.md](docs/public-apis.md)를 참고하세요.
 
 ## 팀원 소개
 > **14팀 냥팡맨**
