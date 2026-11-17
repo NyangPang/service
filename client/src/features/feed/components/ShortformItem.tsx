@@ -84,7 +84,7 @@ export function ShortformItem({ item, couponCount, onOpenCoupons }: Props) {
           label="공유"
           onClick={() =>
             shareLink({
-              title: `${item.storeName} | 잇다`,
+              title: `${item.storeName} | 잇츠`,
               text: `우리 동네 ${item.storeName} 게시물 보러 가기${item.description ? ` - ${item.description}` : ''}`,
               path: `/map/stores/${item.storeId}/shortform?start=${item.shortformId}`,
             })

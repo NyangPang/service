@@ -267,7 +267,7 @@ export function SignupFlow({ initialRole }: { initialRole?: Role }) {
                 setStoreName(e.target.value)
                 setStoreNameTaken(false)
               }}
-              placeholder="ex. 잇다가게 월계점"
+              placeholder="ex. 잇츠가게 성수점"
               maxLength={NICKNAME_MAX}
               autoFocus
             />

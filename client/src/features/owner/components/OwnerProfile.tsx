@@ -177,7 +177,7 @@ function NameEditor({ initial, saving, onSave, onCancel }: { initial: string; sa
           onChange={(e) => setName(e.target.value)}
           maxLength={30}
           autoFocus
-          placeholder="ex. 잇다가게 월계점"
+          placeholder="ex. 잇츠가게 성수점"
           className="h-9 min-w-0 flex-1 rounded-lg bg-q-panel px-3 text-[15px] text-ink outline-none"
         />
       </div>

@@ -40,11 +40,11 @@ export function WelcomePage() {
 
   return (
     <div className="mx-auto flex h-full max-w-[430px] flex-col bg-white px-6 pt-[max(48px,env(safe-area-inset-top))] pb-[max(24px,env(safe-area-inset-bottom))]">
-      <img src={logo} alt="잇다" className="h-[56px] w-fit" />
+      <img src={logo} alt="잇츠" className="h-[56px] w-fit" />
       <h1 className="mt-6 text-[26px] leading-snug font-bold text-ink">
         반가워요!
         <br />
-        잇다를 어떻게 쓰실 건가요?
+        잇츠를 어떻게 쓰실 건가요?
       </h1>
       <p className="mt-2 text-sm text-q-muted">나중에 설정에서 언제든 바꿀 수 있어요</p>
 

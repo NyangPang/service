@@ -50,7 +50,7 @@ export function Splash() {
         className="relative flex items-center rounded-2xl bg-[#e0e5cf] px-3 py-2"
         style={{ animation: 'splash-pop .5s cubic-bezier(.3,1.4,.5,1) both' }}
       >
-        <img src={logo} alt="잇다" className="h-12 w-auto" />
+        <img src={logo} alt="잇츠" className="h-12 w-auto" />
       </span>
     </div>
   )

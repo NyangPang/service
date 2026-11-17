@@ -73,7 +73,7 @@ export const router = createBrowserRouter([
       { path: 'redeem', element: <OwnerRedeemPage />, handle: { title: '쿠폰 사용 처리', action: null } },
       { path: 'create', element: <OwnerVideosPage />, handle: { title: '게시물 제작', action: null } },
       { path: 'quest-store', element: <QuestStorePage />, handle: { title: '퀘스트 가게' } },
-      { path: 'pro', element: <ProPage />, handle: { title: '잇다 PRO' } },
+      { path: 'pro', element: <ProPage />, handle: { title: '잇츠 PRO' } },
       // 예전 주소 호환 (정산은 쿠폰 탭 안으로, 내 영상은 제작 탭으로)
       { path: 'settlement', element: <Navigate to="/owner/coupons?view=settlement" replace /> },
       { path: 'videos', element: <Navigate to="/owner/create" replace /> },

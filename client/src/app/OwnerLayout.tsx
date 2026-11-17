@@ -28,7 +28,7 @@ const MENU: MenuItem[] = [
   { to: '/owner/quest-store', label: '퀘스트 가게 · 방문 QR', icon: '📍', image: OWNER_ILLUST.qr },
   { to: '/owner/coupons/new', label: '쿠폰 발행', icon: '🎟', image: OWNER_ILLUST.couponNew },
   { to: '/owner/redeem', label: '쿠폰 사용 처리', icon: '✅', image: OWNER_ILLUST.coupon },
-  { to: '/owner/pro', label: '잇다 PRO', icon: '⭐', image: OWNER_ILLUST.pro },
+  { to: '/owner/pro', label: '잇츠 PRO', icon: '⭐', image: OWNER_ILLUST.pro },
 ]
 
 /**
