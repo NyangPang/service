@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { LEVEL_TABLE, type LevelUp } from '../schema'
+import type { LevelUp } from '../schema'
 import { FeedBowlIcon, FeedIcon } from './QuestUi'
 
 type Kind = 'FEED1' | 'FEED2' | 'COUPON'
@@ -19,12 +19,15 @@ function kindOf(reward: LevelUp['reward']): Kind {
   return reward.feedAmount >= 2 ? 'FEED2' : reward.feedAmount === 1 ? 'FEED1' : 'COUPON'
 }
 
+/** 카드 3장의 확률 (처음 공개할 때 카드 아래에 표시) */
+export type DrawOdds = { coupon: number; feed1: number; feed2: number }
+
 /**
- * 레벨업 보상 뽑기 연출: 3장(먹이 1 / 먹이 2 / 쿠폰) 공개 → 뒤집기 → 섞기 → 한 장 고르기 → 공개.
- * 결과는 서버 응답(levelUp.reward)으로 이미 정해져 있고, 고른 카드에 그 결과를 보여줌.
+ * 보상 뽑기 연출 (레벨업·리뷰 보상 공통): 3장(먹이 1 / 먹이 2 / 쿠폰) 공개 → 뒤집기 → 섞기 → 한 장 고르기 → 공개.
+ * 결과는 서버 응답(reward)으로 이미 정해져 있고, 고른 카드에 그 결과를 보여줌.
+ * 여러 번 연달아 뽑을 때는 key 를 바꿔 새로 그려야 함
  */
-export function RewardCardDraw({ levelUp, onRevealed }: { levelUp: LevelUp; onRevealed: () => void }) {
-  const odds = LEVEL_TABLE[levelUp.fromLevel]
+export function RewardCardDraw({ reward, odds, onRevealed }: { reward: LevelUp['reward']; odds?: DrawOdds; onRevealed: () => void }) {
   const [phase, setPhase] = useState<Phase>('intro')
   // slots[cardId] = 왼쪽부터 몇 번째 자리인지
   const [slots, setSlots] = useState([0, 1, 2])
@@ -72,7 +75,7 @@ export function RewardCardDraw({ levelUp, onRevealed }: { levelUp: LevelUp; onRe
 
   const pick = (cardId: number) => {
     if (phase !== 'pick') return
-    const won = kindOf(levelUp.reward)
+    const won = kindOf(reward)
     const rest = KINDS.filter((k) => k !== won)
     if (Math.random() < 0.5) rest.reverse()
     const next: Kind[] = []
@@ -134,7 +137,7 @@ export function RewardCardDraw({ levelUp, onRevealed }: { levelUp: LevelUp; onRe
                 <CardFront
                   kind={faces[cardId]}
                   odds={phase === 'intro' ? oddsText(faces[cardId], odds) : null}
-                  reward={isPicked ? levelUp.reward : null}
+                  reward={isPicked ? reward : null}
                   highlight={isPicked && phase.startsWith('reveal')}
                   dimmed={dimmed}
                 />
@@ -219,7 +222,7 @@ function CardBack({ pickable }: { pickable: boolean }) {
   )
 }
 
-function oddsText(kind: Kind, odds: (typeof LEVEL_TABLE)[number] | undefined) {
+function oddsText(kind: Kind, odds: DrawOdds | undefined) {
   if (!odds) return null
   const p = kind === 'FEED1' ? odds.feed1 : kind === 'FEED2' ? odds.feed2 : odds.coupon
   return `확률 ${Number((p * 100).toFixed(1))}%`

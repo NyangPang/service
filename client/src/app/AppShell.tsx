@@ -1,4 +1,4 @@
-import type { ComponentType, CSSProperties } from 'react'
+import type { ComponentType, CSSProperties, ReactNode } from 'react'
 import { Navigate, NavLink, Outlet, useLocation, useMatches, useNavigate } from 'react-router-dom'
 import { BackIcon, PlusIcon } from '@/shared/ui/icons'
 import { useModeStore } from '@/stores/modeStore'
@@ -39,10 +39,13 @@ export function AppShell({
   tabs,
   menuItems,
   modeBadge,
+  headerAction,
 }: {
   tabs: TabItem[]
   menuItems: MenuItem[]
   modeBadge?: string
+  /** 우상단 버튼 앞에 붙는 버튼 (사장님: 알림 종). 동그라미 버튼 모양 클래스를 받음 */
+  headerAction?: (buttonClassName: string) => ReactNode
 }) {
   const navigate = useNavigate()
   const { pathname, search } = useLocation()
@@ -80,18 +83,21 @@ export function AppShell({
             <h1 className={`truncate font-bold text-ink ${modeBadge ? 'text-[21px] leading-tight' : 'text-[25px]'}`}>{title}</h1>
           )}
         </div>
-        {showBack ? (
-          <button type="button" aria-label="뒤로" className={circleButton} onClick={() => navigate(-1)}>
-            <BackIcon />
-          </button>
-        ) : action ? (
-          <button type="button" aria-label={action.label} className={primaryCircleButton} onClick={() => navigate(action.to)}>
-            <PlusIcon />
-          </button>
-        ) : (
-          // 버튼이 없어도 제목이 가운데에 오도록 자리만 차지
-          <span aria-hidden className="size-[46px] shrink-0" />
-        )}
+        <div className="flex shrink-0 items-center gap-2">
+          {headerAction?.(circleButton)}
+          {showBack ? (
+            <button type="button" aria-label="뒤로" className={circleButton} onClick={() => navigate(-1)}>
+              <BackIcon />
+            </button>
+          ) : action ? (
+            <button type="button" aria-label={action.label} className={primaryCircleButton} onClick={() => navigate(action.to)}>
+              <PlusIcon />
+            </button>
+          ) : headerAction ? null : (
+            // 버튼이 없어도 제목이 가운데에 오도록 자리만 차지
+            <span aria-hidden className="size-[46px] shrink-0" />
+          )}
+        </div>
       </header>
 
       {/* --nav-h: 영상 위에 떠 있는 탭 바 높이 (바가 줄면 그만큼 영상 위 글자·버튼도 내려감) */}

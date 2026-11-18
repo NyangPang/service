@@ -178,7 +178,15 @@ export function QuestVisit({ quest }: { quest: Quest }) {
           image={pigeonVerified}
           title="방문 인증 완료!"
           subtitle={`${store.name} 방문이 확인되었습니다.`}
-          actions={<PrimaryButton onClick={afterVisited}>확인</PrimaryButton>}
+          actions={
+            <>
+              <PrimaryButton onClick={afterVisited}>확인</PrimaryButton>
+              {/* 이 방문 인증으로 리뷰 1개 → 보상 뽑기 3회 */}
+              <OutlineButton onClick={() => navigate(`/profile/reviews/new?visitId=${result.visitId}`, { replace: true })}>
+                리뷰 쓰고 보상 뽑기 3회 받기
+              </OutlineButton>
+            </>
+          }
         >
           <RewardBox title={`먹이 ${result.feedGained}개를 획득했습니다`} caption="보유 먹이에 담았어요. 퀘스트 탭에서 비둘기에게 주세요!" />
         </CelebrationScreen>

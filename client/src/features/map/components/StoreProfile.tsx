@@ -8,6 +8,7 @@ import { errorMessage } from '@/shared/lib/error'
 import { shareLink } from '@/shared/lib/share'
 import { LocationIcon, PhotoIcon, ShareIcon, TicketSmallIcon } from '@/shared/ui/icons'
 import { StoreAvatar } from '@/shared/ui/StoreAvatar'
+import { PublicStoreReviews } from '@/features/review/components/StoreReviews'
 import { useStoreDetail, useStores } from '../hooks'
 
 /**
@@ -145,6 +146,9 @@ export function StoreProfile({ storeId }: { storeId: number }) {
           </ul>
         )}
       </section>
+
+      {/* 손님 리뷰 (사장님이 숨긴 리뷰는 안 보임) */}
+      <PublicStoreReviews storeId={storeId} />
 
       {couponOpen && <StoreCouponSheet storeId={storeId} storeName={store.name} onClose={() => setCouponOpen(false)} />}
     </div>

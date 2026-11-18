@@ -85,6 +85,13 @@ function AccountSection({ onLoggedIn, onLoggedOut }: { onLoggedIn: (mode: AppMod
             </Link>
           </li>
         )}
+        {!owner && (
+          <li>
+            <Link to="/profile/reviews" className="flex justify-between border-b border-q-line py-3.5">
+              내 리뷰 <span className="text-q-muted">›</span>
+            </Link>
+          </li>
+        )}
         <li>
           <button
             type="button"

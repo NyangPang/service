@@ -14,6 +14,8 @@ import com.commicom.itda.domain.quest.entity.QuestSubscription;
 import com.commicom.itda.domain.quest.repository.QuestParticipationRepository;
 import com.commicom.itda.domain.quest.repository.QuestRepository;
 import com.commicom.itda.domain.quest.repository.QuestSubscriptionRepository;
+import com.commicom.itda.domain.review.entity.Review;
+import com.commicom.itda.domain.review.repository.ReviewRepository;
 import com.commicom.itda.domain.shortform.entity.Shortform;
 import com.commicom.itda.domain.shortform.repository.ShortformRepository;
 import com.commicom.itda.domain.store.entity.Store;
@@ -52,6 +54,7 @@ public class LocalDataInitializer implements ApplicationRunner {
     private final QuestRepository questRepository;
     private final CouponRepository couponRepository;
     private final UserCouponRepository userCouponRepository;
+    private final ReviewRepository reviewRepository;
 
     @Override
     public void run(ApplicationArguments args) {
@@ -60,6 +63,18 @@ public class LocalDataInitializer implements ApplicationRunner {
         initShortforms();
         initQuestStores();
         initCoupons();
+        initReviews();
+    }
+
+    /** 샘플 사장님 가게(광운 카페) 리뷰 화면 확인용: 샘플 주민 리뷰 1건 (방문 인증 기록 없이 넣음) */
+    private void initReviews() {
+        if (reviewRepository.count() > 0) {
+            return;
+        }
+        storeRepository.findAll().stream().filter(s -> s.getName().equals("[샘플] 광운 카페")).findFirst()
+                .ifPresent(cafe -> memberRepository.findByEmail("resident@test.com").ifPresent(resident ->
+                        reviewRepository.save(Review.builder().member(resident).store(cafe).rating(5)
+                                .content("아메리카노가 고소하고 사장님이 친절해요. 창가 자리가 좋아요!").photoUrls(List.of()).build())));
     }
 
     /**

@@ -699,6 +699,62 @@ Response 예시 (404)
 
 ---
 
+## Review
+
+> 별점(1~5) · 사진/영상(합쳐 최대 3개, 영상은 1개 · 30초 · 50MB 이하) · 본문(최대 200자) · 공개 여부.
+> **QR 방문 인증이 있어야 리뷰를 쓰고, 같은 인증으로 여러 개 쓸 수 있다. 보상 뽑기 3회는 그 인증으로 쓴 첫 리뷰에만.** 날짜·가게와 상관없이 인증 건을 기준으로 센다.
+> - 인증으로 첫 리뷰를 쓰면 뽑기 3회. 뽑기 1회 = 카드 3장(먹이 1개 / 먹이 2개 / 쿠폰) 중 1장 → 쿠폰 3% · 먹이 1개 70% · 먹이 2개 27% (쿠폰 풀이 비면 먹이 2개). 먹이는 보유 먹이에 쌓임
+> - 인증 1건의 보상은 평생 한 번: 두 번째 리뷰부터, 또는 보상 받은 리뷰를 지우고 다시 써도 뽑기는 없음
+> - 보상 받은 리뷰를 지우면 남은 뽑기는 사라짐 (이미 받은 먹이·쿠폰은 그대로). 다 쓴 뒤 지우면 아무 일 없음
+> - 비공개 리뷰(`privateReview`)는 사장님과 작성자 본인에게만 보인다. 사장님이 숨긴 리뷰(`hidden`)도 같음. 둘 다 평균 별점에서 빠짐
+> - 사장님이 숨겨도 손님의 남은 뽑기는 그대로
+>
+> `reviews[]`: `reviewId, visitId, storeId, storeName, storeThumbnailUrl, memberId, nickname, profileImageUrl, rating, content, photoUrls[], videoUrl, privateReview, hidden, drawsLeft`(내 리뷰에서만, 그 외 null)`, createdAt, updatedAt`
+
+| API | Method · Path | 인증 | 설명 |
+| --- | --- | --- | --- |
+| 리뷰를 쓸 수 있는 방문 인증 | `GET /api/reviews/writable-visits` | 필수 | 내 인증 전부, 최근 순. `[]{visitId, storeId, storeName, storeThumbnailUrl, visitedAt, rewardAvailable, reviewCount}` (`rewardAvailable=false`면 더 써도 뽑기 없음) |
+| 리뷰 작성 | `POST /api/reviews` | 필수 | multipart: `data`(JSON `visitId, rating, content, privateReview`) + `photos`(여러 개) + `video`(1개). 응답 `review, drawsGranted`(3 또는 0) (201) |
+| 리뷰 보상 뽑기 | `POST /api/reviews/{reviewId}/draws` | 필수 | 1회 뽑기. 응답 `reward{type: FEED/COUPON, feedAmount, userCoupon}, drawsLeft, feedBalance` |
+| 내 리뷰 목록 | `GET /api/reviews/me` | 필수 | 최신순. `count, reviews[]` (숨김·비공개 포함, `drawsLeft` 있음) |
+| 리뷰 수정 | `PATCH /api/reviews/{reviewId}` | 필수 | multipart: `data`(JSON `rating, content, privateReview, keepPhotoUrls[], keepVideo`) + `photos` + `video`(새 영상을 보내면 교체). 뽑기 횟수는 그대로 |
+| 리뷰 삭제 | `DELETE /api/reviews/{reviewId}` | 필수 | 응답 `revokedDraws`(사라진 남은 뽑기 수) |
+| 가게 리뷰 목록 | `GET /api/stores/{storeId}/reviews` | 선택 | 최신순. `count, averageRating`(공개 리뷰 기준, 소수 첫째 자리, 없으면 0)`, hiddenCount, privateCount, reviews[]`. 그 가게 사장님이면 숨긴·비공개 리뷰도 포함 (두 count 는 사장님에게만 채워짐) |
+| 리뷰 숨기기 (사장님) | `PATCH /api/stores/{storeId}/reviews/{reviewId}/visibility` | 사장님 | Body `{ "hidden": true }` (다시 보이기는 `false`). 응답 리뷰 1건 |
+
+| 상태코드 | 의미 |
+| --- | --- |
+| COMMON400 | 별점 1~5 밖 · 본문 비었거나 200자 초과 · visitId 없음 |
+| REVIEW400 | 사진·영상 3개 초과 또는 영상 2개 이상 |
+| REVIEW400_2 | 영상 파일이 아니거나 50MB 초과 |
+| REVIEW403_2 | 내가 쓴 리뷰가 아님 (수정·삭제·뽑기) |
+| REVIEW404 | 리뷰 없음 (숨기기: 이 가게 리뷰가 아님) |
+| REVIEW404_2 | 내 방문 인증이 아님 |
+| REVIEW409_2 | 남은 뽑기 없음 |
+| STORE403_2 | 숨기기: 내 가게가 아님 |
+| STORE404 | 가게 없음 |
+
+> 회원 탈퇴 시 그 회원의 리뷰·뽑기권·뽑기 기록도 지운다. 업로드 한도는 파일당 60MB, 요청당 80MB.
+
+---
+
+## Notification
+
+> 앱 안 알림. 지금은 **사장님: 우리 가게에 새 리뷰가 등록되면**(`REVIEW_CREATED`) 하나만 있다. 사장님 본인이 쓴 리뷰는 알리지 않는다.
+> 폰 푸시는 없고, 클라이언트가 안 읽은 수를 주기적으로(20초) 조회해 상단 종 배지·토스트로 보여 준다.
+> `notifications[]`: `notificationId, type, title, message, storeId, reviewId, read, createdAt`
+
+| API | Method · Path | 인증 | 설명 |
+| --- | --- | --- | --- |
+| 내 알림 목록 | `GET /api/notifications` | 필수 | 최신순 최대 50개. `unreadCount, notifications[]` |
+| 안 읽은 알림 수 | `GET /api/notifications/unread-count` | 필수 | `unreadCount` |
+| 읽음 처리 | `PATCH /api/notifications/{notificationId}/read` | 필수 | 내 알림이 아니면 NOTIFICATION404 |
+| 모두 읽음 | `PATCH /api/notifications/read-all` | 필수 | |
+
+> 회원 탈퇴 시 그 회원이 받은 알림도 지운다.
+
+---
+
 ## PRO
 
 > 사장님 가게 단위 월 구독 (30일). 해커톤: 결제는 모의 처리하고, 만료일에 자동 결제도 하지 않는다 (만료되면 다시 가입).

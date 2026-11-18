@@ -16,8 +16,9 @@ spring:
 
   servlet:
     multipart:
-      max-file-size: 20MB
-      max-request-size: 20MB
+      # 리뷰 영상(최대 50MB) + 사진 2장이 한 요청에 올 수 있음
+      max-file-size: 60MB
+      max-request-size: 80MB
 
   # 회원가입 인증 메일 (SMTP). MAIL_HOST 가 비어 있으면 메일을 보내지 않고 로그에만 남김
   # 예) Gmail: MAIL_HOST=smtp.gmail.com, MAIL_PORT=587, MAIL_USERNAME=주소, MAIL_PASSWORD=앱 비밀번호(16자리)

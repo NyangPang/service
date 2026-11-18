@@ -18,6 +18,7 @@ import {
   ProPage,
   QuestStorePage,
 } from '@/pages/OwnerPage'
+import { MyReviewsPage, OwnerNotificationsPage, OwnerReviewsPage, ReviewDrawPage, ReviewEditPage, ReviewWritePage } from '@/pages/ReviewPage'
 import { PigeonAlbumPage, PigeonHistoryPage, QuestPage, QuestScanPage, QuestVisitPage } from '@/pages/QuestPage'
 
 export const router = createBrowserRouter([
@@ -51,6 +52,11 @@ export const router = createBrowserRouter([
       { path: '/coupons', element: <CouponPage />, handle: { title: '내 쿠폰함' } },
       { path: '/scraps', element: <ScrapPage />, handle: { title: '스크랩' } },
       { path: '/profile', element: <MyProfilePage />, handle: { title: '프로필' } },
+      // 마이페이지 > 내 리뷰 (QR 방문 인증 1건 = 리뷰 1개 = 보상 뽑기 3회)
+      { path: '/profile/reviews', element: <MyReviewsPage />, handle: { title: '내 리뷰' } },
+      { path: '/profile/reviews/new', element: <ReviewWritePage />, handle: { title: '리뷰 쓰기' } },
+      { path: '/profile/reviews/:reviewId/edit', element: <ReviewEditPage />, handle: { title: '리뷰 수정' } },
+      { path: '/profile/reviews/:reviewId/draw', element: <ReviewDrawPage />, handle: { title: '보상 뽑기' } },
       // 예전 주소 호환
       { path: '/challenge', element: <Navigate to="/quest" replace /> },
       { path: '/quest/reward', element: <Navigate to="/quest" replace /> },
@@ -75,6 +81,10 @@ export const router = createBrowserRouter([
       { path: 'settlement', element: <Navigate to="/owner/coupons?view=settlement" replace /> },
       { path: 'videos', element: <Navigate to="/owner/create" replace /> },
       { path: 'profile', element: <OwnerProfilePage />, handle: { title: '프로필' } },
+      // 가게 프로필 > 손님 리뷰 전체
+      { path: 'reviews', element: <OwnerReviewsPage />, handle: { title: '리뷰' } },
+      // 알림 (새 리뷰) — 상단 종 아이콘
+      { path: 'notifications', element: <OwnerNotificationsPage />, handle: { title: '알림' } },
     ],
   },
 ])

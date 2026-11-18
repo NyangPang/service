@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { untilText } from '@/features/coupon/schema'
 import { ConfettiBurst } from '@/shared/ui/Confetti'
-import { pigeonImage, type LevelUp, type PigeonBreed } from '../schema'
+import { LEVEL_TABLE, pigeonImage, type LevelUp, type PigeonBreed } from '../schema'
 import { CelebrationScreen, FeedBowlIcon, FeedIcon, OutlineButton, PrimaryButton } from './QuestUi'
 import { RewardCardDraw } from './RewardCardDraw'
 
@@ -79,7 +79,7 @@ function LevelUpStep({
     >
       <div className="rounded-3xl bg-q-panel px-3 pt-4 pb-3">
         <p className="mb-2 text-xs font-medium text-q-muted">레벨업 보상 뽑기</p>
-        <RewardCardDraw levelUp={levelUp} onRevealed={() => setRevealed(true)} />
+        <RewardCardDraw key={`${levelUp.fromLevel}-${levelUp.toLevel}`} reward={levelUp.reward} odds={LEVEL_TABLE[levelUp.fromLevel]} onRevealed={() => setRevealed(true)} />
         {revealed && <RewardResult reward={reward} />}
       </div>
       {wonCoupon && <ConfettiBurst />}
@@ -88,7 +88,7 @@ function LevelUpStep({
 }
 
 /** 뽑기 결과 (카드 아래): 아이콘 + 큰 글씨 보상 + 짧은 안내 */
-function RewardResult({ reward }: { reward: LevelUp['reward'] }) {
+export function RewardResult({ reward }: { reward: LevelUp['reward'] }) {
   const coupon = reward.type === 'COUPON' ? reward.userCoupon : null
   const box = 'mt-2 flex animate-[rise-center_.3s_ease-out] items-center gap-3 rounded-2xl px-4 py-3 text-left'
 

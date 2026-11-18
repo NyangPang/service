@@ -20,6 +20,20 @@ import type {
 } from '@/features/coupon/schema'
 import { validateCoupon } from '@/features/coupon/schema'
 import { distanceMeters, GPS_BYPASS } from '@/features/quest/geo'
+import type { AppNotification, NotificationList } from '@/features/notification/schema'
+import {
+  REVIEW_DRAW_ODDS,
+  REVIEW_DRAWS,
+  REVIEW_CONTENT_MAX,
+  REVIEW_MEDIA_MAX,
+  type CreateReviewResult,
+  type MyReviewList,
+  type Review,
+  type ReviewDrawResult,
+  type ReviewInput,
+  type StoreReviewList,
+  type WritableVisit,
+} from '@/features/review/schema'
 import {
   LEVEL_TABLE,
   QUEST_TEMPLATES,
@@ -69,6 +83,10 @@ export const MOCK_ONLY = {
   pro: false,
   /** 숏폼 스크랩 (로그인해야 저장) */
   scrap: false,
+  /** 앱 안 알림 (사장님: 새 리뷰) */
+  notification: false,
+  /** 가게 리뷰 작성·수정·삭제·조회 (방문 인증한 가게만) */
+  review: false,
 } as const
 
 /** 이 기능을 목업으로 돌릴지 */
@@ -120,6 +138,33 @@ interface UserCouponRow {
   createdAt: string
 }
 
+/** mine: 목업 사용자 본인 리뷰인지 (사장님 화면 데모용으로 다른 손님 리뷰도 둠) */
+interface ReviewRow {
+  reviewId: number
+  storeId: number
+  mine: boolean
+  nickname: string
+  rating: number
+  content: string
+  photoUrls: string[]
+  /** 영상 (목업은 브라우저 임시 주소라 새로고침하면 안 보일 수 있음) */
+  videoUrl?: string | null
+  /** 이 리뷰를 쓰게 해 준 방문 인증 (다른 손님 샘플 리뷰는 null) */
+  visitId?: number | null
+  privateReview?: boolean
+  /** 사장님이 숨김 (예전 저장본엔 없을 수 있음) */
+  hidden?: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+/** 리뷰 보상 뽑기권: 방문 인증 1건당 평생 1장 */
+interface DrawTicketRow {
+  visitId: number
+  reviewId: number | null
+  remaining: number
+}
+
 interface Db {
   seq: number
   /** feedBalance: 받았지만 아직 안 먹인 먹이 (2026-10-08: 자동 먹이기 → 쌓아 두고 직접 주기로 변경) */
@@ -129,13 +174,19 @@ interface Db {
   feedLogs: { date: string; source: 'DAILY' | 'AD' | 'QUEST' | 'DRAW'; amount: number; adTransactionId?: string }[]
   history: HistoryItem[]
   quests: { questId: number; title: string; type: QuestType; targetCount: number; rewardFeed: number; basicCount: number }[]
-  visits: { questId: number; storeId: number; date: string }[]
+  /** visitId: 2026-11-17 추가 (리뷰가 방문 인증 1건에 붙음) — 예전 저장본엔 없어서 불러올 때 채움 */
+  visits: { questId: number; storeId: number; date: string; visitId?: number }[]
   /** 템플릿 퀘스트별 참여 가게 (2026-10-08 추가 — 예전 저장본엔 없을 수 있음) */
   questParticipants?: Partial<Record<QuestTemplateKey, number[]>>
   subscriptions: Record<number, { startedAt: string; expiresAt: string }>
   coupons: CouponRow[]
   userCoupons: UserCouponRow[]
   fees: { storeId: number; userCouponId: number; title: string; discountValue: number; fee: number; redeemedAt: string }[]
+  /** 2026-11-17 추가 — 예전 저장본엔 없을 수 있음 */
+  reviews?: ReviewRow[]
+  /** 사장님 알림. storeId = 받는 가게 (목업은 "내 가게" 것만 보여 줌). 2026-11-17 추가 */
+  notifications?: (AppNotification & { forStoreId: number })[]
+  reviewTickets?: DrawTicketRow[]
 }
 
 /* ── 시간 (KST 기준, 명세 0. 공통 규칙) ── */
@@ -159,6 +210,9 @@ function addDays(date: string, days: number) {
 }
 
 /* ── 저장소 ── */
+
+/** 알림 시연용: 목업 손님이 광운 카페(사장님 데모 가게)에 다녀간 기록 (퀘스트 진행도엔 안 들어감) */
+const DEMO_OWNER_VISIT = { questId: 0, storeId: 2, date: '2026-11-15', visitId: 902 }
 
 function seed(): Db {
   const today = kstDate()
@@ -184,7 +238,6 @@ function seed(): Db {
       { questId: 2, title: '게시물 5개 보기', type: 'BASIC', targetCount: 5, rewardFeed: 1, basicCount: 5 },
       { questId: 3, title: '지도에서 가게 3곳 둘러보기', type: 'BASIC', targetCount: 3, rewardFeed: 1, basicCount: 1 },
     ],
-    visits: [{ questId: 1, storeId: 5, date: ago(1) }],
     // 1 월계 분식, 3 김가네, 5 헤어살롱 (모두 퀘스트 가게). 2 광운 카페(사장님 데모)는 아직 미참여
     questParticipants: { restaurant: [1, 3], korean: [3], snack: [1], beauty: [5] },
     subscriptions: {
@@ -213,7 +266,35 @@ function seed(): Db {
       fee: COUPON_FEE,
       redeemedAt: `${ago(d)}T1${i}:20:00+09:00`,
     })),
+    reviews: seedReviews(ago),
+    // questId 0 = 퀘스트와 무관한 방문 기록: 손님이 사장님 데모 가게(광운 카페)에 리뷰를 써서 알림을 받아 볼 수 있게
+    visits: [{ questId: 1, storeId: 5, date: ago(1), visitId: 901 }, { ...DEMO_OWNER_VISIT, date: ago(2) }],
+    notifications: [
+      {
+        notificationId: 41, forStoreId: 2, type: 'REVIEW_CREATED', title: '새 리뷰가 등록됐어요',
+        message: '월계동주민님 ★5 · 아메리카노가 고소하고 사장님이 친절해요. 창가 자리가 좋아서 공부하…',
+        storeId: 2, reviewId: 31, read: false, createdAt: `${ago(1)}T14:10:00+09:00`,
+      },
+      {
+        notificationId: 42, forStoreId: 2, type: 'REVIEW_CREATED', title: '새 리뷰가 등록됐어요',
+        message: '광운대새내기님 ★4 · 케이크가 맛있어요. 시험 기간엔 자리가 금방 차요.',
+        storeId: 2, reviewId: 32, read: true, createdAt: `${ago(4)}T14:10:00+09:00`,
+      },
+    ],
   }
+}
+
+/** 다른 손님 리뷰 — 2 광운 카페(사장님 데모)·1 월계 분식. 내 리뷰는 없음 (헤어살롱 잇다 방문 기록이 있어 바로 써 볼 수 있음) */
+function seedReviews(ago: (d: number) => string): ReviewRow[] {
+  const row = (reviewId: number, storeId: number, nickname: string, rating: number, content: string, d: number): ReviewRow => {
+    const at = `${ago(d)}T14:10:00+09:00`
+    return { reviewId, storeId, mine: false, nickname, rating, content, photoUrls: [], createdAt: at, updatedAt: at }
+  }
+  return [
+    row(31, 2, '월계동주민', 5, '아메리카노가 고소하고 사장님이 친절해요. 창가 자리가 좋아서 공부하기 딱이에요!', 1),
+    row(32, 2, '광운대새내기', 4, '케이크가 맛있어요. 시험 기간엔 자리가 금방 차요.', 4),
+    row(33, 1, '떡볶이러버', 5, '옛날 떡볶이 맛 그대로예요. 튀김도 바삭해요.', 2),
+  ]
 }
 
 function coupon(
@@ -259,6 +340,15 @@ function db(): Db {
     cache = saved ? (JSON.parse(saved) as Db) : seed()
     // 예전에 저장된 목업에는 퀘스트 참여 정보가 없음 → 기본값으로 채움
     cache.questParticipants ??= seed().questParticipants
+    cache.reviews ??= seed().reviews
+    if (!cache.notifications) {
+      cache.notifications = seed().notifications
+      // 알림 시연용 방문 기록 (아래 seed 참고) — 예전 저장본에도 한 번 넣어 줌
+      cache.visits.push(DEMO_OWNER_VISIT)
+    }
+    // 예전 저장본의 방문 기록에 id 붙이기
+    let visitSeq = 800
+    cache.visits.forEach((v) => (v.visitId ??= visitSeq++))
   } catch {
     cache = seed()
   }
@@ -551,12 +641,13 @@ export const mockQuestApi = {
         fail(409, 'QUEST409_3', '이 퀘스트에서 이미 인정된 가게예요')
       }
 
-      d.visits.push({ questId, storeId: body.storeId, date: today })
+      const visitId = nextId()
+      d.visits.push({ questId, storeId: body.storeId, date: today, visitId })
       const after = questView(q)
       const completed = after.status === 'COMPLETED'
       const granted = grantFeed(1 + (completed ? q.rewardFeed : 0), 'QUEST')
       return {
-        visitId: nextId(),
+        visitId,
         feedGained: 1,
         quest: {
           questId,
@@ -871,5 +962,223 @@ export const mockCouponApi = {
         totalFee: items.reduce((sum, f) => sum + f.fee, 0),
         items,
       }
+    }),
+}
+
+/* ── 리뷰 (QR 방문 인증으로 여러 개 쓸 수 있음. 뽑기 3회는 인증당 첫 리뷰에만) ── */
+
+function reviews() {
+  return (db().reviews ??= [])
+}
+
+function tickets() {
+  return (db().reviewTickets ??= [])
+}
+
+const isPublicRow = (r: ReviewRow) => !r.hidden && !r.privateReview
+
+function reviewView(r: ReviewRow, me?: { memberId: number; profileImageUrl: string | null }, drawsLeft: number | null = null): Review {
+  const store = MOCK_STORES.find((s) => s.storeId === r.storeId)
+  return {
+    reviewId: r.reviewId,
+    visitId: r.visitId ?? null,
+    storeId: r.storeId,
+    storeName: storeName(r.storeId),
+    storeThumbnailUrl: store?.thumbnailUrl ?? null,
+    memberId: r.mine && me ? me.memberId : 9000 + r.reviewId,
+    nickname: r.nickname,
+    profileImageUrl: r.mine && me ? me.profileImageUrl : null,
+    rating: r.rating,
+    content: r.content,
+    photoUrls: r.photoUrls,
+    videoUrl: r.videoUrl ?? null,
+    privateReview: !!r.privateReview,
+    hidden: !!r.hidden,
+    drawsLeft,
+    createdAt: r.createdAt,
+    updatedAt: r.updatedAt,
+  }
+}
+
+const drawsLeftOf = (reviewId: number) => tickets().find((t) => t.reviewId === reviewId)?.remaining ?? 0
+
+function validateReview(body: ReviewInput, mediaCount: number, videoCount: number) {
+  if (!Number.isInteger(body.rating) || body.rating < 1 || body.rating > 5 || !body.content.trim() || body.content.length > REVIEW_CONTENT_MAX) {
+    fail(400, 'COMMON400', '입력값이 올바르지 않아요')
+  }
+  if (mediaCount > REVIEW_MEDIA_MAX || videoCount > 1) fail(400, 'REVIEW400', '사진·영상은 합쳐서 3개, 영상은 1개까지 올릴 수 있어요')
+}
+
+function myReview(reviewId: number) {
+  const row = reviews().find((r) => r.reviewId === reviewId)
+  if (!row) fail(404, 'REVIEW404', '리뷰를 찾을 수 없어요')
+  if (!row.mine) fail(403, 'REVIEW403_2', '내가 쓴 리뷰가 아니에요')
+  return row
+}
+
+/** me: 로그인한 회원 (닉네임·사진을 리뷰에 표시). 사진은 data URL, 영상은 브라우저 임시 주소로 저장 */
+type ReviewAuthor = { memberId: number; nickname: string; profileImageUrl: string | null }
+export type MockMedia = { photoUrls: string[]; videoUrl: string | null }
+
+export const mockReviewApi = {
+  /** asOwner: 사장님 화면에서 부름 — 목업 "내 가게"면 숨긴·비공개 리뷰도 함께 */
+  storeList: (storeId: number, asOwner: boolean, me?: ReviewAuthor) =>
+    respond<StoreReviewList>(() => {
+      const owner = asOwner && storeId === mockOwnerStoreId()
+      const all = reviews().filter((r) => r.storeId === storeId).sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+      const visible = all.filter(isPublicRow)
+      const avg = visible.length ? visible.reduce((sum, r) => sum + r.rating, 0) / visible.length : 0
+      return {
+        count: visible.length,
+        averageRating: Math.round(avg * 10) / 10,
+        hiddenCount: owner ? all.filter((r) => r.hidden).length : 0,
+        privateCount: owner ? all.filter((r) => r.privateReview).length : 0,
+        reviews: (owner ? all : visible).map((r) => reviewView(r, me)),
+      }
+    }),
+
+  /** 사장님: 우리 가게 리뷰 숨기기·다시 보이기 */
+  setHidden: (storeId: number, reviewId: number, hidden: boolean, me?: ReviewAuthor) =>
+    respond<Review>(() => {
+      if (storeId !== mockOwnerStoreId()) fail(403, 'STORE403_2', '내 가게가 아니에요')
+      const row = reviews().find((r) => r.reviewId === reviewId && r.storeId === storeId)
+      if (!row) fail(404, 'REVIEW404', '리뷰를 찾을 수 없어요')
+      row.hidden = hidden
+      return reviewView(row, me)
+    }),
+
+  mine: (me: ReviewAuthor) =>
+    respond<MyReviewList>(() => {
+      const rows = reviews().filter((r) => r.mine).sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+      return { count: rows.length, reviews: rows.map((r) => reviewView(r, me, drawsLeftOf(r.reviewId))) }
+    }),
+
+  /** 내 방문 인증 전부 (최근 순) + 보상 여부 · 그 인증으로 쓴 리뷰 수 */
+  writableVisits: () =>
+    respond<WritableVisit[]>(() => {
+      const mine = reviews().filter((r) => r.mine)
+      const rewarded = new Set(tickets().map((t) => t.visitId))
+      return [...db().visits]
+        .filter((v) => v.visitId != null)
+        .sort((a, b) => b.date.localeCompare(a.date) || (b.visitId ?? 0) - (a.visitId ?? 0))
+        .map((v) => ({
+          visitId: v.visitId!,
+          storeId: v.storeId,
+          storeName: storeName(v.storeId),
+          storeThumbnailUrl: MOCK_STORES.find((s) => s.storeId === v.storeId)?.thumbnailUrl ?? null,
+          visitedAt: `${v.date}T12:00:00+09:00`,
+          rewardAvailable: !rewarded.has(v.visitId!),
+          reviewCount: mine.filter((r) => r.visitId === v.visitId).length,
+        }))
+    }),
+
+  create: (visitId: number, body: ReviewInput, media: MockMedia, me: ReviewAuthor) =>
+    respond<CreateReviewResult>(() => {
+      const visit = db().visits.find((v) => v.visitId === visitId)
+      if (!visit) fail(404, 'REVIEW404_2', '방문 인증 기록을 찾을 수 없어요')
+      const videoCount = media.videoUrl ? 1 : 0
+      validateReview(body, media.photoUrls.length + videoCount, videoCount)
+      const at = kstIso()
+      const row: ReviewRow = {
+        reviewId: nextId(), storeId: visit.storeId, visitId, mine: true, nickname: me.nickname,
+        rating: body.rating, content: body.content.trim(), privateReview: body.privateReview,
+        photoUrls: media.photoUrls, videoUrl: media.videoUrl, createdAt: at, updatedAt: at,
+      }
+      reviews().push(row)
+      // 이 인증으로 처음 쓰는 리뷰일 때만 뽑기 3회 (두 번째 리뷰부터, 또는 보상 받은 리뷰를 지운 뒤엔 없음)
+      let drawsGranted = 0
+      if (!tickets().some((t) => t.visitId === visitId)) {
+        tickets().push({ visitId, reviewId: row.reviewId, remaining: REVIEW_DRAWS })
+        drawsGranted = REVIEW_DRAWS
+      }
+      // 리뷰가 등록되면 그 가게 사장님에게 알림 (목업 사장님 = "내 가게")
+      ;(db().notifications ??= []).unshift({
+        notificationId: nextId(), forStoreId: visit.storeId, type: 'REVIEW_CREATED', title: '새 리뷰가 등록됐어요',
+        message: `${me.nickname}님 ★${row.rating} · ${preview(row.content)}`,
+        storeId: visit.storeId, reviewId: row.reviewId, read: false, createdAt: at,
+      })
+      return { review: reviewView(row, me, drawsGranted), drawsGranted }
+    }),
+
+  /** keep: 남길 기존 사진·영상 / added: 새 사진·영상 */
+  update: (reviewId: number, body: ReviewInput, keep: MockMedia, added: MockMedia, me: ReviewAuthor) =>
+    respond<Review>(() => {
+      const row = myReview(reviewId)
+      const keepPhotos = keep.photoUrls.filter((url) => row.photoUrls.includes(url))
+      const videoUrl = added.videoUrl ?? (keep.videoUrl && keep.videoUrl === row.videoUrl ? keep.videoUrl : null)
+      const photoUrls = [...keepPhotos, ...added.photoUrls]
+      validateReview(body, photoUrls.length + (videoUrl ? 1 : 0), (videoUrl ? 1 : 0) + (added.videoUrl && keep.videoUrl ? 1 : 0))
+      Object.assign(row, {
+        rating: body.rating,
+        content: body.content.trim(),
+        privateReview: body.privateReview,
+        photoUrls,
+        videoUrl,
+        nickname: me.nickname,
+        updatedAt: kstIso(),
+      })
+      return reviewView(row, me, drawsLeftOf(row.reviewId))
+    }),
+
+  /** 남은 뽑기는 사라짐 (이미 받은 보상은 그대로) */
+  remove: (reviewId: number) =>
+    respond<{ revokedDraws: number }>(() => {
+      const row = myReview(reviewId)
+      const ticket = tickets().find((t) => t.reviewId === reviewId)
+      const revokedDraws = ticket?.remaining ?? 0
+      if (ticket) Object.assign(ticket, { remaining: 0, reviewId: null })
+      db().reviews = reviews().filter((r) => r !== row)
+      return { revokedDraws }
+    }),
+
+  /** 뽑기 1회: 쿠폰 3% · 먹이 1개 70% · 먹이 2개 27% (쿠폰 풀이 비면 먹이 2개) */
+  draw: (reviewId: number) =>
+    respond<ReviewDrawResult>(() => {
+      myReview(reviewId)
+      const ticket = tickets().find((t) => t.reviewId === reviewId && t.remaining > 0)
+      if (!ticket) fail(409, 'REVIEW409_2', '남은 뽑기가 없어요')
+      ticket.remaining -= 1
+      const reward = draw({ requiredFeed: 0, ...REVIEW_DRAW_ODDS }, 0)
+      const d = db()
+      if (reward.type === 'FEED') d.pigeon.feedBalance = (d.pigeon.feedBalance ?? 0) + reward.feedAmount
+      return { reward, drawsLeft: ticket.remaining, feedBalance: d.pigeon.feedBalance ?? 0 }
+    }),
+}
+
+/* ── 알림 ── */
+
+function preview(content: string) {
+  const line = content.replace(/\s+/g, ' ').trim()
+  return line.length <= 40 ? line : `${line.slice(0, 40)}…`
+}
+
+function myNotifications() {
+  return (db().notifications ??= []).filter((n) => n.forStoreId === mockOwnerStoreId())
+}
+
+export const mockNotificationApi = {
+  list: () =>
+    respond<NotificationList>(() => {
+      const rows = myNotifications().sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 50)
+      return {
+        unreadCount: myNotifications().filter((n) => !n.read).length,
+        notifications: rows.map(({ forStoreId: _s, ...n }) => n),
+      }
+    }),
+
+  unreadCount: () => respond(() => ({ unreadCount: myNotifications().filter((n) => !n.read).length })),
+
+  read: (notificationId: number) =>
+    respond<null>(() => {
+      const n = myNotifications().find((x) => x.notificationId === notificationId)
+      if (!n) fail(404, 'NOTIFICATION404', '알림을 찾을 수 없어요')
+      n.read = true
+      return null
+    }),
+
+  readAll: () =>
+    respond<null>(() => {
+      myNotifications().forEach((n) => (n.read = true))
+      return null
     }),
 }

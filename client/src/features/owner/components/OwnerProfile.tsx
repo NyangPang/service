@@ -17,8 +17,9 @@ import { useAuthStore, useMe } from '@/stores/authStore'
 import { toast } from '@/stores/toastStore'
 import { storeEditOf, updateMyStore } from '../api'
 import { useMyStore, useMyStoreId } from '../hooks'
+import { StoreReviewSection } from '@/features/review/components/StoreReviews'
 
-/** 사장님 프로필 (Figma 11:1746·11:1889) — 가게 정보(사진·가게명·주소) 편집 + 내 영상 */
+/** 사장님 프로필 (Figma 11:1746·11:1889) — 가게 정보(사진·가게명·주소) 편집 + 내 영상 + 손님 리뷰 */
 export function OwnerProfile() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -135,6 +136,8 @@ export function OwnerProfile() {
           </ul>
         )}
       </section>
+
+      <StoreReviewSection storeId={storeId} />
 
       {confirmWithdraw && (
         <Dialog
