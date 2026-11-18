@@ -23,9 +23,9 @@ main 에 client/ 변경 ─────▶ Deploy client         빌드 → S3 �
 ### EC2
 
 1. Docker 설치 (Ubuntu 기준): `sudo apt-get update && sudo apt-get install -y docker.io curl && sudo usermod -aG docker ubuntu` → 다시 접속
-2. 운영 환경변수 파일 `/home/ubuntu/itda/.env` 작성 (`server/.env.example` 참고, 값에 따옴표 없이 `KEY=value`)
-   - `SPRING_PROFILES_ACTIVE=prod`, `DB_URL`·`DB_USERNAME`·`DB_PASSWORD`, `JWT_SECRET`, `AWS_*`, `AWS_S3_BUCKET`, `AWS_CLOUDFRONT_DOMAIN`(업로드 파일용), `BEDROCK_MODEL_ID`, `UNSPLASH_ACCESS_KEY`, `CORS_ALLOWED_ORIGINS`(프론트 주소), `MAIL_*`
-   - EC2 에 IAM Role 을 붙였다면 `AWS_ACCESS_KEY_ID`·`AWS_SECRET_ACCESS_KEY` 는 빼도 됨
+2. 운영 환경변수 파일 `/home/ubuntu/itda/.env` 작성 (아래 [서버 환경변수](#서버-환경변수) 참고, 값에 따옴표 없이 `KEY=value`)
+   - 서버는 `AWS_ACCESS_KEY_ID`·`AWS_SECRET_ACCESS_KEY` 로 직접 접속하므로 EC2 에 IAM Role 이 있어도 키를 넣어야 함
+   - `[필수]`·`[운영 필수]` 항목이 하나라도 비면 서버가 뜨지 않거나(DB·키) 로그인·가입이 막힘(CORS·메일)
 3. 보안 그룹: 8080 은 **CloudFront 에서만** 열기 (관리형 프리픽스 목록 `com.amazonaws.global.cloudfront.origin-facing`), 22 는 GitHub Actions 가 접속할 수 있어야 함
 4. 이미 손으로 띄운 서버 컨테이너가 있으면 이름을 `itda-server` 로 맞추거나, 아래 `SERVER_CONTAINER` 변수로 그 이름을 알려 준다 (배포 때 같은 이름의 컨테이너를 지우고 새로 띄움)
 
@@ -96,3 +96,84 @@ docker run -d --name itda-server --restart unless-stopped -p 8080:8080 \
 (GHCR 이 비공개면 먼저 `docker login ghcr.io` — GitHub 개인 토큰 `read:packages`)
 
 프론트: 문제가 된 커밋을 `git revert` 해서 main 에 올리면 이전 화면으로 다시 배포된다.
+
+---
+
+## 서버 환경변수
+
+- 로컬: `server/.env` 에 작성 (`./gradlew bootRun` 시 자동으로 읽음. IntelliJ 로 실행하면 Working directory 를 `server` 로)
+- 운영(EC2): `/home/ubuntu/itda/.env` 에 두고 `docker run --env-file` 로 넘김
+- 값에 따옴표를 붙이지 말 것 — Docker 는 따옴표까지 값으로 넣는다
+- 빈 값(`KEY=`)은 "빈 문자열"로 들어가 기본값을 덮는다. 안 쓸 항목은 줄을 지우거나 `#` 로 막아 둘 것
+
+```bash
+# ============================================================
+# [필수] 비어 있으면 서버가 시작되지 않음 (로컬·운영 공통)
+# ============================================================
+
+# local: H2 메모리 DB·샘플 데이터 / prod: MySQL(RDS)·ddl validate. Docker 이미지는 prod 가 기본이라 운영에선 생략 가능
+SPRING_PROFILES_ACTIVE=local
+
+# JWT 서명 키 (32바이트 이상 랜덤 문자열. 예: openssl rand -base64 48)
+JWT_SECRET=
+
+# AWS — 서버가 이 키로 직접 접속함 (EC2 IAM Role 은 쓰지 않으므로 운영에서도 필요)
+# 필요한 권한: 업로드 버킷 S3 PutObject, Bedrock InvokeModel(대화 모델 + amazon.nova-canvas-v1:0)
+AWS_REGION=ap-northeast-2
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+
+# 업로드 파일(가게·게시물·리뷰 사진) 버킷과 그 CloudFront 도메인
+# ⚠ 프론트 배포용 버킷과 다른 버킷. 도메인은 https:// 없이 (예: d1234abcd.cloudfront.net)
+AWS_S3_BUCKET=
+AWS_CLOUDFRONT_DOMAIN=
+
+# Bedrock 대화 모델 ID 또는 inference profile ID (게시물 소개 글·메뉴판 인식)
+BEDROCK_MODEL_ID=
+
+# Unsplash API 키 (developers.unsplash.com > Your apps > Access Key)
+UNSPLASH_ACCESS_KEY=
+
+# ============================================================
+# [운영 필수] prod 프로필에서 꼭 채울 것 (로컬 H2 는 안 씀)
+# ============================================================
+
+# RDS MySQL. 마지막 itda 는 데이터베이스 이름
+# 운영은 ddl-auto: validate 라 server/docs/sql/ 의 SQL 로 테이블을 먼저 만들어야 함
+DB_URL=jdbc:mysql://<rds-endpoint>:3306/itda
+DB_USERNAME=
+DB_PASSWORD=
+
+# 프론트 주소 (쉼표로 여러 개). 운영은 프론트 CloudFront 주소 — 없으면 로그인·글쓰기가 403
+# 예) CORS_ALLOWED_ORIGINS=https://d5678efgh.cloudfront.net
+CORS_ALLOWED_ORIGINS=http://localhost:5173
+
+# 회원가입 인증 메일 (SMTP). 운영에서 비우면 인증번호를 받을 방법이 없어 가입 불가
+# 로컬은 비워도 됨 (인증번호가 응답 devCode 로 옴)
+# Gmail: MAIL_HOST=smtp.gmail.com, MAIL_PORT=587, MAIL_PASSWORD=앱 비밀번호 16자리 (Google 계정 > 보안 > 앱 비밀번호)
+# MAIL_HOST=
+# MAIL_PORT=587
+# MAIL_USERNAME=
+# MAIL_PASSWORD=
+# 보내는 사람 주소 (없으면 MAIL_USERNAME)
+# MAIL_FROM=
+
+# ============================================================
+# [선택] 비워 두면 기본값 — 바꿀 때만 # 를 지우고 채움
+# ============================================================
+
+# 로그인 유지 시간 (ms, 기본 24시간)
+# JWT_ACCESS_EXPIRATION_MS=86400000
+
+# 가게 방문 QR 값을 만드는 비밀값 (기본: JWT_SECRET)
+# QUEST_QR_SECRET=
+
+# 방문 인증 GPS 반경 검사 건너뛰기 (기본: 로컬 true, 운영 false — 운영에선 켜지 말 것)
+# QUEST_GPS_BYPASS=false
+
+# Swagger 문서 공개 (기본 true, 운영에서 숨기려면 false)
+# SWAGGER_ENABLED=true
+
+# 지금은 쓰지 않는 영상 생성 기능용 (넣지 않아도 됨):
+# RUNWAYML_API_SECRET, AWS_POLLY_VOICE_ID, FFMPEG_PATH, VIDEO_WORK_DIR
+```
