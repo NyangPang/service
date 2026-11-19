@@ -778,6 +778,7 @@ Response 예시 (200)
 > 1. `POST /api/stores/{storeId}/photos` (multipart `photos` 여러 개, **사장님 본인 가게만** — 아니면 `STORE403_2`) → S3 주소 목록
 > 2. `POST /api/generation`에 `photoUrls`(최대 4개, 넘으면 `COMMON400`)로 보냄. 이 가게 사진 폴더(`stores/{storeId}/`)에 올라간 주소만 저장하고 나머지는 버림
 > 3. DB: [`docs/sql/2026-10-09-shortform-photo.sql`](sql/2026-10-09-shortform-photo.sql) (`shortform_photo` 테이블)
+> **영상 게시물**: 피드·상세 응답에 `videoUrl`(String | null)이 붙습니다. 값이 있으면 앱은 피드에서 사진 대신 영상을 재생하고(음소거 자동 재생, 화면에 보이는 게시물만), `imageUrl`은 영상의 포스터·썸네일로 씁니다. 지금은 AI 생성이 영상을 만들지 않아 샘플 데이터 등 DB에 직접 넣은 게시물만 해당합니다. DB: [`docs/sql/2026-11-19-shortform-video.sql`](sql/2026-11-19-shortform-video.sql)
 
 #### 게시물 관리 (사장님)
 

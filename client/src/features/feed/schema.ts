@@ -6,6 +6,8 @@ export interface Shortform {
   shortformId: number
   storeId: number
   storeName: string
+  /** 가게 프로필 사진 (가게 thumbnailUrl, 없으면 null → 업종 그림) */
+  storeThumbnailUrl?: string | null
   category: string
   categoryName: string
   address: string
@@ -13,7 +15,7 @@ export interface Shortform {
   menus: string[]
   /** 한 줄 소개 */
   description: string
-  /** 목업 샘플 영상 (서버 게시물은 사진만 있음) */
+  /** 홍보 영상 (서버 videoUrl, 영상 게시물만). 있으면 피드에서 사진 대신 재생하고 posterUrl 은 썸네일 */
   videoUrl?: string
   /** 게시물 사진 (서버 imageUrl) — 첫 장 */
   posterUrl: string | null

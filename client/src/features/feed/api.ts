@@ -28,6 +28,8 @@ interface ServerShortform {
   imageUrl: string | null
   /** 옆으로 넘겨 볼 사진 전체 */
   imageUrls?: string[]
+  /** 홍보 영상 (영상 게시물만). 있으면 imageUrl 은 포스터 */
+  videoUrl?: string | null
   title: string
   /** 게시물 소개 글 (사장님 어필을 AI가 다듬은 문장, 없으면 null) */
   caption?: string | null
@@ -47,11 +49,13 @@ function toShortform(s: ServerShortform, stores: StoreSummary[]): Shortform {
     shortformId: s.shortformId,
     storeId: s.storeId,
     storeName: store?.name ?? s.storeName,
+    storeThumbnailUrl: store?.thumbnailUrl ?? null,
     category: store?.category ?? '',
     categoryName: store?.categoryName ?? '',
     address: store?.address ?? '',
     menus: [],
     description: s.caption || s.title,
+    videoUrl: s.videoUrl ?? undefined,
     posterUrl: s.imageUrl,
     images: s.imageUrls,
     createdAt: s.createdAt,

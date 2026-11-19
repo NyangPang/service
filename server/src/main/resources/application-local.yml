@@ -17,6 +17,10 @@ spring:
 email-verification:
   expose-code: true
 
+# 로컬: 샘플 가게 125곳 + 영상 게시물을 기본으로 넣음
+sample-data:
+  enabled: ${SAMPLE_DATA_ENABLED:true}
+
 # 로컬: 집에서도 방문 인증을 해 볼 수 있게 GPS 반경 검사를 건너뜀
 quest:
   gps-bypass: ${QUEST_GPS_BYPASS:true}
