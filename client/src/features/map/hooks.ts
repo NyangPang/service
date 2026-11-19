@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
 import { errorCode } from '@/shared/lib/error'
 import { fetchStoreDetail, fetchStores } from './api'
+import { neighborhoodOf } from './kakao'
 import { MAP_CATEGORIES, type LatLng, type MapCategoryKey, type StoreSummary } from './schema'
 
 export function useStores(questOnly = false) {
@@ -69,6 +70,22 @@ export function useMyLocation(): LocationState {
   }, [])
 
   return state
+}
+
+/**
+ * 내 위치의 동네(구·행정동). 위치를 못 받았거나 카카오 키가 없으면 data 가 null.
+ * 위치가 조금씩 흔들려도 다시 부르지 않게 좌표를 약 100m 단위로 반올림해 캐시함
+ */
+export function useMyNeighborhood() {
+  const location = useMyLocation()
+  const position = location.status === 'ok' ? location.position : null
+  const key = position ? [position.lat.toFixed(3), position.lng.toFixed(3)] : null
+  return useQuery({
+    queryKey: ['neighborhood', key],
+    queryFn: () => neighborhoodOf(position!),
+    enabled: position != null,
+    staleTime: Infinity,
+  })
 }
 
 export interface StoreGroup {

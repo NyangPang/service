@@ -13,7 +13,7 @@ import { StoreMarker } from './StoreMarker'
 /** 지도 기본 배율 (카카오 level, 작을수록 확대) */
 const DEFAULT_LEVEL = 3
 
-/** 잇다 맵 화면 */
+/** 잇츠 맵 화면 */
 export function StoreMapView() {
   return (
     // 시트를 내렸을 때 아래 탭 바를 덮지 않도록 지도 영역 밖은 잘라냄

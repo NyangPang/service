@@ -159,7 +159,7 @@ export function SettingsDrawer({ buttonClassName, items }: { buttonClassName: st
               className="absolute inset-y-0 left-0 flex w-[84%] max-w-[340px] animate-[slide-in_.22s_ease-out] flex-col overflow-y-auto bg-white pt-[max(20px,env(safe-area-inset-top))] pb-6 shadow-2xl"
             >
               <header className="flex items-center justify-between px-5">
-                <img src={logo} alt="잇다" className="h-9 w-fit" />
+                <img src={logo} alt="잇츠" className="h-9 w-fit" />
                 <button type="button" aria-label="닫기" onClick={() => setOpen(false)} className="flex size-9 items-center justify-center text-q-muted">
                   <CloseIcon />
                 </button>

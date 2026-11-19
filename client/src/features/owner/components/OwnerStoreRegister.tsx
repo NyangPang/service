@@ -54,7 +54,7 @@ export function OwnerStoreRegister() {
         next={{ label: submitting ? '등록 중...' : '가게 등록하기', onClick: submit, disabled: !ready || submitting }}
       >
         <Field label="가게명">
-          <FieldInput value={name} onChange={(e) => setName(e.target.value)} placeholder="ex. 잇다가게 월계점" maxLength={NICKNAME_MAX} />
+          <FieldInput value={name} onChange={(e) => setName(e.target.value)} placeholder="ex. 잇츠가게 성수점" maxLength={NICKNAME_MAX} />
         </Field>
 
         <Field label="프로필 사진 (선택)" action={<FieldButton onClick={() => fileRef.current?.click()}>찾기</FieldButton>}>

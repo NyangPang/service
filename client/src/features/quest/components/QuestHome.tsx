@@ -3,6 +3,7 @@ import pigeonWalk from '@/assets/map/pigeon-walk.png'
 import pigeonGps from '@/assets/quest/pigeon-gps.png'
 import { OWNER_ILLUST } from '@/features/owner/illustrations'
 import { useMyCoupons } from '@/features/coupon/hooks'
+import { useMyNeighborhood } from '@/features/map/hooks'
 import { usePigeonAccess, useQuests } from '../hooks'
 import { questTemplate, type Quest } from '../schema'
 import { PigeonCard } from './PigeonCard'
@@ -12,6 +13,7 @@ import { FeedIcon, ProgressBar, SectionTitle } from './QuestUi'
 export function QuestHome() {
   const { data: quests, isLoading, isError } = useQuests()
   const { data: coupons } = useMyCoupons('AVAILABLE')
+  const { data: neighborhood } = useMyNeighborhood()
 
   const ongoing = quests?.filter((q) => q.status === 'IN_PROGRESS') ?? []
   const done = quests?.filter((q) => q.status === 'COMPLETED') ?? []
@@ -20,7 +22,7 @@ export function QuestHome() {
     <div className="h-full overflow-y-auto px-5 pb-8">
       {/* 떠 있는 ≡ · + 버튼(높이 76px) 사이 가운데 */}
       <p className="flex h-[76px] items-center justify-center gap-1.5 text-[17px] font-bold text-q-green">
-        월계동 <span aria-hidden className="size-2.5 rounded-full bg-q-green" />
+        {neighborhood?.dong ?? '우리 동네'} <span aria-hidden className="size-2.5 rounded-full bg-q-green" />
       </p>
 
       <PigeonCard />

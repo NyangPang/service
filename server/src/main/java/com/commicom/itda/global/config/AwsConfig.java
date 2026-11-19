@@ -17,10 +17,10 @@ public class AwsConfig {
     @Value("${aws.region}")
     private String region;
 
-    @Value("${AWS_ACCESS_KEY_ID}")
+    @Value("${AWS_ACCESS_KEY_ID:local-dummy}") // 키가 없으면(로컬) 가짜 값 — AWS 호출만 실패
     private String accessKeyId;
 
-    @Value("${AWS_SECRET_ACCESS_KEY}")
+    @Value("${AWS_SECRET_ACCESS_KEY:local-dummy}")
     private String secretAccessKey;
 
     private StaticCredentialsProvider credentialsProvider() {

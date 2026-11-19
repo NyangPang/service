@@ -14,7 +14,7 @@ import { OwnerCard, OwnerScreen } from './OwnerUi'
 
 const BENEFITS = [
   { icon: '📍', title: '손님이 직접 찾아와요', text: '동네 퀘스트 "가게 방문하기"의 대상 가게가 돼요' },
-  { icon: '🚩', title: '지도에서 눈에 띄어요', text: '잇다 맵에 퀘스트 가게로 표시되고 필터로도 찾을 수 있어요' },
+  { icon: '🚩', title: '지도에서 눈에 띄어요', text: '잇츠 맵에 퀘스트 가게로 표시되고 필터로도 찾을 수 있어요' },
   { icon: '🕊', title: '단골이 생겨요', text: '방문할 때마다 손님 비둘기가 자라서 다시 올 이유가 생겨요' },
 ]
 
@@ -219,7 +219,7 @@ export function QuestStoreScreen() {
 
       {bigQr && qr.data && (
         <div role="dialog" aria-modal aria-label="방문 인증 QR" className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white px-8">
-          <p className="text-sm font-bold text-q-green">잇다 퀘스트 방문 인증</p>
+          <p className="text-sm font-bold text-q-green">잇츠 퀘스트 방문 인증</p>
           <p className="mt-1 text-[26px] font-bold text-q-text">{storeName}</p>
           <div className="mt-6 rounded-3xl border-4 border-q-green p-5">
             <QRCodeSVG value={visitQrUrl(storeId, qr.data.qrToken)} size={260} fgColor="#1e6b45" level="M" />
@@ -239,7 +239,7 @@ function QrBox({ url, code, storeName, size }: { url: string; code: string; stor
   return (
     // print:* — 인쇄할 때는 이 카드만 크게
     <div className="qr-print mx-auto w-fit rounded-2xl border-2 border-dashed border-q-green px-5 pt-4 pb-3 text-center">
-      <p className="hidden text-lg font-bold print:block">{storeName} · 잇다 퀘스트 방문 인증</p>
+      <p className="hidden text-lg font-bold print:block">{storeName} · 잇츠 퀘스트 방문 인증</p>
       <QRCodeSVG value={url} size={size} fgColor="#1e6b45" level="M" className="mx-auto" />
       <p className="mt-2 text-[11px] text-q-muted">QR이 안 찍히면 아래 코드를 입력</p>
       <p className="font-mono text-xl font-bold tracking-[0.2em] text-q-text">{code}</p>

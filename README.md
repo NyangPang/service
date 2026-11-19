@@ -88,6 +88,10 @@
 - 고령층과 이동약자를 포함한 모든 세대의 정보 접근성 향상
 - (확장) 네이버페이 등 간편결제 제휴를 통한 방문 쿠폰 지급
 
+## 로컬 실행
+
+서버·화면을 내 컴퓨터에서 띄우는 방법은 [SETUP.md](SETUP.md)를, 신규 기능을 어디에 만들지는 [docs/new-features.md](docs/new-features.md)를, 외부 API·키·오픈소스는 [docs/public-apis.md](docs/public-apis.md)를 참고하세요.
+
 ## 팀원 소개
 > **14팀 냥팡맨**
 >- 한양대학교 컴퓨터소프트웨어학부 [성현주](https://github.com/LEELMIO), [이채원](https://github.com/CW-YI), [임지오](https://github.com/imzioim)

@@ -44,7 +44,7 @@ export function OwnerRedeem() {
             <br />
             주문 금액은 계산대에서 직접 확인해 주세요
           </p>
-          <p className="mt-3 text-xs text-q-muted">잇다 수수료 {done.fee.toLocaleString()}원이 정산에 기록돼요</p>
+          <p className="mt-3 text-xs text-q-muted">잇츠 수수료 {done.fee.toLocaleString()}원이 정산에 기록돼요</p>
         </section>
         <PrimaryButton className="mt-4" onClick={() => setDone(null)}>
           다음 쿠폰 처리하기

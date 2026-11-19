@@ -71,7 +71,7 @@ export function StoreProfile({ storeId }: { storeId: number }) {
           <Action
             label="공유"
             onClick={() =>
-              shareLink({ title: `${store.name} | 잇다`, text: `우리 동네 ${store.name}을(를) 소개해요`, path: `/map/stores/${storeId}` })
+              shareLink({ title: `${store.name} | 잇츠`, text: `우리 동네 ${store.name}을(를) 소개해요`, path: `/map/stores/${storeId}` })
             }
           >
             <ShareIcon />
