@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import logo from '@/assets/logo-itda.svg'
+import logo from '@/assets/its-logo.svg'
 import pigeonWalk from '@/assets/map/pigeon-walk.png'
 import { LoginForm } from '@/features/auth/components/LoginForm'
 import { useLogout } from '@/features/auth/hooks'

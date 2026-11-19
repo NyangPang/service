@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import pigeonWalk from '@/assets/map/pigeon-walk.png'
 import pigeonGps from '@/assets/quest/pigeon-gps.png'
-import logo from '@/assets/logo-itda.svg'
+import logo from '@/assets/its-logo.svg'
 import { MODE_HOME, useModeStore, type AppMode } from '@/stores/modeStore'
 
 const OPTIONS: { mode: AppMode; title: string; desc: string; points: string[]; image: string }[] = [
