@@ -37,11 +37,7 @@ DB는 메모리(H2)라 서버를 끄면 데이터가 초기화되고, 켤 때 �
 | --- | --- |
 | 회원가입·로그인, 가게·지도, 퀘스트, 쿠폰, 스크랩 | AI 게시물 생성(Bedrock), 사진 업로드(S3), 영상(Runway) |
 
-실제 키는 `server/.env.example` 을 복사해 `server/.env` 를 만들고 채웁니다. 키는 팀 DM으로만 공유하고 **절대 커밋하지 마세요** (`.env` 는 git이 무시합니다).
-
-```bash
-cp server/.env.example server/.env
-```
+실제 키는 `server/.env` 파일을 만들어 채웁니다. 항목 목록은 [docs/deploy.md의 서버 환경변수](docs/deploy.md#서버-환경변수)를 그대로 복사해 쓰세요. 키는 팀 DM으로만 공유하고 **절대 커밋하지 마세요** (`.env` 는 git이 무시합니다).
 
 ### 샘플 계정 (비밀번호 모두 `password1234`)
 
@@ -58,7 +54,7 @@ cp server/.env.example server/.env
 ```bash
 cd client
 npm install
-cp .env.example .env   # 카카오맵 키(VITE_KAKAO_MAP_KEY)를 넣어야 지도가 보임
+# client/.env 를 만들고 카카오맵 키(VITE_KAKAO_MAP_KEY)를 넣어야 지도가 보임 — 항목은 client/README.md
 npm run dev
 ```
 

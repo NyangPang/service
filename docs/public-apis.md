@@ -1,17 +1,17 @@
 # 외부 API · 오픈소스 정리
 
 잇츠가 쓰는 외부 서비스, 발급해야 하는 키, 오픈소스 목록입니다. (2026-11-17 기준)
-키는 `server/.env`, `client/.env`에만 넣고 **절대 커밋하지 않습니다.** 공유는 팀 DM으로 합니다.
+키는 `server/.env`, `client/.env`에만 넣고 (항목: [docs/deploy.md](deploy.md#서버-환경변수), [client/README.md](../client/README.md)) **절대 커밋하지 않습니다.** 공유는 팀 DM으로 합니다.
 
 ## 1. 발급해야 하는 키
 
 | 서비스 | 용도 | 키 이름 | 담당 | 상태 |
 | --- | --- | --- | --- | --- |
-| AWS (아연 님 계정) | Bedrock(Claude), S3, CloudFront, Polly | `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_S3_BUCKET`, `AWS_CLOUDFRONT_DOMAIN`, `BEDROCK_MODEL_ID` | 임아연 | ⬜ |
-| 카카오 Developers | 지도, 주소 검색, 좌표→행정동 | `VITE_KAKAO_MAP_KEY` (JavaScript 키) | 임지오 | ⬜ |
+| AWS (팀 계정, 담당 확인 중) | Bedrock(Claude), S3, CloudFront, Polly | `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_S3_BUCKET`, `AWS_CLOUDFRONT_DOMAIN`, `BEDROCK_MODEL_ID` | 성현주 / 임아연 | ⬜ |
+| 카카오 Developers | 지도, 주소 검색, 좌표→행정동 | `VITE_KAKAO_MAP_KEY` (JavaScript 키) | 임지오 | ✅ (팀 DM 공유) |
 | Runway | AI 영상(·이미지) 생성 | `RUNWAYML_API_SECRET` | 이채원 | ⬜ |
 
-### AWS 준비 (아연 님)
+### AWS 준비
 
 1. IAM 사용자 생성 후 액세스 키 발급 (루트 계정 키 사용 금지)
 2. Bedrock에서 Claude 모델 사용 신청 (서울 `ap-northeast-2`) → 모델 ID를 `BEDROCK_MODEL_ID`에
@@ -23,7 +23,7 @@
 ### 카카오 키 (지오)
 
 1. [Kakao Developers](https://developers.kakao.com) → 애플리케이션 추가 → **JavaScript 키** 복사
-2. 플랫폼 > Web 사이트 도메인에 `http://localhost:5173`과 배포 주소 등록 (등록 안 된 주소에선 지도가 안 뜸)
+2. 앱 키 > JavaScript 키 > **JavaScript SDK 도메인**에 `http://localhost:5173`과 배포 주소 등록 (등록 안 된 주소에선 지도가 안 뜸, '앱 대표 도메인' 칸이 아님)
 3. 지도·주소 검색·좌표→행정동(`coord2RegionCode`)이 모두 이 키 하나로 동작 (JS SDK `services` 라이브러리)
 
 ## 2. 쓰는 외부 API

@@ -8,7 +8,7 @@
 | 기능 | 서버 (`server/src/main/java/com/commicom/itda/`) | 화면 (`client/src/`) |
 | --- | --- | --- |
 | 리뷰 · 마이페이지 | `domain/review/` (빈 패키지 준비됨) | `features/review/` 새로 만들기 |
-| 동네별 랭킹 · 업종 검색 | `domain/ranking/` (빈 패키지 준비됨), 업종은 `domain/store/` | `features/ranking/` 새로 만들기 |
+| 동네별 랭킹 · 업종 검색 | `domain/store/service/StoreRankingService` (구 단위 방문순, 7/14/31일 — 완료) | `features/search/` (완료) |
 | AI 영상 | `infra/video/` (Runway·FFmpeg 코드 있음, 현재 미연결), `domain/generation/` | `features/generation/` |
 | 쉬운모드 | — | `styles/index.css`, `app/SettingsDrawer.tsx` |
 
@@ -21,7 +21,7 @@ API를 만들면 `server/docs/api-spec.md` 에 같은 형식으로 적어 주세
 | --- | --- |
 | 사진·영상 업로드 | `infra/storage/StorageService` (S3), 화면 `shared/lib/image.ts` |
 | 보상 뽑기 | `domain/pigeon/service/PigeonService` 레벨업 뽑기 (쿠폰·먹이·교환권) |
-| 실제 방문 기록 | `domain/quest/entity/QuestVisit` (`storeId`, `visitDate`) — 방문순 랭킹 원천 |
+| 실제 방문 기록 | `domain/quest/entity/QuestVisit` (`storeId`, `visitDate`) — 방문순 랭킹이 이미 사용 중 |
 | 스크랩 기록 | `domain/scrap/entity/ShortformScrap` — 스크랩순 랭킹 원천 |
 | 내 위치 · 내 동네 | 화면 `features/map/hooks.ts` 의 `useMyLocation()`, `useMyNeighborhood()` (카카오 좌표→행정동) |
 
@@ -29,7 +29,7 @@ API를 만들면 `server/docs/api-spec.md` 에 같은 형식으로 적어 주세
 
 | 데이터 | 필요한 기능 | 메모 |
 | --- | --- | --- |
-| 가게의 **구·동** | 동네별 랭킹 | 지금 `Store` 에는 주소 문자열과 위경도뿐. 가게 등록 때 카카오 좌표→행정동으로 구·동을 저장하는 방식 추천 |
+| 가게의 **동** | 동 단위 랭킹(필요하면) | 구는 `store/entity/District` 가 주소에서 뽑음. 동까지 나누려면 가게 등록 때 카카오 좌표→행정동으로 저장 |
 | **조회수** | 조회순 랭킹 | `QuestEventLog` 는 퀘스트용(회원당 1번)이라 랭킹에 못 씀 |
 | **좋아요** | 좋아요순 랭킹 | 없음 |
 | 업종 **세부 분류** (일식 등) | 업종 검색 | `StoreCategory` 는 대분류(음식점 등)뿐 |
