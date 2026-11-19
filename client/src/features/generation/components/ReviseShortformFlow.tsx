@@ -5,6 +5,7 @@ import pigeonCrying from '@/assets/generation/pigeon-crying.jpg'
 import pigeonUpload from '@/assets/generation/pigeon-upload.jpg'
 import pigeonUploaded from '@/assets/generation/pigeon-uploaded.png'
 import { PostCarousel } from '@/features/feed/components/PostCarousel'
+import { ShortformThumb } from '@/features/feed/components/ShortformThumb'
 import { useStoreShortforms } from '@/features/feed/hooks'
 import type { Shortform } from '@/features/feed/schema'
 import { useMyStoreId } from '@/features/owner/hooks'
@@ -248,18 +249,10 @@ function Revise({ original, onExit }: { original: Shortform; onExit: () => void 
 
 /** 지금 손님에게 보이는 영상 (무엇을 고치는지 확인용) */
 function OriginalCard({ video }: { video: Shortform }) {
-  const f = video.frame
   return (
     <div className="flex items-center gap-3 rounded-2xl bg-q-panel p-3">
       <span className="relative block h-[84px] w-[56px] shrink-0 overflow-hidden rounded-xl bg-q-mint">
-        {video.posterUrl && (
-          <img
-            src={video.posterUrl}
-            alt=""
-            className="absolute left-1/2 max-w-none -translate-x-1/2"
-            style={f ? { height: `${100 / f.height}%`, top: `${(-100 * f.top) / f.height}%` } : { height: '100%', top: 0 }}
-          />
-        )}
+        <ShortformThumb video={video} />
       </span>
       <span className="min-w-0">
         <span className="text-[11px] font-bold text-q-green">지금 공개 중인 게시물</span>

@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import pigeonCrying from '@/assets/generation/pigeon-crying.jpg'
 import pigeonUpload from '@/assets/generation/pigeon-upload.jpg'
 import { PostCarousel } from '@/features/feed/components/PostCarousel'
+import { PostVideo } from '@/features/feed/components/PostVideo'
+import { ShortformThumb } from '@/features/feed/components/ShortformThumb'
 import { useDeleteShortform, useStoreShortforms } from '@/features/feed/hooks'
 import type { Shortform } from '@/features/feed/schema'
 import { Dialog } from '@/features/generation/components/Dialog'
@@ -83,7 +85,7 @@ export function OwnerVideos() {
             <li key={v.shortformId}>
               <button type="button" onClick={() => setOpenId(v.shortformId)} className="block w-full text-left active:scale-[0.98]">
                 <span className="relative block aspect-[9/14] overflow-hidden rounded-2xl bg-q-mint">
-                  <Poster video={v} />
+                  <ShortformThumb video={v} />
                   {i === 0 && (
                     <span className="absolute top-2 left-2 rounded-full bg-point-orange px-2 py-0.5 text-[10px] font-bold text-white">NEW</span>
                   )}
@@ -132,7 +134,11 @@ function VideoDetail({ video, onClose }: { video: Shortform; onClose: () => void
         </div>
 
         <div className="relative mx-auto mt-2 aspect-[4/5] w-full max-w-[280px] overflow-hidden rounded-3xl shadow-[0_10px_30px_rgba(8,104,22,0.18)]">
-          <PostCarousel images={video.images ?? (video.posterUrl ? [video.posterUrl] : [])} alt={video.description || video.storeName} frame={video.frame} />
+          {video.videoUrl ? (
+            <PostVideo url={video.videoUrl} posterUrl={video.posterUrl} alt={video.description || video.storeName} active frame={video.frame} />
+          ) : (
+            <PostCarousel images={video.images ?? (video.posterUrl ? [video.posterUrl] : [])} alt={video.description || video.storeName} frame={video.frame} />
+          )}
         </div>
 
         <p className="mt-4 text-[16px] font-bold text-q-text">{video.description || video.storeName}</p>
@@ -231,19 +237,6 @@ function Action({
   )
 }
 
-/** 썸네일: 샘플 영상은 위아래 검은 띠가 있어 그림 구간만 보이게 확대 (스크랩 목록과 같은 방식) */
-function Poster({ video }: { video: Shortform }) {
-  if (!video.posterUrl) return null
-  const f = video.frame
-  return (
-    <img
-      src={video.posterUrl}
-      alt=""
-      className="absolute left-1/2 max-w-none -translate-x-1/2"
-      style={f ? { height: `${100 / f.height}%`, top: `${(-100 * f.top) / f.height}%` } : { height: '100%', top: 0 }}
-    />
-  )
-}
 
 function TrashIcon() {
   return (

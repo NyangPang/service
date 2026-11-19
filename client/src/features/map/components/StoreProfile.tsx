@@ -2,7 +2,7 @@ import { useState, type ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { StoreCouponSheet } from '@/features/coupon/components/StoreCouponSheet'
 import { useStoreShortforms } from '@/features/feed/hooks'
-import type { Shortform } from '@/features/feed/schema'
+import { ShortformThumb } from '@/features/feed/components/ShortformThumb'
 import { useQuestEvent } from '@/features/quest/hooks'
 import { errorMessage } from '@/shared/lib/error'
 import { shareLink } from '@/shared/lib/share'
@@ -133,7 +133,7 @@ export function StoreProfile({ storeId }: { storeId: number }) {
             {videos?.map((v) => (
               <li key={v.shortformId}>
                 <Link to={`/map/stores/${storeId}/shortform?start=${v.shortformId}`} className="relative block aspect-[9/13] overflow-hidden bg-[#dde5e2]">
-                  <Thumb video={v} />
+                  <ShortformThumb video={v} />
                   <span className="absolute top-1.5 right-1.5 flex size-5 items-center justify-center rounded bg-white/90 text-q-text">
                     <span className="scale-[0.3]">
                       <PhotoIcon />
@@ -176,15 +176,3 @@ function InfoRow({ label, children }: { label: string; children: ReactNode }) {
   )
 }
 
-function Thumb({ video }: { video: Shortform }) {
-  if (!video.posterUrl) return null
-  const f = video.frame
-  return (
-    <img
-      src={video.posterUrl}
-      alt=""
-      className="absolute left-1/2 max-w-none -translate-x-1/2"
-      style={f ? { height: `${100 / f.height}%`, top: `${(-100 * f.top) / f.height}%` } : { height: '100%', top: 0 }}
-    />
-  )
-}

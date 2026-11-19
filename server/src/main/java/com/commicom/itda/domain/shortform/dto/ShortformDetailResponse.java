@@ -15,6 +15,8 @@ public record ShortformDetailResponse(
         String imageUrl,
         /** 옆으로 넘겨 볼 사진 전체 (첫 장 = imageUrl, 최대 5장) */
         List<String> imageUrls,
+        /** 홍보 영상 (영상 게시물만, 없으면 null). 있으면 imageUrl 은 포스터 */
+        String videoUrl,
         String title,
         /** 게시물 소개 글 (사장님 어필을 다듬은 문장, 없으면 null) */
         String caption,
@@ -31,6 +33,7 @@ public record ShortformDetailResponse(
                 store.getCategory().getDescription(),
                 shortform.getImageUrl(),
                 shortform.getImageUrls(),
+                shortform.getVideoUrl(),
                 shortform.getTitle(),
                 shortform.getCaption(),
                 shortform.getCreatedAt()
