@@ -46,6 +46,7 @@ import {
   type VisitRequest,
   type VisitResult,
 } from '@/features/quest/schema'
+import { districtOf, SEOUL_DISTRICTS, type District, type RankingParams, type RankedStore, type StoreRankingResult } from '@/features/search/schema'
 
 /** true면 모든 기능을 목업으로 (서버 없이 시연) */
 export const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true'
@@ -871,5 +872,62 @@ export const mockCouponApi = {
         totalFee: items.reduce((sum, f) => sum + f.fee, 0),
         items,
       }
+    }),
+}
+
+/* ── 가게 검색·동네 랭킹 (방문 기록이 퀘스트 목업 데이터라 퀘스트 목업일 때 사용) ── */
+
+export const mockRankingApi = {
+  ranking: ({ district, category, q, days }: RankingParams) =>
+    respond<StoreRankingResult>(() => {
+      const to = kstDate()
+      const from = addDays(to, -(days - 1))
+      const norm = (s: string) => s.replace(/\s+/g, '').toLowerCase()
+      const query = q.trim()
+      const counts = new Map<number, number>()
+      db()
+        .visits.filter((v) => v.date >= from && v.date <= to)
+        .forEach((v) => counts.set(v.storeId, (counts.get(v.storeId) ?? 0) + 1))
+
+      const sorted = MOCK_STORES.filter(
+        (s) =>
+          (!district || districtOf(s.address) === district) &&
+          (!category || s.category === category) &&
+          (!query || norm(s.name).includes(norm(query))),
+      ).sort(
+        (a, b) =>
+          (counts.get(b.storeId) ?? 0) - (counts.get(a.storeId) ?? 0) || a.name.localeCompare(b.name) || a.storeId - b.storeId,
+      )
+
+      let rank = 0
+      let prev: number | null = null
+      const stores: RankedStore[] = sorted.map((s, i) => {
+        const visitCount = counts.get(s.storeId) ?? 0
+        if (visitCount !== prev) rank = i + 1
+        prev = visitCount
+        return {
+          rank,
+          storeId: s.storeId,
+          name: s.name,
+          category: s.category,
+          categoryName: s.categoryName,
+          address: s.address,
+          district: districtOf(s.address),
+          thumbnailUrl: s.thumbnailUrl,
+          visitCount,
+        }
+      })
+      return { district, category, q: query || null, days, from, to, stores }
+    }),
+
+  /** 서울 자치구 25곳 전부 + 구마다 가게 수 (없으면 0) */
+  districts: () =>
+    respond<District[]>(() => {
+      const counts = new Map<string, number>()
+      MOCK_STORES.forEach((s) => {
+        const d = districtOf(s.address)
+        if (d) counts.set(d, (counts.get(d) ?? 0) + 1)
+      })
+      return SEOUL_DISTRICTS.map((name) => ({ name, storeCount: counts.get(name) ?? 0 }))
     }),
 }

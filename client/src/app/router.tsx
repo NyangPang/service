@@ -19,6 +19,7 @@ import {
   QuestStorePage,
 } from '@/pages/OwnerPage'
 import { PigeonAlbumPage, PigeonHistoryPage, QuestPage, QuestScanPage, QuestVisitPage } from '@/pages/QuestPage'
+import { SearchPage } from '@/pages/SearchPage'
 
 export const router = createBrowserRouter([
   // 처음 실행: 손님 / 사장님 선택
@@ -41,6 +42,8 @@ export const router = createBrowserRouter([
       // 지도에서 진입하는 하위 화면: /map 하위라 지도 탭이 활성 상태로 유지됨
       { path: '/map/stores/:storeId/shortform', element: <StoreShortformPage />, handle: { title: '홍보 게시물', fixedNav: true } },
       { path: '/map/stores/:storeId', element: <StoreProfilePage />, handle: { title: '가게 프로필' } },
+      // 가게 검색 · 동네 랭킹 (지역·업종·기간별 실제 방문 많은 순)
+      { path: '/search', element: <SearchPage />, handle: { title: '검색' } },
       // 상단 바 없이 ≡ · + 버튼만 띄우고 그 사이에 동네 이름
       { path: '/quest', element: <QuestPage />, handle: { immersive: true } },
       // 퀘스트 하위 화면: /quest 하위라 퀘스트 탭이 활성 상태로 유지됨
