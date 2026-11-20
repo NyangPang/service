@@ -22,7 +22,10 @@ export function Toaster() {
         role="status"
         aria-live="polite"
         className={`max-w-[380px] animate-[toast_2.2s_ease-in-out_forwards] rounded-full px-4 py-2.5 text-center text-14 font-bold shadow-[0_6px_20px_rgba(0,0,0,0.18)] ${
-          current.tone === 'error' ? 'bg-point-red-dark text-white' : 'bg-ink/90 text-white backdrop-blur'
+          // ink 는 다크모드에서 밝은 글자색이 되므로, 다크에서는 한 단계 밝은 어두운 바탕 + 테두리
+          current.tone === 'error'
+            ? 'bg-point-red-dark text-white'
+            : 'bg-ink/90 text-white backdrop-blur dark:bg-q-track/95 dark:text-q-text dark:ring-1 dark:ring-white/10'
         }`}
       >
         {current.message}

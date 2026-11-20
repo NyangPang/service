@@ -26,8 +26,8 @@ export function MyReviews() {
     return (
       <div className="flex h-full flex-col items-center justify-center px-8 text-center">
         <img src={pigeonWalk} alt="" className="h-24 w-auto object-contain" />
-        <p className="mt-4 text-[16px] font-bold text-ink">로그인하면 내 리뷰를 볼 수 있어요</p>
-        <Link to="/login?next=/profile/reviews" className="mt-5 flex h-11 w-full items-center justify-center rounded-xl bg-green-4 text-[15px] font-bold text-white">
+        <p className="mt-4 text-16 font-bold text-ink">로그인하면 내 리뷰를 볼 수 있어요</p>
+        <Link to="/login?next=/profile/reviews" className="mt-5 flex h-11 w-full items-center justify-center rounded-xl bg-green-4 text-15 font-bold text-white">
           로그인
         </Link>
       </div>
@@ -48,21 +48,21 @@ export function MyReviews() {
   const otherVisits = writable?.filter((v) => !v.rewardAvailable) ?? []
 
   return (
-    <div className="h-full overflow-y-auto bg-white pb-10">
+    <div className="h-full overflow-y-auto bg-surface pb-10">
       {rewardVisits.length > 0 && (
         <section className="px-5 pt-5">
-          <h2 className="text-[13px] font-bold text-ink">리뷰 쓰고 보상 받기</h2>
+          <h2 className="text-13 font-bold text-ink">리뷰 쓰고 보상 받기</h2>
           <ul className="mt-2 flex flex-col gap-2">
             {rewardVisits.map((v) => (
               <li key={v.visitId}>
                 <Link to={`/profile/reviews/new?visitId=${v.visitId}`} className="flex items-center gap-3 rounded-2xl bg-q-mint px-4 py-3">
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[15px] font-bold text-q-text">{v.storeName}</span>
-                    <span className="block text-[12px] text-q-green">
+                    <span className="block truncate text-15 font-bold text-q-text">{v.storeName}</span>
+                    <span className="block text-12 text-fg-q-green">
                       {formatReviewDate(v.visitedAt)} 방문 인증 · 리뷰 쓰면 뽑기 {REVIEW_DRAWS}회 🎁
                     </span>
                   </span>
-                  <span className="shrink-0 rounded-lg bg-green-4 px-3 py-1.5 text-[13px] font-bold text-white">리뷰 쓰기</span>
+                  <span className="shrink-0 rounded-lg bg-green-4 px-3 py-1.5 text-13 font-bold text-white">리뷰 쓰기</span>
                 </Link>
               </li>
             ))}
@@ -73,7 +73,7 @@ export function MyReviews() {
       {/* 보상을 이미 받은 인증도 리뷰는 더 쓸 수 있음 (뽑기 없음) */}
       {otherVisits.length > 0 && (
         <details className="group mx-5 mt-4 rounded-2xl bg-q-panel px-4 py-3">
-          <summary className="flex cursor-pointer list-none items-center justify-between text-[14px] font-bold text-q-text">
+          <summary className="flex cursor-pointer list-none items-center justify-between text-14 font-bold text-q-text">
             다른 방문 인증으로 리뷰 더 쓰기
             <span aria-hidden className="text-q-muted transition-transform group-open:rotate-90">
               ›
@@ -84,12 +84,12 @@ export function MyReviews() {
               <li key={v.visitId} className="border-t border-q-line first:border-t-0">
                 <Link to={`/profile/reviews/new?visitId=${v.visitId}`} className="flex items-center gap-3 py-2.5">
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[14px] font-medium text-q-text">{v.storeName}</span>
-                    <span className="block text-[12px] text-q-muted">
+                    <span className="block truncate text-14 font-medium text-q-text">{v.storeName}</span>
+                    <span className="block text-12 text-q-muted">
                       {formatReviewDate(v.visitedAt)} 방문 인증 · 리뷰 {v.reviewCount}개 · 보상 받음
                     </span>
                   </span>
-                  <span className="shrink-0 text-[13px] font-bold text-green-4">리뷰 쓰기 ›</span>
+                  <span className="shrink-0 text-13 font-bold text-green-4">리뷰 쓰기 ›</span>
                 </Link>
               </li>
             ))}
@@ -98,14 +98,14 @@ export function MyReviews() {
       )}
 
       <section className="mt-6">
-        <h2 className="px-5 text-[13px] font-bold text-ink">
-          내가 쓴 리뷰 {mine?.count ? <span className="text-q-green">{mine.count}</span> : null}
+        <h2 className="px-5 text-13 font-bold text-ink">
+          내가 쓴 리뷰 {mine?.count ? <span className="text-fg-q-green">{mine.count}</span> : null}
         </h2>
         {isLoading && <div className="mx-5 mt-3 h-28 animate-pulse rounded-2xl bg-q-panel" />}
         {mine && mine.count === 0 && (
           <div className="px-8 py-14 text-center">
-            <p className="text-[14px] text-green-4">아직 쓴 리뷰가 없어요</p>
-            <p className="mt-1 text-[12px] text-q-muted">QR 방문 인증을 하면 리뷰를 쓰고 보상 뽑기 {REVIEW_DRAWS}회를 받아요</p>
+            <p className="text-14 text-green-4">아직 쓴 리뷰가 없어요</p>
+            <p className="mt-1 text-12 text-q-muted">QR 방문 인증을 하면 리뷰를 쓰고 보상 뽑기 {REVIEW_DRAWS}회를 받아요</p>
           </div>
         )}
         <div className="mt-1">
@@ -119,11 +119,11 @@ export function MyReviews() {
                     <button
                       type="button"
                       onClick={() => navigate(`/profile/reviews/${r.reviewId}/edit`)}
-                      className="h-8 rounded-lg bg-q-panel px-3 text-[12px] font-bold text-green-4"
+                      className="h-8 rounded-lg bg-q-panel px-3 text-12 font-bold text-green-4"
                     >
                       수정
                     </button>
-                    <button type="button" onClick={() => setDeleting(r)} className="h-8 rounded-lg bg-q-panel px-3 text-[12px] font-bold text-q-muted">
+                    <button type="button" onClick={() => setDeleting(r)} className="h-8 rounded-lg bg-q-panel px-3 text-12 font-bold text-q-muted">
                       삭제
                     </button>
                   </span>
@@ -132,7 +132,7 @@ export function MyReviews() {
               {leftOf(r) > 0 && (
                 <Link
                   to={`/profile/reviews/${r.reviewId}/draw`}
-                  className="mx-5 -mt-1 mb-3 flex h-10 items-center justify-center gap-1.5 rounded-xl bg-green-6 text-[14px] font-bold text-white"
+                  className="mx-5 -mt-1 mb-3 flex h-10 items-center justify-center gap-1.5 rounded-xl bg-green-6 text-14 font-bold text-white"
                 >
                   🎁 보상 뽑기 {leftOf(r)}회 남음
                 </Link>

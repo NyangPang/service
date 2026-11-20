@@ -44,8 +44,8 @@ export function ReviewDraw({ review }: { review: Review }) {
   if (left === 0 && !result) {
     return (
       <div className="flex h-full flex-col items-center justify-center px-8 text-center">
-        <p className="text-[16px] font-bold text-ink">남은 보상 뽑기가 없어요</p>
-        <Link to="/profile/reviews" className="mt-5 flex h-11 w-full items-center justify-center rounded-xl bg-green-4 text-[15px] font-bold text-white">
+        <p className="text-16 font-bold text-ink">남은 보상 뽑기가 없어요</p>
+        <Link to="/profile/reviews" className="mt-5 flex h-11 w-full items-center justify-center rounded-xl bg-green-4 text-15 font-bold text-white">
           내 리뷰로
         </Link>
       </div>
@@ -53,9 +53,9 @@ export function ReviewDraw({ review }: { review: Review }) {
   }
 
   return (
-    <div className="h-full overflow-y-auto bg-white px-5 pt-6 pb-10 text-center">
-      <p className="text-[13px] text-q-muted">{review.storeName} 리뷰 보상</p>
-      <h2 className="mt-1 text-[21px] font-bold text-q-text">보상 뽑기</h2>
+    <div className="h-full overflow-y-auto bg-surface px-5 pt-6 pb-10 text-center">
+      <p className="text-13 text-q-muted">{review.storeName} 리뷰 보상</p>
+      <h2 className="mt-1 text-21 font-bold text-q-text">보상 뽑기</h2>
       <DrawDots total={REVIEW_DRAWS} used={REVIEW_DRAWS - left} />
 
       <div className="mt-5 rounded-3xl bg-q-panel px-3 pt-4 pb-3">
@@ -69,9 +69,9 @@ export function ReviewDraw({ review }: { review: Review }) {
           </>
         ) : (
           <div className="py-8">
-            <p className="text-[40px]">🎁</p>
-            <p className="mt-2 text-[15px] font-bold text-q-text">리뷰를 남겨 줘서 고마워요!</p>
-            <p className="mt-1 text-[13px] text-q-muted">
+            <p className="text-40">🎁</p>
+            <p className="mt-2 text-15 font-bold text-q-text">리뷰를 남겨 줘서 고마워요!</p>
+            <p className="mt-1 text-13 text-q-muted">
               카드 3장(먹이 1개 · 먹이 2개 · 쿠폰) 중 하나를 골라요
               <br />
               뽑기 {left}회가 남았어요
@@ -81,7 +81,7 @@ export function ReviewDraw({ review }: { review: Review }) {
       </div>
 
       {error && (
-        <p role="alert" className="mt-3 text-[13px] font-medium text-point-red-dark">
+        <p role="alert" className="mt-3 text-13 font-medium text-fg-red">
           {error}
         </p>
       )}
@@ -100,7 +100,7 @@ export function ReviewDraw({ review }: { review: Review }) {
         {result && revealed && left === 0 && <PrimaryButton onClick={done}>완료</PrimaryButton>}
         {wonCoupon && <OutlineButton onClick={() => navigate('/coupons')}>쿠폰함에서 보기</OutlineButton>}
         {(!result || revealed) && left > 0 && (
-          <button type="button" onClick={done} className="mt-1 text-[13px] text-q-muted underline">
+          <button type="button" onClick={done} className="mt-1 text-13 text-q-muted underline">
             나중에 뽑을래요 (내 리뷰에서 이어서 뽑을 수 있어요)
           </button>
         )}

@@ -13,7 +13,7 @@ export function StoreReviews({ storeId }: { storeId: number }) {
   const { data, isLoading } = useStoreReviews(storeId, true)
 
   return (
-    <div className="h-full overflow-y-auto bg-white pb-10">
+    <div className="h-full overflow-y-auto bg-surface pb-10">
       <div className="px-5 pt-5">
         {isLoading ? (
           <div className="h-[68px] animate-pulse rounded-2xl bg-q-panel" />
@@ -33,7 +33,7 @@ export function StoreReviewSection({ storeId }: { storeId: number }) {
   return (
     <section className="mt-8">
       <div className="flex items-center justify-between px-5">
-        <h2 className="text-[13px] font-bold text-ink">리뷰</h2>
+        <h2 className="text-13 font-bold text-ink">리뷰</h2>
         {data && data.reviews.length > 0 && (
           <Link to="/owner/reviews" className="text-xs font-medium text-green-4">
             전체 보기 ›
@@ -51,12 +51,12 @@ export function PublicStoreReviews({ storeId }: { storeId: number }) {
   const { data } = useStoreReviews(storeId)
   if (!data) return null
   return (
-    <section className="mt-5 bg-white">
-      <h3 className="px-5 pt-4 text-[15px] font-bold text-q-text">
-        리뷰 {data.count ? <span className="text-q-green">{data.count}</span> : null}
+    <section className="mt-5 bg-surface">
+      <h3 className="px-5 pt-4 text-15 font-bold text-q-text">
+        리뷰 {data.count ? <span className="text-fg-q-green">{data.count}</span> : null}
       </h3>
       {data.count === 0 ? (
-        <p className="py-10 text-center text-[13px] text-q-muted">아직 리뷰가 없어요</p>
+        <p className="py-10 text-center text-13 text-q-muted">아직 리뷰가 없어요</p>
       ) : (
         <>
           <div className="mt-3 px-5">
@@ -99,12 +99,12 @@ function OwnerReviewList({ storeId, reviews }: { storeId: number; reviews: Revie
                 type="button"
                 onClick={() => change(r, false)}
                 disabled={setHidden.isPending}
-                className="h-8 shrink-0 rounded-lg bg-green-4 px-3 text-[12px] font-bold text-white"
+                className="h-8 shrink-0 rounded-lg bg-green-4 px-3 text-12 font-bold text-white"
               >
                 다시 보이기
               </button>
             ) : (
-              <button type="button" onClick={() => setHiding(r)} className="h-8 shrink-0 rounded-lg bg-q-panel px-3 text-[12px] font-bold text-q-muted">
+              <button type="button" onClick={() => setHiding(r)} className="h-8 shrink-0 rounded-lg bg-q-panel px-3 text-12 font-bold text-q-muted">
                 숨기기
               </button>
             )
@@ -128,8 +128,8 @@ function OwnerReviewList({ storeId, reviews }: { storeId: number; reviews: Revie
 function EmptyReviews() {
   return (
     <div className="px-8 py-12 text-center">
-      <p className="text-[14px] text-green-4">아직 리뷰가 없어요</p>
-      <p className="mt-1 text-[12px] text-q-muted">퀘스트로 방문 인증한 손님이 리뷰를 남길 수 있어요</p>
+      <p className="text-14 text-green-4">아직 리뷰가 없어요</p>
+      <p className="mt-1 text-12 text-q-muted">퀘스트로 방문 인증한 손님이 리뷰를 남길 수 있어요</p>
     </div>
   )
 }
