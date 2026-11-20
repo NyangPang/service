@@ -15,6 +15,8 @@ import com.commicom.itda.domain.member.entity.Role;
 import com.commicom.itda.domain.member.repository.MemberRepository;
 import com.commicom.itda.domain.pigeon.service.PigeonService;
 import com.commicom.itda.domain.quest.service.QuestService;
+import com.commicom.itda.domain.notification.service.NotificationService;
+import com.commicom.itda.domain.review.service.ReviewService;
 import com.commicom.itda.domain.scrap.repository.ScrapRepository;
 import com.commicom.itda.domain.scrap.repository.ShortformScrapRepository;
 import com.commicom.itda.domain.store.entity.Store;
@@ -44,6 +46,8 @@ public class MemberService {
     private final QuestService questService;
     private final PigeonService pigeonService;
     private final CouponService couponService;
+    private final ReviewService reviewService;
+    private final NotificationService notificationService;
     private final StorageService storageService;
     private final EmailVerificationService emailVerificationService;
 
@@ -152,6 +156,8 @@ public class MemberService {
         questService.deleteAllOf(memberId);
         pigeonService.deleteAllOf(memberId);
         couponService.deleteAllOf(memberId);
+        reviewService.deleteAllOf(member);
+        notificationService.deleteAllOf(memberId);
         memberRepository.delete(member);
     }
 }

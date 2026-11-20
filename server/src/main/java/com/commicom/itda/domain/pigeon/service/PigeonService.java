@@ -106,6 +106,23 @@ public class PigeonService {
     }
 
     /**
+     * 리뷰 보상 뽑기로 나온 먹이: 레벨업 뽑기처럼 보유 먹이에 바로 쌓음 (feed_log 에는 남기지 않음 — 기록은 review_draw).
+     * 남은 보유 먹이를 돌려줌
+     */
+    @Transactional
+    public int addDrawFeed(Long memberId, int amount) {
+        Pigeon pigeon = pigeonOf(memberId);
+        pigeon.addBalance(amount);
+        return pigeon.getFeedBalance();
+    }
+
+    /** 지금 보유 먹이 (쿠폰이 나와 먹이가 안 늘었을 때 응답용) */
+    @Transactional
+    public int feedBalance(Long memberId) {
+        return pigeonOf(memberId).getFeedBalance();
+    }
+
+    /**
      * 보유 먹이를 먹이고, 필요 먹이를 채울 때마다 레벨업 + 뽑기 (한 번에 여러 레벨 오를 수 있음).
      * 알(Lv.0)은 먹이 1개로 부화하고 종류가 랜덤으로 정해짐 (부화는 뽑기 없음)
      */

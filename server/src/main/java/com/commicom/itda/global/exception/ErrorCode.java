@@ -96,7 +96,18 @@ public enum ErrorCode {
     SCRAP_ALREADY_EXISTS(HttpStatus.CONFLICT, "SCRAP409", "이미 스크랩한 가게예요"),
     SCRAP_NOT_FOUND(HttpStatus.NOT_FOUND, "SCRAP404", "스크랩하지 않은 가게예요"),
     SCRAP_SHORTFORM_ALREADY_EXISTS(HttpStatus.CONFLICT, "SCRAP409_2", "이미 스크랩한 게시물이에요"),
-    SCRAP_SHORTFORM_NOT_FOUND(HttpStatus.NOT_FOUND, "SCRAP404_2", "스크랩하지 않은 게시물이에요");
+    SCRAP_SHORTFORM_NOT_FOUND(HttpStatus.NOT_FOUND, "SCRAP404_2", "스크랩하지 않은 게시물이에요"),
+
+    // 리뷰
+    REVIEW_TOO_MANY_MEDIA(HttpStatus.BAD_REQUEST, "REVIEW400", "사진·영상은 합쳐서 3개, 영상은 1개까지 올릴 수 있어요"),
+    REVIEW_INVALID_VIDEO(HttpStatus.BAD_REQUEST, "REVIEW400_2", "영상은 50MB 이하 영상 파일만 올릴 수 있어요"),
+    REVIEW_FORBIDDEN(HttpStatus.FORBIDDEN, "REVIEW403_2", "내가 쓴 리뷰가 아니에요"),
+    REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "REVIEW404", "리뷰를 찾을 수 없어요"),
+    REVIEW_VISIT_NOT_FOUND(HttpStatus.NOT_FOUND, "REVIEW404_2", "방문 인증 기록을 찾을 수 없어요"),
+    REVIEW_NO_DRAWS_LEFT(HttpStatus.CONFLICT, "REVIEW409_2", "남은 뽑기가 없어요"),
+
+    // 알림
+    NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTIFICATION404", "알림을 찾을 수 없어요");
 
     private final HttpStatus status;
     private final String code;

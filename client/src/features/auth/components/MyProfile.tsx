@@ -12,7 +12,7 @@ import { Field, FieldButton, FieldInput, PasswordInput } from './AuthUi'
 
 type Status = { text: string; error?: boolean } | null
 
-/** 손님 프로필 수정 (Figma 11:1829 · 11:1978 · 11:2030): 닉네임(중복확인 = 저장) · 비밀번호 · 회원탈퇴 */
+/** 손님 프로필 수정 (Figma 11:1829 · 11:1978 · 11:2030): 닉네임(중복확인 = 저장) · 비밀번호 · 내 리뷰 · 회원탈퇴 */
 export function MyProfile() {
   const navigate = useNavigate()
   const me = useMe()
@@ -132,6 +132,10 @@ export function MyProfile() {
           placeholder="수정할 비밀번호 입력"
         />
       </Field>
+
+      <Link to="/profile/reviews" className="mt-6 flex h-12 items-center justify-between rounded-xl bg-q-panel px-4 text-15 font-bold text-green-4">
+        내 리뷰 <span aria-hidden>›</span>
+      </Link>
 
       <p className="mt-6 text-center text-12 text-q-muted">{me.email}</p>
       <button type="button" onClick={() => setConfirmWithdraw(true)} className="mx-auto mt-3 block text-12 text-gray-2 underline">
