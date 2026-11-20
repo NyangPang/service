@@ -23,10 +23,10 @@ export function PigeonHistory() {
       <ol className="relative flex flex-col gap-3 before:absolute before:top-2 before:bottom-2 before:left-[27px] before:w-0.5 before:bg-q-mint">
         {data?.history.map((item) => (
           <li key={item.historyId} className="relative flex items-center gap-3">
-            <span className="relative flex size-14 shrink-0 items-center justify-center rounded-full border-2 border-white bg-q-mint">
+            <span className="relative flex size-14 shrink-0 items-center justify-center rounded-full border-2 border-surface bg-q-mint">
               <img src={pigeonImage(item.toLevel)} alt="" className="size-11 object-contain" />
             </span>
-            <div className="flex-1 rounded-2xl border border-q-line bg-white px-4 py-3">
+            <div className="flex-1 rounded-2xl border border-q-line bg-surface px-4 py-3">
               <div className="flex items-center justify-between">
                 <p className="text-15 font-bold text-q-text">
                   Lv. {item.fromLevel} → Lv. {item.toLevel}
@@ -48,7 +48,7 @@ function RewardText({ item }: { item: HistoryItem }) {
   const { reward } = item
   if (reward.type === 'COUPON' && reward.userCoupon) {
     return (
-      <p className="mt-1 text-13 font-medium text-point-red-dark">
+      <p className="mt-1 text-13 font-medium text-fg-red">
         🎟 {reward.userCoupon.storeName} · {reward.userCoupon.title} ({untilText(reward.userCoupon.expiresAt)})
       </p>
     )

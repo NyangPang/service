@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import logo from '@/assets/its-logo.svg'
+import { AppLogo } from '@/shared/ui/AppLogo'
 import pigeonWalk from '@/assets/map/pigeon-walk.png'
 import { LoginForm } from '@/features/auth/components/LoginForm'
 import { useLogout } from '@/features/auth/hooks'
@@ -12,7 +12,7 @@ import { errorMessage } from '@/shared/lib/error'
 import { CloseIcon, MenuIcon } from '@/shared/ui/icons'
 import { toast } from '@/stores/toastStore'
 import { useAuthStore, useMe } from '@/stores/authStore'
-import { useDisplayStore } from '@/stores/displayStore'
+import { useDisplayStore, type Theme } from '@/stores/displayStore'
 import { MODE_HOME, useModeStore, type AppMode } from '@/stores/modeStore'
 
 export interface MenuItem {
@@ -63,7 +63,7 @@ function AccountSection({ onLoggedIn, onLoggedOut }: { onLoggedIn: (mode: AppMod
     <section className="mt-6 px-5">
       <h2 className="text-xs font-bold text-q-muted">계정</h2>
       <div className="mt-2 flex items-center gap-3 rounded-2xl bg-q-panel px-4 py-3">
-        <span className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white">
+        <span className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-surface">
           {me.profileImageUrl ? <img src={me.profileImageUrl} alt="" className="size-full object-cover" /> : <img src={pigeonWalk} alt="" className="size-9 object-contain" />}
         </span>
         <span className="min-w-0 flex-1">
@@ -100,6 +100,39 @@ function AccountSection({ onLoggedIn, onLoggedOut }: { onLoggedIn: (mode: AppMod
         </li>
       </ul>
     </section>
+  )
+}
+
+const THEMES: { theme: Theme; label: string }[] = [
+  { theme: 'light', label: '밝게' },
+  { theme: 'dark', label: '어둡게' },
+  { theme: 'system', label: '기기 설정' },
+]
+
+/** 화면 테마 (밝게 / 어둡게 / 휴대폰 설정 따라가기) */
+function ThemePicker() {
+  const { theme, setTheme } = useDisplayStore()
+  return (
+    <div className="border-b border-q-line py-3.5">
+      <span className="block">화면 테마</span>
+      <div role="radiogroup" aria-label="화면 테마" className="mt-2 grid grid-cols-3 gap-1 rounded-full bg-q-panel p-1">
+        {THEMES.map((t) => {
+          const active = theme === t.theme
+          return (
+            <button
+              key={t.theme}
+              type="button"
+              role="radio"
+              aria-checked={active}
+              onClick={() => setTheme(t.theme)}
+              className={`h-9 rounded-full text-13 font-bold transition-colors ${active ? 'bg-green-6 text-white' : 'text-q-muted'}`}
+            >
+              {t.label}
+            </button>
+          )
+        })}
+      </div>
+    </div>
   )
 }
 
@@ -180,10 +213,10 @@ export function SettingsDrawer({ buttonClassName, items }: { buttonClassName: st
               role="dialog"
               aria-modal
               aria-label="설정"
-              className="absolute inset-y-0 left-0 flex w-[84%] max-w-[340px] animate-[slide-in_.22s_ease-out] flex-col overflow-y-auto bg-white pt-[max(20px,env(safe-area-inset-top))] pb-6 shadow-2xl"
+              className="absolute inset-y-0 left-0 flex w-[84%] max-w-[340px] animate-[slide-in_.22s_ease-out] flex-col overflow-y-auto bg-surface pt-[max(20px,env(safe-area-inset-top))] pb-6 shadow-2xl"
             >
               <header className="flex items-center justify-between px-5">
-                <img src={logo} alt="잇츠" className="h-9 w-fit" />
+                <AppLogo className="h-9 w-fit" />
                 <button type="button" aria-label="닫기" onClick={() => setOpen(false)} className="flex size-9 items-center justify-center text-q-muted">
                   <CloseIcon />
                 </button>
@@ -202,7 +235,7 @@ export function SettingsDrawer({ buttonClassName, items }: { buttonClassName: st
                         aria-checked={active}
                         onClick={() => !active && switchMode(m.mode)}
                         className={`rounded-2xl border-2 px-3 py-3 text-left ${
-                          active ? 'border-green-6 bg-green-6 text-white' : 'border-q-line bg-white text-ink'
+                          active ? 'border-fg-green-6 bg-green-6 text-white' : 'border-q-line bg-surface text-ink'
                         }`}
                       >
                         <span className="block text-15 font-bold">{m.label}</span>
@@ -213,7 +246,7 @@ export function SettingsDrawer({ buttonClassName, items }: { buttonClassName: st
                 </div>
                 {ownerBlocked && (
                   <div role="alert" className="mt-2 rounded-2xl border border-point-orange bg-point-yellow/20 px-4 py-3">
-                    <p className="text-13 font-bold text-point-red-dark">사장님 모드는 사장님 계정으로 쓸 수 있어요</p>
+                    <p className="text-13 font-bold text-fg-red">사장님 모드는 사장님 계정으로 쓸 수 있어요</p>
                     <p className="mt-0.5 text-12 text-q-sub">지금은 손님 계정({me?.nickname})으로 로그인되어 있어요</p>
                     <div className="mt-2.5 grid grid-cols-2 gap-2">
                       <button
@@ -222,7 +255,7 @@ export function SettingsDrawer({ buttonClassName, items }: { buttonClassName: st
                           logout('로그아웃했어요 · 사장님 계정으로 로그인해 주세요')
                           setOwnerBlocked(false)
                         }}
-                        className="h-9 rounded-lg bg-white text-12 font-bold text-q-text"
+                        className="h-9 rounded-lg bg-surface text-12 font-bold text-q-text"
                       >
                         다른 계정으로 로그인
                       </button>
@@ -262,6 +295,9 @@ export function SettingsDrawer({ buttonClassName, items }: { buttonClassName: st
               <section className="mt-6 px-5">
                 <h2 className="text-xs font-bold text-q-muted">앱 설정</h2>
                 <ul className="mt-1 text-15 text-ink">
+                  <li>
+                    <ThemePicker />
+                  </li>
                   <li>
                     <LargeTextSwitch />
                   </li>

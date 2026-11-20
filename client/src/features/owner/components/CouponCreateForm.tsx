@@ -83,7 +83,7 @@ export function CouponCreateForm() {
                 set('discountType', type)
                 set('discountValue', type === 'AMOUNT' ? '1000' : String(RATE_MIN))
               }}
-              className="h-11 rounded-xl border border-q-line text-sm font-bold text-q-sub aria-pressed:border-q-green aria-pressed:bg-q-mint aria-pressed:text-q-green"
+              className="h-11 rounded-xl border border-q-line text-sm font-bold text-q-sub aria-pressed:border-q-green aria-pressed:bg-q-mint aria-pressed:text-fg-q-green"
             >
               {type === 'AMOUNT' ? '금액 (원)' : '비율 (%)'}
             </button>
@@ -127,12 +127,12 @@ export function CouponCreateForm() {
       <div className="mt-5 rounded-2xl border border-dashed border-q-line px-4 py-3 text-center">
         <p className="text-xs text-q-muted">미리보기</p>
         <p className="mt-0.5 text-15 font-bold text-q-text">{form.title.trim() || '쿠폰 이름'}</p>
-        <p className="text-sm font-bold text-point-red-dark">{body.discountValue > 0 ? discountText(body) : '-'}</p>
+        <p className="text-sm font-bold text-fg-red">{body.discountValue > 0 ? discountText(body) : '-'}</p>
       </div>
 
       <p className="mt-3 text-center text-xs text-q-muted">할인 금액은 사장님 부담, 손님이 사용한 쿠폰 1건당 소액 수수료가 붙어요</p>
       {error && (
-        <p role="alert" className="mt-3 text-center text-13 font-medium text-point-red-dark">
+        <p role="alert" className="mt-3 text-center text-13 font-medium text-fg-red">
           {error}
         </p>
       )}

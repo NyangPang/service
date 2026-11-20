@@ -149,7 +149,7 @@ export function SignupFlow({ initialRole }: { initialRole?: Role }) {
   const accountReady = emailVerified && password.length >= PASSWORD_MIN && (owner || nickChecked === 'ok')
 
   return (
-    <div className="mx-auto flex h-full max-w-[430px] flex-col bg-white">
+    <div className="mx-auto flex h-full max-w-[430px] flex-col bg-surface">
       {step !== 'welcome' && (
         <header className="flex h-[68px] shrink-0 items-center justify-between px-[18px] pt-[env(safe-area-inset-top)]">
           <span className="size-[44px]" />
@@ -158,7 +158,7 @@ export function SignupFlow({ initialRole }: { initialRole?: Role }) {
             type="button"
             aria-label="뒤로"
             onClick={back}
-            className="flex size-[44px] items-center justify-center rounded-full border border-mint-line bg-white text-green-6 shadow-[0_4px_14px_rgba(8,104,22,0.14)]"
+            className="flex size-[44px] items-center justify-center rounded-full border border-mint-line bg-surface text-fg-green-6 shadow-[0_4px_14px_rgba(8,104,22,0.14)]"
           >
             <BackIcon />
           </button>
@@ -238,11 +238,11 @@ export function SignupFlow({ initialRole }: { initialRole?: Role }) {
               style={{ colorScheme: 'light' }}
               className={`h-10 min-w-0 flex-1 bg-transparent px-1 text-15 outline-none ${category ? 'text-ink' : 'text-gray-2'}`}
             >
-              <option value="" className="bg-white text-gray-2">
+              <option value="" className="bg-surface text-gray-2">
                 대분류
               </option>
               {STORE_CATEGORIES.map((c) => (
-                <option key={c.code} value={c.code} className="bg-white text-ink">
+                <option key={c.code} value={c.code} className="bg-surface text-ink">
                   {c.name}
                 </option>
               ))}
@@ -251,7 +251,7 @@ export function SignupFlow({ initialRole }: { initialRole?: Role }) {
             <FieldInput value={subCategory} onChange={(e) => setSubCategory(e.target.value)} placeholder="소분류 (직접입력)" maxLength={20} aria-label="업종 소분류" />
           </Field>
           {error && (
-            <p role="alert" className="mt-4 text-center text-13 font-medium text-point-red-dark">
+            <p role="alert" className="mt-4 text-center text-13 font-medium text-fg-red">
               {error}
             </p>
           )}
@@ -313,7 +313,7 @@ export function SignupFlow({ initialRole }: { initialRole?: Role }) {
             <PasswordInput autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="비밀번호를 입력해주세요" maxLength={64} />
           </Field>
           {error && (
-            <p role="alert" className="mt-4 text-center text-13 font-medium text-point-red-dark">
+            <p role="alert" className="mt-4 text-center text-13 font-medium text-fg-red">
               {error}
             </p>
           )}

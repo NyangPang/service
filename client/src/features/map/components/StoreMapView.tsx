@@ -97,7 +97,7 @@ function KakaoStoreMap() {
         <br />
         카카오 Developers의 Web 사이트 도메인에
         <br />
-        <b className="break-all text-green-6">{window.location.origin}</b>
+        <b className="break-all text-fg-green-6">{window.location.origin}</b>
         <br />이 등록되어 있는지 확인해 주세요.
       </MapMessage>
     )
@@ -140,7 +140,7 @@ function KakaoStoreMap() {
           setQuestOnly((v) => !v)
           clearSelection()
         }}
-        className="absolute top-[78px] left-[14px] z-20 rounded-full border border-green-1 bg-white px-3 py-1.5 text-13 font-bold text-ink shadow-sm aria-pressed:border-green-6 aria-pressed:bg-green-6 aria-pressed:text-white"
+        className="absolute top-[78px] left-[14px] z-20 rounded-full border border-green-1 bg-surface px-3 py-1.5 text-13 font-bold text-ink shadow-sm aria-pressed:border-fg-green-6 aria-pressed:bg-green-6 aria-pressed:text-white"
       >
         🚩 퀘스트 가게만
       </button>
@@ -154,7 +154,7 @@ function KakaoStoreMap() {
       )}
 
       {isError && (
-        <p className="absolute inset-x-[14px] top-[124px] z-20 rounded-full border border-point-orange bg-white px-4 py-2 text-center text-sm font-medium text-point-red-dark">
+        <p className="absolute inset-x-[14px] top-[124px] z-20 rounded-full border border-point-orange bg-surface px-4 py-2 text-center text-sm font-medium text-fg-red">
           가게 정보를 불러오지 못했어요
         </p>
       )}
@@ -165,7 +165,7 @@ function KakaoStoreMap() {
             <button
               type="button"
               aria-label="내 위치로 이동"
-              className="flex size-[49px] items-center justify-center rounded-full border border-green-1 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
+              className="flex size-[49px] items-center justify-center rounded-full border border-green-1 bg-surface shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
               onClick={goToMe}
             >
               <img src={pigeonWalk} alt="" className="size-8 object-contain" />

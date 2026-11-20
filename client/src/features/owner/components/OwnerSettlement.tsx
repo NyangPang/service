@@ -15,7 +15,7 @@ export function OwnerSettlement() {
   return (
     <OwnerScreen>
       <div className="flex items-center justify-center gap-4">
-        <button type="button" aria-label="이전 달" onClick={() => setMonth(shiftMonth(month, -1))} className="size-9 rounded-full bg-white text-lg text-q-sub">
+        <button type="button" aria-label="이전 달" onClick={() => setMonth(shiftMonth(month, -1))} className="size-9 rounded-full bg-surface text-lg text-q-sub">
           ‹
         </button>
         <p className="text-lg font-bold text-q-text tabular-nums">
@@ -26,13 +26,13 @@ export function OwnerSettlement() {
           aria-label="다음 달"
           disabled={month >= thisMonth}
           onClick={() => setMonth(shiftMonth(month, 1))}
-          className="size-9 rounded-full bg-white text-lg text-q-sub disabled:opacity-30"
+          className="size-9 rounded-full bg-surface text-lg text-q-sub disabled:opacity-30"
         >
           ›
         </button>
       </div>
 
-      {isLoading && <div className="mt-4 h-40 animate-pulse rounded-2xl bg-white" />}
+      {isLoading && <div className="mt-4 h-40 animate-pulse rounded-2xl bg-surface" />}
       {isError && <p className="py-10 text-center text-sm text-q-muted">정산 내역을 불러오지 못했어요</p>}
       {data && (
         <>
@@ -64,7 +64,7 @@ export function OwnerSettlement() {
                     </div>
                     <div className="shrink-0 text-right text-xs">
                       <p className="text-q-sub">할인 {item.discountValue.toLocaleString()}원</p>
-                      <p className="font-bold text-q-green">수수료 {item.fee}원</p>
+                      <p className="font-bold text-fg-q-green">수수료 {item.fee}원</p>
                     </div>
                   </li>
                 ))}

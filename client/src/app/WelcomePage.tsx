@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import pigeonWalk from '@/assets/map/pigeon-walk.png'
 import pigeonGps from '@/assets/quest/pigeon-gps.png'
-import logo from '@/assets/its-logo.svg'
+import { AppLogo } from '@/shared/ui/AppLogo'
 import { MODE_HOME, useModeStore, type AppMode } from '@/stores/modeStore'
 
 const OPTIONS: { mode: AppMode; title: string; desc: string; points: string[]; image: string }[] = [
@@ -39,8 +39,8 @@ export function WelcomePage() {
   }
 
   return (
-    <div className="mx-auto flex h-full max-w-[430px] flex-col bg-white px-6 pt-[max(48px,env(safe-area-inset-top))] pb-[max(24px,env(safe-area-inset-bottom))]">
-      <img src={logo} alt="잇츠" className="h-[56px] w-fit" />
+    <div className="mx-auto flex h-full max-w-[430px] flex-col bg-surface px-6 pt-[max(48px,env(safe-area-inset-top))] pb-[max(24px,env(safe-area-inset-bottom))]">
+      <AppLogo className="h-[56px] w-fit" />
       <h1 className="mt-6 text-26 leading-snug font-bold text-ink">
         반가워요!
         <br />
@@ -59,7 +59,7 @@ export function WelcomePage() {
               aria-checked={active}
               onClick={() => setPicked(o.mode)}
               className={`relative flex items-center gap-4 overflow-hidden rounded-3xl border-2 px-5 py-5 text-left transition-colors ${
-                active ? 'border-green-6 bg-q-mint' : 'border-q-line bg-white'
+                active ? 'border-fg-green-6 bg-q-mint' : 'border-q-line bg-surface'
               }`}
             >
               <span className="min-w-0 flex-1">
@@ -70,7 +70,7 @@ export function WelcomePage() {
                     <span
                       key={p}
                       className={`rounded-full px-2.5 py-1 text-11 font-bold ${
-                        active ? 'bg-white text-green-6' : 'bg-q-panel text-q-sub'
+                        active ? 'bg-surface text-fg-green-6' : 'bg-q-panel text-q-sub'
                       }`}
                     >
                       {p}
@@ -82,7 +82,7 @@ export function WelcomePage() {
               <span
                 aria-hidden
                 className={`absolute top-4 right-4 flex size-6 items-center justify-center rounded-full border-2 text-xs font-bold ${
-                  active ? 'border-green-6 bg-green-6 text-white' : 'border-q-line bg-white text-transparent'
+                  active ? 'border-fg-green-6 bg-green-6 text-white' : 'border-q-line bg-surface text-transparent'
                 }`}
               >
                 ✓
@@ -102,7 +102,7 @@ export function WelcomePage() {
       </button>
       <p className="mt-4 text-center text-13 text-q-muted">
         이미 계정이 있나요?{' '}
-        <Link to="/login" className="font-bold text-green-6 underline">
+        <Link to="/login" className="font-bold text-fg-green-6 underline">
           로그인
         </Link>
       </p>

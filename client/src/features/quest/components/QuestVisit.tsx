@@ -90,7 +90,7 @@ export function QuestVisit({ quest }: { quest: Quest }) {
           <section className="rounded-2xl bg-q-mint px-4 py-5 text-center">
             <h2 className="text-21 font-bold text-q-text">{store.name}</h2>
             <p className="mt-1 text-13 text-q-muted">{store.address}</p>
-            {me && <p className="mt-1 text-xs font-medium text-q-green">여기서 약 {formatDistance(distanceTo(me, store))}</p>}
+            {me && <p className="mt-1 text-xs font-medium text-fg-q-green">여기서 약 {formatDistance(distanceTo(me, store))}</p>}
           </section>
 
           {sorted.length > 1 && (
@@ -108,7 +108,7 @@ export function QuestVisit({ quest }: { quest: Quest }) {
                         setError(null)
                       }}
                       className={`rounded-full border px-3 py-1.5 text-13 font-medium ${
-                        selected ? 'border-q-green bg-q-green text-white' : 'border-q-line bg-white text-q-sub'
+                        selected ? 'border-q-green bg-q-green text-white' : 'border-q-line bg-surface text-q-sub'
                       }`}
                     >
                       {s.name}
@@ -150,7 +150,7 @@ export function QuestVisit({ quest }: { quest: Quest }) {
             {locating ? '위치 확인 중...' : '방문 인증하기'}
           </PrimaryButton>
           {error && (
-            <p role="alert" className="mt-2.5 text-center text-13 font-medium text-point-red-dark">
+            <p role="alert" className="mt-2.5 text-center text-13 font-medium text-fg-red">
               {error}
             </p>
           )}
@@ -164,7 +164,7 @@ export function QuestVisit({ quest }: { quest: Quest }) {
                 '한 퀘스트에서는 서로 다른 가게만 인정',
               ].map((text) => (
                 <li key={text} className="flex gap-2">
-                  <span aria-hidden className="font-bold text-q-green">✓</span>
+                  <span aria-hidden className="font-bold text-fg-q-green">✓</span>
                   {text}
                 </li>
               ))}
@@ -211,7 +211,7 @@ function RewardBox({ title, caption }: { title: string; caption: string }) {
         <FeedIcon className="size-8" />
         {title}
       </p>
-      <p className="mt-2 text-13 text-q-green">{caption}</p>
+      <p className="mt-2 text-13 text-fg-q-green">{caption}</p>
     </div>
   )
 }

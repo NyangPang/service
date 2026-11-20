@@ -34,11 +34,11 @@ export function OwnerRedeem() {
   if (done) {
     return (
       <OwnerScreen>
-        <section className="rounded-3xl bg-white px-6 py-8 text-center">
+        <section className="rounded-3xl bg-surface px-6 py-8 text-center">
           <img src={OWNER_ILLUST.coupon} alt="" className="mx-auto h-[130px] w-auto object-contain drop-shadow" />
-          <p className="mt-3 text-sm font-bold text-q-green">사용 처리 완료</p>
+          <p className="mt-3 text-sm font-bold text-fg-q-green">사용 처리 완료</p>
           <p className="mt-1 text-xl font-bold text-q-text">{done.title}</p>
-          <p className="mt-3 text-32 font-bold text-point-red-dark">{discountText(done)}</p>
+          <p className="mt-3 text-32 font-bold text-fg-red">{discountText(done)}</p>
           <p className="mt-4 rounded-xl bg-point-yellow/30 px-4 py-3 text-13 text-q-sub">
             {minOrderText(done.minOrderAmount)}
             <br />
@@ -87,7 +87,7 @@ export function OwnerRedeem() {
         />
 
         {redeem.isError && (
-          <p role="alert" className="mt-3 text-center text-13 font-medium text-point-red-dark">
+          <p role="alert" className="mt-3 text-center text-13 font-medium text-fg-red">
             {errorMessage(redeem.error)}
           </p>
         )}

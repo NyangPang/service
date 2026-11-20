@@ -39,7 +39,7 @@ export function ScrapGrid() {
         <li key={s.shortformId}>
           <Link to={`/?start=${s.shortformId}`} className="relative block aspect-[9/13] overflow-hidden bg-q-mint">
             <ShortformThumb video={s} />
-            <span className="absolute top-1.5 right-1.5 flex size-6 items-center justify-center rounded-md bg-white/90 text-q-text">
+            <span className="absolute top-1.5 right-1.5 flex size-6 items-center justify-center rounded-md bg-surface/90 text-q-text">
               <span className="scale-[0.35]">
                 <PhotoIcon />
               </span>

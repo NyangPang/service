@@ -60,7 +60,7 @@ export function StoreMarker({
             onOpenCoupons={onOpenCoupons}
           />
         ) : isListOpen ? (
-          <ul className="mb-1.5 max-h-52 divide-y-[0.7px] divide-mint-line overflow-y-auto rounded-[20px] border border-mint-line bg-mint py-1 text-green-6">
+          <ul className="mb-1.5 max-h-52 divide-y-[0.7px] divide-mint-line overflow-y-auto rounded-[20px] border border-mint-line bg-mint py-1 text-fg-green-6">
             {group.stores.map((store) => (
               <li key={store.storeId}>
                 <button type="button" className={`${menuItem} max-w-52 truncate`} onClick={() => onSelectStore(store)}>
@@ -74,7 +74,7 @@ export function StoreMarker({
           <button
             type="button"
             onClick={handlePinClick}
-            className={`mb-1.5 max-w-48 truncate rounded-full border border-mint-line bg-mint px-[10px] py-1 text-green-6 ${bubbleText}`}
+            className={`mb-1.5 max-w-48 truncate rounded-full border border-mint-line bg-mint px-[10px] py-1 text-fg-green-6 ${bubbleText}`}
           >
             {group.stores.some((s) => s.isQuestStore) && <QuestFlag />}
             {isGroup ? `${truncate(first.name, 6)} 외 ${rest.length}개` : first.name}
@@ -111,11 +111,11 @@ function StorePopup({
   const coupons = store.availableCouponCount ?? 0
   return (
     <div role="menu" aria-label={store.name} className="relative mb-2.5 w-[216px]">
-      <div className="overflow-hidden rounded-[20px] border border-mint-line bg-white shadow-[0_8px_24px_rgba(8,104,22,0.18)]">
+      <div className="overflow-hidden rounded-[20px] border border-mint-line bg-surface shadow-[0_8px_24px_rgba(8,104,22,0.18)]">
         <div className="border-b border-mint-line bg-mint/45 px-4 pt-3 pb-2.5">
           <p className="truncate text-base font-bold tracking-[-0.5px] text-ink">{store.name}</p>
           <div className="mt-1 flex items-center gap-1.5">
-            <span className="truncate text-xs text-green-6/80">{store.categoryName}</span>
+            <span className="truncate text-xs text-fg-green-6/80">{store.categoryName}</span>
             {store.isQuestStore && (
               <span className="shrink-0 rounded-full bg-green-6 px-1.5 py-px text-10 font-bold text-white">퀘스트 가게</span>
             )}
@@ -138,7 +138,7 @@ function StorePopup({
             type="button"
             role="menuitem"
             onClick={() => onOpenProfile(store)}
-            className="h-10 rounded-xl border border-mint-line bg-white text-sm font-bold text-green-6 active:bg-mint/40"
+            className="h-10 rounded-xl border border-mint-line bg-surface text-sm font-bold text-fg-green-6 active:bg-mint/40"
           >
             프로필 보기
           </button>
@@ -147,11 +147,11 @@ function StorePopup({
               type="button"
               role="menuitem"
               onClick={() => onOpenCoupons(store)}
-              className="flex h-10 items-center justify-between rounded-xl bg-mint px-3.5 text-sm font-bold text-green-6 active:bg-mint-line/60"
+              className="flex h-10 items-center justify-between rounded-xl bg-mint px-3.5 text-sm font-bold text-fg-green-6 active:bg-mint-line/60"
             >
               <span>쿠폰 받기</span>
               <span className="flex items-center gap-1">
-                <span className="rounded-full bg-white px-2 py-px text-xs">{coupons}장</span>›
+                <span className="rounded-full bg-surface px-2 py-px text-xs">{coupons}장</span>›
               </span>
             </button>
           )}
@@ -160,7 +160,7 @@ function StorePopup({
       {/* 핀을 가리키는 꼬리 */}
       <span
         aria-hidden
-        className="absolute -bottom-[7px] left-1/2 size-3.5 -translate-x-1/2 rotate-45 border-r border-b border-mint-line bg-white"
+        className="absolute -bottom-[7px] left-1/2 size-3.5 -translate-x-1/2 rotate-45 border-r border-b border-mint-line bg-surface"
       />
     </div>
   )

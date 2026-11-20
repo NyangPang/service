@@ -48,7 +48,7 @@ export function OwnerStoreRegister() {
   }
 
   return (
-    <div className="mx-auto flex h-full max-w-[430px] flex-col bg-white pt-[env(safe-area-inset-top)]">
+    <div className="mx-auto flex h-full max-w-[430px] flex-col bg-surface pt-[env(safe-area-inset-top)]">
       <Screen
         hero={<Hero sub={'아직 등록한 가게가 없어요\n가게 정보를 알려 주세요'} plain />}
         next={{ label: submitting ? '등록 중...' : '가게 등록하기', onClick: submit, disabled: !ready || submitting }}
@@ -89,11 +89,11 @@ export function OwnerStoreRegister() {
             style={{ colorScheme: 'light' }}
             className={`h-10 min-w-0 flex-1 bg-transparent px-1 text-15 outline-none ${category ? 'text-ink' : 'text-gray-2'}`}
           >
-            <option value="" className="bg-white text-gray-2">
+            <option value="" className="bg-surface text-gray-2">
               대분류
             </option>
             {STORE_CATEGORIES.map((c) => (
-              <option key={c.code} value={c.code} className="bg-white text-ink">
+              <option key={c.code} value={c.code} className="bg-surface text-ink">
                 {c.name}
               </option>
             ))}
@@ -101,7 +101,7 @@ export function OwnerStoreRegister() {
         </Field>
 
         {error && (
-          <p role="alert" className="mt-4 text-center text-13 font-medium text-point-red-dark">
+          <p role="alert" className="mt-4 text-center text-13 font-medium text-fg-red">
             {error}
           </p>
         )}

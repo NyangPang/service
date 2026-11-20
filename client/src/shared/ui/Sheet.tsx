@@ -34,8 +34,8 @@ export function Sheet({
         aria-label={title}
         className={
           center
-            ? 'relative max-h-[78vh] w-full max-w-[390px] animate-[rise-center_.32s_cubic-bezier(.2,.9,.25,1.05)] overflow-y-auto rounded-3xl bg-white px-5 pt-5 pb-6 shadow-[0_20px_50px_rgba(8,104,22,0.25)]'
-            : 'relative max-h-[80vh] w-full max-w-[430px] animate-[rise_.25s_ease-out] overflow-y-auto rounded-t-3xl bg-white px-5 pt-5 pb-[max(24px,env(safe-area-inset-bottom))]'
+            ? 'relative max-h-[78vh] w-full max-w-[390px] animate-[rise-center_.32s_cubic-bezier(.2,.9,.25,1.05)] overflow-y-auto rounded-3xl bg-surface px-5 pt-5 pb-6 shadow-[0_20px_50px_rgba(8,104,22,0.25)]'
+            : 'relative max-h-[80vh] w-full max-w-[430px] animate-[rise_.25s_ease-out] overflow-y-auto rounded-t-3xl bg-surface px-5 pt-5 pb-[max(24px,env(safe-area-inset-bottom))]'
         }
       >
         <header className="mb-4 flex items-center justify-between">

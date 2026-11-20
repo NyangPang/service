@@ -15,7 +15,7 @@ export function OwnerCouponTabs() {
   return (
     <div className="flex h-full flex-col bg-q-panel">
       <div className="shrink-0 px-5 pt-4" role="tablist">
-        <div className="grid grid-cols-2 rounded-full bg-white p-1 shadow-[0_2px_8px_rgba(8,104,22,0.06)]">
+        <div className="grid grid-cols-2 rounded-full bg-surface p-1 shadow-[0_2px_8px_rgba(8,104,22,0.06)]">
           {VIEWS.map((v) => (
             <button
               key={v.key}

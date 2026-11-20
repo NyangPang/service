@@ -58,7 +58,7 @@ export function OwnerHome() {
         </Link>
       )}
 
-      <OwnerCard title="이번 달 쿠폰" className="mt-3" aside={<Link to="/owner/coupons?view=settlement" className="text-xs font-medium text-q-green">정산 보기 ›</Link>}>
+      <OwnerCard title="이번 달 쿠폰" className="mt-3" aside={<Link to="/owner/coupons?view=settlement" className="text-xs font-medium text-fg-q-green">정산 보기 ›</Link>}>
         <dl className="grid grid-cols-3 gap-2 text-center">
           <Stat label="발행 중" value={`${activeCoupons.length}종`} />
           <Stat label="사용" value={`${settlement?.usedCount ?? 0}건`} />
@@ -107,7 +107,7 @@ function StatusTile({
   return (
     <Link
       to={to}
-      className={`relative overflow-hidden rounded-2xl px-4 pt-3.5 pb-3 ${on ? 'bg-q-green text-white' : 'bg-white text-q-text'}`}
+      className={`relative overflow-hidden rounded-2xl px-4 pt-3.5 pb-3 ${on ? 'bg-q-green text-white' : 'bg-surface text-q-text'}`}
     >
       <img src={image} alt="" className="absolute -right-2 -bottom-2 h-[66px] w-auto object-contain opacity-95" />
       <span className={`relative block text-xs ${on ? 'opacity-80' : 'text-q-muted'}`}>{label}</span>

@@ -97,7 +97,7 @@ function RewardResult({ reward }: { reward: LevelUp['reward'] }) {
       <div role="status" className={`${box} border border-dashed border-point-orange bg-point-yellow/25`}>
         <span aria-hidden className="text-30 leading-none">🎟</span>
         <span className="min-w-0 flex-1">
-          <span className="block text-17 font-bold text-point-red-dark">쿠폰 당첨!</span>
+          <span className="block text-17 font-bold text-fg-red">쿠폰 당첨!</span>
           <span className="block truncate text-13 font-bold text-q-text">
             {coupon.storeName} · {coupon.title}
           </span>
@@ -108,19 +108,19 @@ function RewardResult({ reward }: { reward: LevelUp['reward'] }) {
   }
   if (reward.feedAmount > 0) {
     return (
-      <div role="status" className={`${box} bg-white`}>
+      <div role="status" className={`${box} bg-surface`}>
         {reward.feedAmount >= 2 ? <FeedBowlIcon className="h-10 w-11 shrink-0" /> : <FeedIcon className="size-10 shrink-0" />}
         <span className="flex-1">
-          <span className="block text-20 leading-tight font-bold text-q-green">먹이 +{reward.feedAmount}</span>
+          <span className="block text-20 leading-tight font-bold text-fg-q-green">먹이 +{reward.feedAmount}</span>
           <span className="block text-12 text-q-muted">보유 먹이로 쏙! 비둘기에게 바로 줄 수 있어요</span>
         </span>
       </div>
     )
   }
   return (
-    <div role="status" className={`${box} bg-white`}>
+    <div role="status" className={`${box} bg-surface`}>
       <span aria-hidden className="text-28 leading-none">🏆</span>
-      <span className="text-16 font-bold text-q-green">최고 레벨 달성을 축하해요!</span>
+      <span className="text-16 font-bold text-fg-q-green">최고 레벨 달성을 축하해요!</span>
     </div>
   )
 }

@@ -34,7 +34,7 @@ export function MyCoupons() {
             role="tab"
             aria-selected={tab.status === status}
             onClick={() => setStatus(tab.status)}
-            className="h-9 rounded-full text-13 font-bold text-q-muted aria-selected:bg-white aria-selected:text-q-green aria-selected:shadow-sm"
+            className="h-9 rounded-full text-13 font-bold text-q-muted aria-selected:bg-surface aria-selected:text-fg-q-green aria-selected:shadow-sm"
           >
             {tab.label}
           </button>
@@ -73,7 +73,7 @@ export function MyCoupons() {
               ]}
               dimmed={c.status !== 'AVAILABLE'}
               onClick={c.status === 'AVAILABLE' ? () => setOpened(c) : undefined}
-              action={c.status === 'AVAILABLE' ? <span className="text-13 font-bold text-q-green">사용 ›</span> : undefined}
+              action={c.status === 'AVAILABLE' ? <span className="text-13 font-bold text-fg-q-green">사용 ›</span> : undefined}
             />
           </li>
         ))}

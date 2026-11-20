@@ -65,7 +65,7 @@ function ArrowButton({ side, onClick }: { side: 'left' | 'right'; onClick: () =>
       type="button"
       onClick={onClick}
       aria-label={side === 'left' ? '이전 사진' : '다음 사진'}
-      className={`absolute top-1/2 ${side === 'left' ? 'left-2' : 'right-2'} hidden size-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-lg font-bold text-ink shadow group-hover:flex`}
+      className={`absolute top-1/2 ${side === 'left' ? 'left-2' : 'right-2'} hidden size-8 -translate-y-1/2 items-center justify-center rounded-full bg-surface/85 text-lg font-bold text-ink shadow group-hover:flex`}
     >
       {side === 'left' ? '‹' : '›'}
     </button>

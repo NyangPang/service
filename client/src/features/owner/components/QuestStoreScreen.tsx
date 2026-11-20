@@ -46,7 +46,7 @@ export function QuestStoreScreen() {
   if (access.pending || isLoading || !sub) {
     return (
       <OwnerScreen>
-        <div className="h-60 animate-pulse rounded-2xl bg-white" />
+        <div className="h-60 animate-pulse rounded-2xl bg-surface" />
       </OwnerScreen>
     )
   }
@@ -64,7 +64,7 @@ export function QuestStoreScreen() {
                   {sub.expiresAt && untilText(sub.expiresAt)} · 월 구독
                 </p>
               </div>
-              <span className="rounded-full bg-q-mint px-2.5 py-1 text-xs font-bold text-q-green">등록됨</span>
+              <span className="rounded-full bg-q-mint px-2.5 py-1 text-xs font-bold text-fg-q-green">등록됨</span>
             </div>
           </OwnerCard>
 
@@ -78,7 +78,7 @@ export function QuestStoreScreen() {
 
           <OwnerCard title="오늘의 방문 인증 QR" className="mt-3" aside={<span className="text-xs text-q-muted">매일 자정 바뀜</span>}>
             {qr.isLoading && <div className="mx-auto size-[220px] animate-pulse rounded-2xl bg-q-panel" />}
-            {qr.isError && <p className="text-center text-sm text-point-red-dark">{errorMessage(qr.error)}</p>}
+            {qr.isError && <p className="text-center text-sm text-fg-red">{errorMessage(qr.error)}</p>}
             {qr.data && (
               <>
                 <QrBox url={visitQrUrl(storeId, qr.data.qrToken)} code={qr.data.qrToken} storeName={storeName} size={200} />
@@ -93,7 +93,7 @@ export function QuestStoreScreen() {
                   <button
                     type="button"
                     onClick={() => window.print()}
-                    className="h-11 rounded-full border border-q-green bg-white text-sm font-bold text-q-green"
+                    className="h-11 rounded-full border border-q-green bg-surface text-sm font-bold text-fg-q-green"
                   >
                     인쇄하기
                   </button>
@@ -132,7 +132,7 @@ export function QuestStoreScreen() {
 
               <ul className="mt-3 flex flex-col gap-2">
                 {BENEFITS.map((b) => (
-                  <li key={b.title} className="flex items-center gap-3.5 rounded-2xl bg-white px-4 py-4">
+                  <li key={b.title} className="flex items-center gap-3.5 rounded-2xl bg-surface px-4 py-4">
                     <span aria-hidden className="flex size-12 shrink-0 items-center justify-center rounded-full bg-q-mint text-xl">
                       {b.icon}
                     </span>
@@ -159,7 +159,7 @@ export function QuestStoreScreen() {
             </div>
           </div>
 
-          <div className="shrink-0 border-t border-q-line bg-white px-5 pt-3 pb-3">
+          <div className="shrink-0 border-t border-q-line bg-surface px-5 pt-3 pb-3">
             <PrimaryButton
               onClick={() => {
                 if (access.canManage) return setPaying(true)
@@ -185,7 +185,7 @@ export function QuestStoreScreen() {
             <Row label="상품" value="퀘스트 가게 월 구독 (30일)" />
             <Row label="금액" value="미정 · 해커톤 모의 결제" />
           </dl>
-          {subscribe.isError && <p className="mt-2 text-center text-13 text-point-red-dark">{errorMessage(subscribe.error)}</p>}
+          {subscribe.isError && <p className="mt-2 text-center text-13 text-fg-red">{errorMessage(subscribe.error)}</p>}
           <PrimaryButton
             className="mt-5"
             disabled={subscribe.isPending}
@@ -218,8 +218,8 @@ export function QuestStoreScreen() {
       )}
 
       {bigQr && qr.data && (
-        <div role="dialog" aria-modal aria-label="방문 인증 QR" className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white px-8">
-          <p className="text-sm font-bold text-q-green">잇츠 퀘스트 방문 인증</p>
+        <div role="dialog" aria-modal aria-label="방문 인증 QR" className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-surface px-8">
+          <p className="text-sm font-bold text-fg-q-green">잇츠 퀘스트 방문 인증</p>
           <p className="mt-1 text-26 font-bold text-q-text">{storeName}</p>
           <div className="mt-6 rounded-3xl border-4 border-q-green p-5">
             <QRCodeSVG value={visitQrUrl(storeId, qr.data.qrToken)} size={260} fgColor="#1e6b45" level="M" />

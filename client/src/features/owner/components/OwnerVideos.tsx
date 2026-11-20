@@ -51,21 +51,21 @@ export function OwnerVideos() {
       <div className="mt-5">
         <p className="text-13 text-q-muted">손님 피드에 공개 중</p>
         <h2 className="text-20 font-bold text-q-text">
-          우리 가게 게시물 <span className="text-q-green">{videos?.length ?? 0}</span>개
+          우리 가게 게시물 <span className="text-fg-q-green">{videos?.length ?? 0}</span>개
         </h2>
       </div>
 
       {isLoading && (
         <div className="mt-4 grid grid-cols-2 gap-3">
           {[0, 1].map((i) => (
-            <div key={i} className="aspect-[9/14] animate-pulse rounded-2xl bg-white" />
+            <div key={i} className="aspect-[9/14] animate-pulse rounded-2xl bg-surface" />
           ))}
         </div>
       )}
       {isError && <p className="py-10 text-center text-sm text-q-muted">게시물을 불러오지 못했어요</p>}
 
       {videos && videos.length === 0 && (
-        <div className="mt-6 flex flex-col items-center rounded-2xl bg-white px-6 py-8 text-center">
+        <div className="mt-6 flex flex-col items-center rounded-2xl bg-surface px-6 py-8 text-center">
           <img src={OWNER_ILLUST.videoEdit} alt="" className="h-[120px] w-auto object-contain" />
           <p className="mt-3 text-16 font-bold text-q-text">아직 올린 게시물이 없어요</p>
           <p className="mt-1 text-13 leading-relaxed text-q-muted">지도 링크나 메뉴판만 있으면 홍보 게시물을 만들어 드려요</p>
@@ -120,11 +120,11 @@ function VideoDetail({ video, onClose }: { video: Shortform; onClose: () => void
 
   return (
     <div role="dialog" aria-modal aria-label="게시물 보기" className="fixed inset-0 z-40 flex items-end justify-center bg-black/50">
-      <div className="max-h-full w-full max-w-[430px] animate-[rise_.3s_ease-out] overflow-y-auto rounded-t-3xl bg-white px-5 pt-4 pb-[max(20px,env(safe-area-inset-bottom))]">
+      <div className="max-h-full w-full max-w-[430px] animate-[rise_.3s_ease-out] overflow-y-auto rounded-t-3xl bg-surface px-5 pt-4 pb-[max(20px,env(safe-area-inset-bottom))]">
         <div className="flex items-center justify-between">
           <p className="text-13 text-q-muted">
             {formatDate(video.createdAt)} 업로드
-            {video.updatedAt && <span className="text-q-green"> · {formatDate(video.updatedAt)} 수정</span>}
+            {video.updatedAt && <span className="text-fg-q-green"> · {formatDate(video.updatedAt)} 수정</span>}
           </p>
           <button type="button" aria-label="닫기" onClick={onClose} className="flex size-9 items-center justify-center rounded-full bg-q-panel text-q-text">
             <span className="scale-[0.8]">
@@ -146,7 +146,7 @@ function VideoDetail({ video, onClose }: { video: Shortform; onClose: () => void
 
         <div className="mt-5 grid grid-cols-4 gap-2">
           <Action label="손님 화면" onClick={() => navigate(`/map/stores/${video.storeId}/shortform?start=${video.shortformId}`)}>
-            <span className="scale-[0.55] text-q-green">
+            <span className="scale-[0.55] text-fg-q-green">
               <PhotoIcon />
             </span>
           </Action>
@@ -228,7 +228,7 @@ function Action({
     <button
       type="button"
       onClick={onClick}
-      className={`relative flex flex-col items-center gap-1 rounded-xl bg-q-panel py-3 text-12 font-bold active:bg-q-mint ${danger ? 'text-point-red-dark' : 'text-q-text'}`}
+      className={`relative flex flex-col items-center gap-1 rounded-xl bg-q-panel py-3 text-12 font-bold active:bg-q-mint ${danger ? 'text-fg-red' : 'text-q-text'}`}
     >
       {pro && <span className="absolute top-1 right-1 rounded-full bg-green-6 px-1.5 text-9 leading-4 font-bold text-white">PRO</span>}
       <span className="flex size-9 items-center justify-center">{children}</span>

@@ -73,10 +73,10 @@ export function ProPlan() {
           </section>
 
           {isPro && expiresAt && (
-            <section className="mt-3 rounded-2xl bg-white px-5 py-4">
+            <section className="mt-3 rounded-2xl bg-surface px-5 py-4">
               <div className="flex items-center justify-between">
                 <p className="text-16 font-bold text-q-text">PRO 이용 중</p>
-                <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${canceled ? 'bg-q-panel text-q-muted' : 'bg-q-mint text-q-green'}`}>
+                <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${canceled ? 'bg-q-panel text-q-muted' : 'bg-q-mint text-fg-q-green'}`}>
                   {canceled ? '해지 예약됨' : '자동 갱신'}
                 </span>
               </div>
@@ -89,7 +89,7 @@ export function ProPlan() {
 
           <ul className="mt-3 flex flex-col gap-2">
             {PRO_BENEFITS.map((b) => (
-              <li key={b.title} className="flex items-center gap-3.5 rounded-2xl bg-white py-3.5 pr-4 pl-3">
+              <li key={b.title} className="flex items-center gap-3.5 rounded-2xl bg-surface py-3.5 pr-4 pl-3">
                 <span aria-hidden className="flex size-[68px] shrink-0 items-center justify-center rounded-2xl bg-q-mint">
                   <img src={b.image} alt="" className="h-[60px] w-auto object-contain" />
                 </span>
@@ -101,13 +101,13 @@ export function ProPlan() {
             ))}
           </ul>
 
-          <section className="mt-3 rounded-2xl bg-white px-4 py-4">
+          <section className="mt-3 rounded-2xl bg-surface px-4 py-4">
             <table className="w-full text-13">
               <thead>
                 <tr className="text-xs text-q-muted">
                   <th className="pb-2 text-left font-medium">기능</th>
                   <th className="w-16 pb-2 font-medium">무료</th>
-                  <th className="w-16 pb-2 font-bold text-q-green">PRO</th>
+                  <th className="w-16 pb-2 font-bold text-fg-q-green">PRO</th>
                 </tr>
               </thead>
               <tbody>
@@ -115,14 +115,14 @@ export function ProPlan() {
                   <tr key={label} className="border-t border-q-line">
                     <td className="py-2.5 text-q-text">{label}</td>
                     <td className="text-center text-q-muted">{free ? '✓' : '–'}</td>
-                    <td className="text-center font-bold text-q-green">{pro ? '✓' : '–'}</td>
+                    <td className="text-center font-bold text-fg-q-green">{pro ? '✓' : '–'}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </section>
 
-          <section className="mt-3 rounded-2xl bg-white px-4 py-4">
+          <section className="mt-3 rounded-2xl bg-surface px-4 py-4">
             <p className="mb-3 text-15 font-bold text-q-text">이용 안내</p>
             <dl className="flex flex-col gap-2 text-13">
               {TERMS.map(([label, value]) => (
@@ -143,7 +143,7 @@ export function ProPlan() {
       </div>
 
       {((!isPro && !isPending) || canceled) && (
-        <div className="shrink-0 border-t border-q-line bg-white px-5 pt-3 pb-3">
+        <div className="shrink-0 border-t border-q-line bg-surface px-5 pt-3 pb-3">
           {!isPro && (
             <PrimaryButton
               onClick={() => {
@@ -209,7 +209,7 @@ export function ProPlan() {
               type="button"
               onClick={() => changeAutoRenew(false)}
               disabled={setAutoRenew.isPending}
-              className="h-11 rounded-full border border-q-line bg-white text-sm font-bold text-q-muted"
+              className="h-11 rounded-full border border-q-line bg-surface text-sm font-bold text-q-muted"
             >
               해지하기
             </button>

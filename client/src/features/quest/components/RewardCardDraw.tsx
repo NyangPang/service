@@ -97,7 +97,7 @@ export function RewardCardDraw({ levelUp, onRevealed }: { levelUp: LevelUp; onRe
 
   return (
     <div className="text-center">
-      <p className={`text-15 font-bold ${phase === 'pick' ? 'animate-pulse text-q-green' : 'text-q-text'}`}>{guide}</p>
+      <p className={`text-15 font-bold ${phase === 'pick' ? 'animate-pulse text-fg-q-green' : 'text-q-text'}`}>{guide}</p>
       {phase === 'intro' && (
         // 곧 카드를 섞는다는 걸 알려주는 줄어드는 막대
         <div className="mx-auto mt-2 h-1 w-24 overflow-hidden rounded-full bg-q-track">
@@ -176,7 +176,7 @@ function CardFront({
   return (
     <span
       className={`absolute inset-0 flex flex-col items-center justify-center rounded-2xl border-2 px-1.5 transition-opacity duration-300 ${
-        coupon ? 'border-point-orange bg-point-yellow/25' : 'border-mint-line bg-white'
+        coupon ? 'border-point-orange bg-point-yellow/25' : 'border-mint-line bg-surface'
       } ${highlight ? 'shadow-[0_0_0_4px_rgba(60,179,113,0.35),0_10px_24px_rgba(8,104,22,0.25)]' : 'shadow-sm'} ${
         dimmed ? 'opacity-45' : ''
       }`}
@@ -190,7 +190,7 @@ function CardFront({
         <FeedBowlIcon className="h-12 w-14" />
       )}
       {coupon && <span className="text-34 leading-none">🎟</span>}
-      <span className={`mt-2 text-14 font-bold ${coupon ? 'text-point-red-dark' : 'text-q-text'}`}>
+      <span className={`mt-2 text-14 font-bold ${coupon ? 'text-fg-red' : 'text-q-text'}`}>
         {kind === 'FEED1' ? '먹이 1개' : kind === 'FEED2' ? '먹이 2개' : '쿠폰'}
       </span>
       {odds && <span className="mt-0.5 text-11 text-q-muted">{odds}</span>}
@@ -209,7 +209,7 @@ function CardBack({ pickable }: { pickable: boolean }) {
   return (
     <span
       className={`absolute inset-0 flex items-center justify-center overflow-hidden rounded-2xl border-2 border-white bg-gradient-to-br from-green-4 to-green-6 shadow-md ${
-        pickable ? 'ring-2 ring-mint-line ring-offset-2' : ''
+        pickable ? 'ring-2 ring-mint-line ring-offset-2 ring-offset-surface' : ''
       }`}
       style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
     >

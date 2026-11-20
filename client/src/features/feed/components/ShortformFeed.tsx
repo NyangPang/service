@@ -78,7 +78,7 @@ export function ShortformFeed({ storeId, startId }: { storeId?: number; startId?
   const couponCount = (id: number) => stores?.find((s) => s.storeId === id)?.availableCouponCount ?? 0
 
   return (
-    <div className="relative h-full bg-white">
+    <div className="relative h-full bg-surface">
       <div ref={containerRef} className="h-full snap-y snap-mandatory overflow-y-auto overscroll-contain [scrollbar-width:none]">
         {items.map((item, i) => (
           <div key={item.shortformId} data-index={i} className="h-full snap-start snap-always">
@@ -115,7 +115,7 @@ export function ShortformFeed({ storeId, startId }: { storeId?: number; startId?
               >
                 처음부터 다시 보기
               </button>
-              <button type="button" onClick={() => navigate('/map')} className="h-12 rounded-full bg-white text-15 font-bold text-green-6">
+              <button type="button" onClick={() => navigate('/map')} className="h-12 rounded-full bg-surface text-15 font-bold text-fg-green-6">
                 지도에서 가게 둘러보기
               </button>
             </div>
@@ -163,7 +163,7 @@ function FeedGuide() {
       {/* 아이콘: 2026-10-09 사용자 제공 */}
       <GuideRow icon={guideSwipe} motion="animate-[guide-swipe_1.6s_ease-in-out_infinite]" title="위로 넘기면 다음 게시물" sub="동네 가게 게시물을 하나씩 구경해요" />
       <GuideRow icon={guideScrap} title="마음에 들면 스크랩" sub="사진 아래 버튼으로 스크랩·위치·공유, 쿠폰도 바로 받아요" />
-      <span className="mt-2 rounded-full bg-white px-6 py-2.5 text-15 font-bold text-ink">알겠어요</span>
+      <span className="mt-2 rounded-full bg-surface px-6 py-2.5 text-15 font-bold text-ink">알겠어요</span>
     </button>
   )
 }

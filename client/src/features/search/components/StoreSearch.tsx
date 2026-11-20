@@ -57,7 +57,7 @@ export function StoreSearch() {
 
   return (
     <div className="h-full overflow-y-auto pb-8">
-      <div className="sticky top-0 z-10 bg-white px-5 pt-3 pb-3">
+      <div className="sticky top-0 z-10 bg-surface px-5 pt-3 pb-3">
         <label className="flex h-12 items-center gap-2 rounded-full border border-q-line bg-q-panel px-4 text-q-muted focus-within:border-q-green">
           <SearchIcon />
           <input
@@ -108,7 +108,7 @@ export function StoreSearch() {
                   aria-pressed={selected}
                   onClick={() => update({ category: c.code })}
                   className={`rounded-full border px-3 py-1.5 text-13 font-medium whitespace-nowrap ${
-                    selected ? 'border-q-green bg-q-green text-white' : 'border-q-line bg-white text-q-sub'
+                    selected ? 'border-q-green bg-q-green text-white' : 'border-q-line bg-surface text-q-sub'
                   }`}
                 >
                   {c.name}
@@ -174,7 +174,7 @@ function RankingRow({ store, showRank }: { store: RankedStore; showRank: boolean
         <div className="min-w-0 flex-1">
           <p className="truncate text-15 font-bold text-q-text">{store.name}</p>
           <p className="truncate text-xs text-q-muted">
-            <span className="font-medium text-q-green">{store.categoryName}</span>
+            <span className="font-medium text-fg-q-green">{store.categoryName}</span>
             {store.district && ` · ${store.district}`}
           </p>
         </div>

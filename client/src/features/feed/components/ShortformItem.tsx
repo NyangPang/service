@@ -41,13 +41,13 @@ export function ShortformItem({ item, active, couponCount, onOpenCoupons }: Prop
   }
 
   return (
-    <article className="flex h-full flex-col bg-white" aria-label={`${item.storeName} 홍보 게시물`}>
+    <article className="flex h-full flex-col bg-surface" aria-label={`${item.storeName} 홍보 게시물`}>
       {/* 가게 프로필 */}
       <header className="flex shrink-0 items-center gap-2.5 px-4 py-2.5">
         <Link
           to={`/map/stores/${item.storeId}`}
           aria-label={`${item.storeName} 프로필`}
-          className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white ring-2 ring-green-4 ring-offset-2"
+          className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-surface ring-2 ring-green-4 ring-offset-2 ring-offset-surface"
         >
           <StoreProfilePhoto url={item.storeThumbnailUrl} icon={icon} />
         </Link>
@@ -64,7 +64,7 @@ export function ShortformItem({ item, active, couponCount, onOpenCoupons }: Prop
             {item.address}
           </Link>
         </div>
-        <Link to={`/map/stores/${item.storeId}`} className="shrink-0 rounded-full border border-q-line px-3 py-1.5 text-12 font-bold text-green-6">
+        <Link to={`/map/stores/${item.storeId}`} className="shrink-0 rounded-full border border-q-line px-3 py-1.5 text-12 font-bold text-fg-green-6">
           가게 보기
         </Link>
       </header>
@@ -143,9 +143,9 @@ export function ShortformItem({ item, active, couponCount, onOpenCoupons }: Prop
 function PostPhoto({ item, icon, active }: { item: Shortform; icon?: string; active: boolean }) {
   const alt = item.description || `${item.storeName} 사진`
   const fallback = (
-    <div className="flex size-full flex-col items-center justify-center bg-gradient-to-br from-q-mint to-[#d7ebe0] text-center">
+    <div className="flex size-full flex-col items-center justify-center bg-gradient-to-br from-q-mint to-[#d7ebe0] dark:to-q-panel text-center">
       {icon && <img src={icon} alt="" className="h-[120px] w-auto object-contain opacity-90" />}
-      <p className="mt-3 text-15 font-bold text-green-6">{item.storeName}</p>
+      <p className="mt-3 text-15 font-bold text-fg-green-6">{item.storeName}</p>
       <p className="mt-0.5 text-12 text-q-muted">사진을 준비하고 있어요</p>
     </div>
   )

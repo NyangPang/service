@@ -63,10 +63,10 @@ export function OwnerProfile() {
     }
   }
 
-  if (!store) return <div className="h-full animate-pulse bg-white" />
+  if (!store) return <div className="h-full animate-pulse bg-surface" />
 
   return (
-    <div className="h-full overflow-y-auto bg-white pb-10">
+    <div className="h-full overflow-y-auto bg-surface pb-10">
       <section className="px-5 pt-6">
         <h2 className="text-13 font-bold text-ink">가게 정보</h2>
 
@@ -74,7 +74,7 @@ export function OwnerProfile() {
           <span className="pt-1 pl-1 text-15 text-green-4">프로필 사진</span>
           <button type="button" aria-label="프로필 사진 바꾸기" onClick={() => fileRef.current?.click()} className="relative" disabled={saving}>
             <StoreAvatar url={store.thumbnailUrl} className="size-[92px]" />
-            <span className="absolute -right-1.5 -bottom-1.5 flex size-8 items-center justify-center rounded-full border-2 border-white bg-green-4 text-white">
+            <span className="absolute -right-1.5 -bottom-1.5 flex size-8 items-center justify-center rounded-full border-2 border-surface bg-green-4 text-white">
               <PencilIcon />
             </span>
           </button>
@@ -91,7 +91,7 @@ export function OwnerProfile() {
         ) : (
           <Row label="주소" value={store.address} onEdit={() => setEditing('address')} />
         )}
-        {error && <p role="alert" className="mt-2 text-13 text-point-red-dark">{error}</p>}
+        {error && <p role="alert" className="mt-2 text-13 text-fg-red">{error}</p>}
 
         <Link
           to={`/map/stores/${storeId}`}
@@ -119,12 +119,12 @@ export function OwnerProfile() {
         {videos && videos.length === 0 ? (
           <p className="py-14 text-center text-14 text-green-4">업로드한 게시물이 없습니다</p>
         ) : (
-          <ul className="mt-3 grid grid-cols-3 gap-px bg-white">
+          <ul className="mt-3 grid grid-cols-3 gap-px bg-surface">
             {videos?.map((v) => (
               <li key={v.shortformId}>
-                <Link to="/owner/create" className="relative block aspect-[9/13] overflow-hidden bg-[#dde5e2]">
+                <Link to="/owner/create" className="relative block aspect-[9/13] overflow-hidden bg-[#dde5e2] dark:bg-q-panel">
                   <ShortformThumb video={v} />
-                  <span className="absolute top-1.5 right-1.5 flex size-5 items-center justify-center rounded bg-white/90 text-q-text">
+                  <span className="absolute top-1.5 right-1.5 flex size-5 items-center justify-center rounded bg-surface/90 text-q-text">
                     <span className="scale-[0.3]">
                       <PhotoIcon />
                     </span>

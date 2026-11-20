@@ -45,20 +45,20 @@ export function OwnerQuests() {
         </Link>
       )}
 
-      <section className="rounded-2xl bg-white px-5 py-4">
+      <section className="rounded-2xl bg-surface px-5 py-4">
         <p className="text-15 font-bold text-q-text">우리 가게가 참여할 퀘스트를 골라 주세요</p>
         <p className="mt-1 text-13 leading-relaxed text-q-muted">
           손님이 퀘스트를 깨려고 참여 가게를 찾아와요.
           <br />
           참여 가게가 한 곳도 없는 퀘스트는 손님에게 보이지 않아요.
         </p>
-        <p className="mt-3 inline-block rounded-full bg-q-mint px-3 py-1 text-xs font-bold text-q-green">참여 중 {joinedCount}개</p>
+        <p className="mt-3 inline-block rounded-full bg-q-mint px-3 py-1 text-xs font-bold text-fg-q-green">참여 중 {joinedCount}개</p>
       </section>
 
-      {isLoading && <div className="mt-3 h-40 animate-pulse rounded-2xl bg-white" />}
+      {isLoading && <div className="mt-3 h-40 animate-pulse rounded-2xl bg-surface" />}
       {isError && <p className="py-10 text-center text-sm text-q-muted">퀘스트 목록을 불러오지 못했어요</p>}
       {toggle.isError && (
-        <p role="alert" className="mt-3 text-center text-13 font-medium text-point-red-dark">
+        <p role="alert" className="mt-3 text-center text-13 font-medium text-fg-red">
           {errorMessage(toggle.error)}
         </p>
       )}
@@ -106,18 +106,18 @@ function TemplateCard({
   const tpl = questTemplate(t.templateKey)
   const hidden = t.participantCount === 0
   return (
-    <li className={`flex items-center gap-3 rounded-2xl bg-white py-3 pr-3 pl-3 ${t.joined ? 'ring-2 ring-q-green' : ''}`}>
+    <li className={`flex items-center gap-3 rounded-2xl bg-surface py-3 pr-3 pl-3 ${t.joined ? 'ring-2 ring-q-green' : ''}`}>
       <span className="flex size-16 shrink-0 items-center justify-center rounded-2xl bg-q-mint">
         {tpl && <img src={tpl.image} alt="" className="h-14 w-auto object-contain" />}
       </span>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
           <p className="truncate text-15 font-bold text-q-text">{t.title}</p>
-          {recommended && <span className="shrink-0 rounded-full bg-point-yellow/50 px-1.5 py-px text-10 font-bold text-point-red-dark">추천</span>}
+          {recommended && <span className="shrink-0 rounded-full bg-point-yellow/50 px-1.5 py-px text-10 font-bold text-fg-red">추천</span>}
         </div>
         <p className="truncate text-xs text-q-muted">{t.description}</p>
         <p className="mt-1 flex items-center gap-2 text-11 whitespace-nowrap text-q-sub">
-          <span className={hidden ? 'font-bold text-point-red-dark' : ''}>
+          <span className={hidden ? 'font-bold text-fg-red' : ''}>
             {hidden ? '참여 가게 없음 (숨김)' : `참여 가게 ${t.participantCount}곳`}
           </span>
           <span className="flex shrink-0 items-center gap-0.5">
@@ -131,7 +131,7 @@ function TemplateCard({
         disabled={disabled || pending}
         onClick={() => onToggle(t)}
         className={`h-9 shrink-0 rounded-full px-3.5 text-13 font-bold whitespace-nowrap transition-transform active:scale-95 disabled:opacity-40 ${
-          t.joined ? 'bg-q-mint text-q-green' : 'bg-q-green text-white'
+          t.joined ? 'bg-q-mint text-fg-q-green' : 'bg-q-green text-white'
         }`}
       >
         {pending ? '...' : t.joined ? '✓ 참여 중' : hidden ? '첫 가게 되기' : '참여하기'}

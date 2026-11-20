@@ -55,7 +55,7 @@ export function StoreCouponSheet({
                       onError: (e) => setMessage({ ok: false, text: errorMessage(e) }),
                     })
                   }
-                  className="h-9 rounded-full bg-q-green px-4 text-13 font-bold whitespace-nowrap text-white transition-transform active:scale-95 disabled:bg-q-mint disabled:text-q-green"
+                  className="h-9 rounded-full bg-q-green px-4 text-13 font-bold whitespace-nowrap text-white transition-transform active:scale-95 disabled:bg-q-mint disabled:text-fg-q-green"
                 >
                   {c.alreadyDownloaded ? '✓ 받음' : '받기'}
                 </button>
@@ -69,7 +69,7 @@ export function StoreCouponSheet({
           role="status"
           key={message.text + burst}
           className={`mt-4 animate-[rise-center_.3s_ease-out] rounded-full py-2.5 text-center text-sm font-bold ${
-            message.ok ? 'bg-q-mint text-q-green' : 'bg-point-yellow/30 text-point-red-dark'
+            message.ok ? 'bg-q-mint text-fg-q-green' : 'bg-point-yellow/30 text-fg-red'
           }`}
         >
           {message.text}

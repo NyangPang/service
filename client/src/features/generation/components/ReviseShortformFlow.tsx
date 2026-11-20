@@ -33,13 +33,13 @@ export function ReviseShortformFlow({ shortformId }: { shortformId: number }) {
   const backToList = () => navigate('/owner/videos', { replace: true })
 
   return (
-    <div className="mx-auto flex h-full max-w-[430px] flex-col bg-white">
+    <div className="mx-auto flex h-full max-w-[430px] flex-col bg-surface">
       <header className="flex h-[68px] shrink-0 items-center justify-between px-[18px] pt-[env(safe-area-inset-top)]">
         <button
           type="button"
           aria-label="닫기"
           onClick={backToList}
-          className="flex size-[44px] items-center justify-center rounded-full border border-mint-line bg-white text-green-6 shadow-[0_4px_14px_rgba(8,104,22,0.14)]"
+          className="flex size-[44px] items-center justify-center rounded-full border border-mint-line bg-surface text-fg-green-6 shadow-[0_4px_14px_rgba(8,104,22,0.14)]"
         >
           <CloseIcon />
         </button>
@@ -255,7 +255,7 @@ function OriginalCard({ video }: { video: Shortform }) {
         <ShortformThumb video={video} />
       </span>
       <span className="min-w-0">
-        <span className="text-11 font-bold text-q-green">지금 공개 중인 게시물</span>
+        <span className="text-11 font-bold text-fg-q-green">지금 공개 중인 게시물</span>
         <span className="mt-0.5 line-clamp-2 block text-14 font-bold text-q-text">{video.description || video.storeName}</span>
       </span>
     </div>

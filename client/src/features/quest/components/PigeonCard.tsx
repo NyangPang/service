@@ -67,14 +67,14 @@ export function PigeonCard() {
     <section className="rounded-3xl bg-q-mint px-5 pt-4 pb-5">
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-1.5">
-          <span className="shrink-0 rounded-full bg-white px-3 py-1 text-13 font-bold text-q-green-dark">
+          <span className="shrink-0 rounded-full bg-surface px-3 py-1 text-13 font-bold text-q-green-dark dark:text-fg-q-green">
             {levelLabel(pigeon.level, pigeon.levelName)}
           </span>
           {breed && (
-            <span className="truncate rounded-full bg-white/70 px-2.5 py-1 text-12 font-bold text-q-green">{breed}</span>
+            <span className="truncate rounded-full bg-surface/70 px-2.5 py-1 text-12 font-bold text-fg-q-green">{breed}</span>
           )}
         </div>
-        <div className="flex shrink-0 gap-2.5 text-13 font-medium text-q-green">
+        <div className="flex shrink-0 gap-2.5 text-13 font-medium text-fg-q-green">
           <Link to="/quest/album">앨범 ›</Link>
           <Link to="/quest/history">성장 기록 ›</Link>
         </div>
@@ -100,7 +100,7 @@ export function PigeonCard() {
 
       {pigeon.isMaxLevel ? (
         <div className="mt-3 text-center">
-          <p className="text-15 font-bold text-q-green">최고 레벨까지 키웠어요!</p>
+          <p className="text-15 font-bold text-fg-q-green">최고 레벨까지 키웠어요!</p>
           <button
             type="button"
             disabled={graduate.isPending}
@@ -120,7 +120,7 @@ export function PigeonCard() {
         <div className="mt-3">
           <div className="flex justify-between text-13">
             <span className="font-bold text-q-text">다음 레벨까지</span>
-            <span className="font-bold text-q-green">
+            <span className="font-bold text-fg-q-green">
               {pigeon.currentFeed} / {pigeon.requiredFeed}
             </span>
           </div>
@@ -133,7 +133,7 @@ export function PigeonCard() {
 
       {/* 보유 먹이 + 먹이 주기 (Figma 5. 리워드 탭의 "보유 먹이 + 먹이 주기") */}
       {!pigeon.isMaxLevel && (
-        <div className="mt-4 flex items-center gap-3 rounded-2xl bg-white px-4 py-3">
+        <div className="mt-4 flex items-center gap-3 rounded-2xl bg-surface px-4 py-3">
           <FeedBowlIcon className="h-11 w-12" />
           <div className="flex-1">
             <p className="text-11 text-q-muted">보유 먹이</p>
@@ -153,7 +153,7 @@ export function PigeonCard() {
                 type="button"
                 disabled={busy}
                 onClick={() => giveFeed(Math.min(feedBalance, remaining))}
-                className="text-11 font-medium text-q-green underline"
+                className="text-11 font-medium text-fg-q-green underline"
               >
                 {feedBalance >= remaining ? `레벨업까지 ${remaining}개 주기` : `${feedBalance}개 모두 주기`}
               </button>
@@ -174,7 +174,7 @@ export function PigeonCard() {
           disabled={today.dailyFeedClaimed || busy}
           onClick={() => daily.mutate(undefined, { onSuccess: gained, onError: fail })}
           // 씨앗은 왼쪽 고정 자리, 글자는 씨앗 오른쪽 남은 공간의 가운데 (문구 길이가 바뀌어도 겹치지 않음)
-          className="relative flex h-[52px] items-center rounded-2xl border border-q-green bg-white pr-2 pl-10 text-q-green disabled:border-transparent disabled:text-q-muted"
+          className="relative flex h-[52px] items-center rounded-2xl border border-q-green bg-surface pr-2 pl-10 text-fg-q-green disabled:border-transparent disabled:text-q-muted"
         >
           <FeedIcon
             className={`absolute top-1/2 left-3 size-6 -translate-y-1/2 ${today.dailyFeedClaimed ? 'opacity-40' : ''}`}
@@ -188,7 +188,7 @@ export function PigeonCard() {
           type="button"
           disabled={adLeft <= 0 || busy}
           onClick={() => setWatchingAd(true)}
-          className="flex h-[52px] flex-col items-center justify-center rounded-2xl border border-q-green bg-white text-q-green disabled:border-transparent disabled:text-q-muted"
+          className="flex h-[52px] flex-col items-center justify-center rounded-2xl border border-q-green bg-surface text-fg-q-green disabled:border-transparent disabled:text-q-muted"
         >
           <span className="text-14 font-bold">▶ 광고 보고 먹이</span>
           <span className="text-11">
@@ -198,7 +198,7 @@ export function PigeonCard() {
       </div>
 
       {toast && (
-        <p key={toast} role="status" className="mt-3 animate-[rise-center_.3s_ease-out] text-center text-13 font-bold text-q-green-dark">
+        <p key={toast} role="status" className="mt-3 animate-[rise-center_.3s_ease-out] text-center text-13 font-bold text-q-green-dark dark:text-fg-q-green">
           {toast}
         </p>
       )}

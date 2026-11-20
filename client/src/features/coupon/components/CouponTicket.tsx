@@ -25,11 +25,11 @@ export function CouponTicket({
   const body = (
     <>
       <div className="flex w-[92px] shrink-0 flex-col items-center justify-center border-r-2 border-dashed border-q-line bg-point-yellow/30 px-1.5 py-4">
-        <span className={`leading-none font-bold whitespace-nowrap text-point-red-dark ${amountSize}`}>
+        <span className={`leading-none font-bold whitespace-nowrap text-fg-red ${amountSize}`}>
           {amount}
           <span className="text-13">{discountType === 'AMOUNT' ? '원' : '%'}</span>
         </span>
-        <span className="mt-1 text-11 font-medium text-point-red-dark">할인</span>
+        <span className="mt-1 text-11 font-medium text-fg-red">할인</span>
       </div>
       <div className="min-w-0 flex-1 px-4 py-3 text-left">
         <p className="truncate text-15 font-bold text-q-text">{title}</p>
@@ -42,7 +42,7 @@ export function CouponTicket({
       {action && <div className="flex shrink-0 items-center pr-3">{action}</div>}
     </>
   )
-  const className = `flex w-full overflow-hidden rounded-2xl border border-q-line bg-white ${dimmed ? 'opacity-50' : ''}`
+  const className = `flex w-full overflow-hidden rounded-2xl border border-q-line bg-surface ${dimmed ? 'opacity-50' : ''}`
   return onClick ? (
     <button type="button" onClick={onClick} className={className} aria-label={`${title} ${discountText({ discountType, discountValue })}`}>
       {body}

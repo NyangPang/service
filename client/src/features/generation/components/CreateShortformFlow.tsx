@@ -108,13 +108,13 @@ export function CreateShortformFlow() {
   const inputStep = step === 'source' ? 1 : step === 'menus' ? 2 : step === 'appeal' ? 3 : 0
 
   return (
-    <div className="mx-auto flex h-full max-w-[430px] flex-col bg-white">
+    <div className="mx-auto flex h-full max-w-[430px] flex-col bg-surface">
       <header className="flex h-[68px] shrink-0 items-center justify-between px-[18px] pt-[env(safe-area-inset-top)]">
         <button
           type="button"
           aria-label="닫기"
           onClick={close}
-          className="flex size-[44px] items-center justify-center rounded-full border border-mint-line bg-white text-green-6 shadow-[0_4px_14px_rgba(8,104,22,0.14)]"
+          className="flex size-[44px] items-center justify-center rounded-full border border-mint-line bg-surface text-fg-green-6 shadow-[0_4px_14px_rgba(8,104,22,0.14)]"
         >
           <CloseIcon />
         </button>

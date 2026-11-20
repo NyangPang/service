@@ -16,12 +16,12 @@ export function PigeonAlbum() {
         <Link to="/quest" className="flex items-center gap-3 rounded-2xl border border-q-green bg-q-mint px-4 py-3">
           <img src={pigeonImage(pigeon.level, pigeon.breed)} alt="" className="size-14 object-contain" />
           <div className="min-w-0 flex-1">
-            <p className="text-12 font-bold text-q-green">지금 키우는 {pigeon.generation}번째 비둘기</p>
+            <p className="text-12 font-bold text-fg-q-green">지금 키우는 {pigeon.generation}번째 비둘기</p>
             <p className="truncate text-15 font-bold text-q-text">
               {pigeon.isEgg ? '🥚 아직 알이에요' : `${breedLabel(pigeon.breed)} · Lv. ${pigeon.level}`}
             </p>
           </div>
-          <span className="text-q-green">›</span>
+          <span className="text-fg-q-green">›</span>
         </Link>
       )}
 
@@ -54,8 +54,8 @@ export function PigeonAlbum() {
 function GraduateCard({ item }: { item: AlbumItem }) {
   const b = PIGEON_BREEDS[item.breed]
   return (
-    <div className="flex flex-col items-center rounded-2xl border border-q-line bg-white px-3 pt-3 pb-3.5 text-center">
-      <span className="self-start rounded-full bg-q-mint px-2 py-0.5 text-11 font-bold text-q-green">🎓 {item.generation}기</span>
+    <div className="flex flex-col items-center rounded-2xl border border-q-line bg-surface px-3 pt-3 pb-3.5 text-center">
+      <span className="self-start rounded-full bg-q-mint px-2 py-0.5 text-11 font-bold text-fg-q-green">🎓 {item.generation}기</span>
       <img src={b.image} alt="" className="mt-1 h-[96px] w-auto object-contain" />
       <p className="mt-2 text-14 font-bold text-q-text">
         {b.emoji} {b.name} 비둘기
@@ -63,7 +63,7 @@ function GraduateCard({ item }: { item: AlbumItem }) {
       <p className="mt-0.5 text-11 text-q-muted">
         {dateText(item.graduatedAt)} 졸업 · {item.days}일
       </p>
-      {item.rewardCouponCount > 0 && <p className="mt-0.5 text-11 font-medium text-q-green">쿠폰 {item.rewardCouponCount}장</p>}
+      {item.rewardCouponCount > 0 && <p className="mt-0.5 text-11 font-medium text-fg-q-green">쿠폰 {item.rewardCouponCount}장</p>}
     </div>
   )
 }

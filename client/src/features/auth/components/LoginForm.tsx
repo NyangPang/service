@@ -33,7 +33,7 @@ export function LoginForm({ onSuccess, compact = false }: { onSuccess?: () => vo
         <input type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="비밀번호를 입력해주세요" className={input} />
       </label>
       {login.isError && (
-        <p role="alert" className="mt-2 text-12 font-medium text-point-red-dark">
+        <p role="alert" className="mt-2 text-12 font-medium text-fg-red">
           {errorMessage(login.error)}
         </p>
       )}

@@ -24,7 +24,7 @@ export function DistrictPicker({ value, onChange }: { value: string | null; onCh
         aria-haspopup="dialog"
         aria-label={`지역 선택: ${value ?? '서울 전체'}`}
         className={`flex h-9 min-w-0 items-center gap-1.5 rounded-full border pr-2.5 pl-3 text-13 font-bold transition-colors ${
-          value ? 'border-q-green bg-q-mint text-q-green' : 'border-q-line bg-white text-q-text'
+          value ? 'border-q-green bg-q-mint text-fg-q-green' : 'border-q-line bg-surface text-q-text'
         }`}
       >
         <PinIcon />
@@ -66,14 +66,14 @@ export function DistrictPicker({ value, onChange }: { value: string | null; onCh
                       selected
                         ? 'border-q-green bg-q-green text-white'
                         : count
-                          ? 'border-q-line bg-white text-q-text active:bg-q-mint'
-                          : 'border-q-line/70 bg-white text-q-sub active:bg-q-mint'
+                          ? 'border-q-line bg-surface text-q-text active:bg-q-mint'
+                          : 'border-q-line/70 bg-surface text-q-sub active:bg-q-mint'
                     }`}
                   >
                     <span className="text-14 font-bold">{name}</span>
                     <span
                       className={`mt-0.5 text-11 ${
-                        selected ? 'text-white/85' : count ? 'font-medium text-q-green' : 'text-q-muted'
+                        selected ? 'text-white/85' : count ? 'font-medium text-fg-q-green' : 'text-q-muted'
                       }`}
                     >
                       {count === undefined ? ' ' : count > 0 ? `가게 ${count}` : '아직 없음'}
