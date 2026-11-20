@@ -36,6 +36,41 @@
   --color-q-cream: #fff6dd;
   --color-q-ground: #efe6d6;
 
+  /*
+   * 글자 크기: 전부 --font-scale 을 곱해서 큰글씨 모드(설정)에서 한꺼번에 커짐.
+   * 픽셀 크기는 text-[13px] 대신 text-13 처럼 씀 (text-[Npx] 로 쓰면 큰글씨 모드에서 안 커짐)
+   */
+  --text-xs: calc(0.75rem * var(--font-scale));
+  --text-sm: calc(0.875rem * var(--font-scale));
+  --text-base: calc(1rem * var(--font-scale));
+  --text-lg: calc(1.125rem * var(--font-scale));
+  --text-xl: calc(1.25rem * var(--font-scale));
+  --text-2xl: calc(1.5rem * var(--font-scale));
+  --text-3xl: calc(1.875rem * var(--font-scale));
+  --text-4xl: calc(2.25rem * var(--font-scale));
+  --text-9: calc(9px * var(--font-scale));
+  --text-10: calc(10px * var(--font-scale));
+  --text-11: calc(11px * var(--font-scale));
+  --text-12: calc(12px * var(--font-scale));
+  --text-13: calc(13px * var(--font-scale));
+  --text-14: calc(14px * var(--font-scale));
+  --text-15: calc(15px * var(--font-scale));
+  --text-16: calc(16px * var(--font-scale));
+  --text-17: calc(17px * var(--font-scale));
+  --text-18: calc(18px * var(--font-scale));
+  --text-19: calc(19px * var(--font-scale));
+  --text-20: calc(20px * var(--font-scale));
+  --text-21: calc(21px * var(--font-scale));
+  --text-22: calc(22px * var(--font-scale));
+  --text-24: calc(24px * var(--font-scale));
+  --text-25: calc(25px * var(--font-scale));
+  --text-26: calc(26px * var(--font-scale));
+  --text-28: calc(28px * var(--font-scale));
+  --text-30: calc(30px * var(--font-scale));
+  --text-32: calc(32px * var(--font-scale));
+  --text-34: calc(34px * var(--font-scale));
+  --text-38: calc(38px * var(--font-scale));
+
   --font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   /* Figma 타이틀 폰트 Jalnan 2 — 웹폰트가 없어 같은 계열의 여기어때 잘난체(Jalnan)로 (아래 @font-face) */
   --font-title: 'Jalnan 2', 'Jalnan', 'Pretendard', sans-serif;
@@ -50,6 +85,14 @@
   font-display: swap;
 }
 
+/* 큰글씨 모드: <html data-font-size="large"> (stores/displayStore.ts 가 붙임) */
+:root {
+  --font-scale: 1;
+}
+:root[data-font-size='large'] {
+  --font-scale: 1.2;
+}
+
 html,
 body,
 #root {
@@ -57,7 +100,7 @@ body,
 }
 
 body {
-  @apply bg-gray-1 font-sans text-neutral-900 antialiased;
+  @apply bg-gray-1 font-sans text-base text-neutral-900 antialiased;
 }
 
 /* 사장님 방문 인증 QR 인쇄: QR 카드만 종이 가운데에 크게 */

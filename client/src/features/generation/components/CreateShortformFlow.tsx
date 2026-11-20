@@ -170,7 +170,7 @@ export function CreateShortformFlow() {
             maxLength={200}
             rows={5}
             placeholder="예) 가게가 넓고 고기가 맛있어요"
-            className="w-full resize-none border-b-2 border-green-4 py-2 text-[15px] leading-relaxed text-ink outline-none placeholder:text-gray-2"
+            className="w-full resize-none border-b-2 border-green-4 py-2 text-15 leading-relaxed text-ink outline-none placeholder:text-gray-2"
           />
           <p className="mt-1 text-right text-xs text-gray-2">{appeal.length} / 200</p>
           <p className="mt-4 rounded-xl bg-q-panel px-4 py-3 text-xs leading-relaxed break-keep text-q-muted">
@@ -203,8 +203,8 @@ export function CreateShortformFlow() {
           </div>
           {detail.data && (
             <div className="mx-auto mt-4 max-w-[300px]">
-              <p className="text-[16px] font-bold text-ink">{detail.data.title}</p>
-              {detail.data.caption && <p className="mt-1 text-[14px] leading-relaxed text-q-sub">{detail.data.caption}</p>}
+              <p className="text-16 font-bold text-ink">{detail.data.title}</p>
+              {detail.data.caption && <p className="mt-1 text-14 leading-relaxed text-q-sub">{detail.data.caption}</p>}
             </div>
           )}
         </Screen>
@@ -222,12 +222,12 @@ export function CreateShortformFlow() {
                   setEditRequest('')
                   setStep('editInput')
                 }}
-                className="h-12 rounded-xl bg-green-4 text-[15px] font-bold text-white active:scale-[0.98]"
+                className="h-12 rounded-xl bg-green-4 text-15 font-bold text-white active:scale-[0.98]"
               >
                 {label}
               </button>
             ))}
-            <button type="button" onClick={() => setModal('delete')} className="h-12 rounded-xl bg-[#475569] text-[15px] font-bold text-white active:scale-[0.98]">
+            <button type="button" onClick={() => setModal('delete')} className="h-12 rounded-xl bg-[#475569] text-15 font-bold text-white active:scale-[0.98]">
               삭제
             </button>
           </div>
@@ -248,7 +248,7 @@ export function CreateShortformFlow() {
             maxLength={200}
             autoFocus
             placeholder={editPlaceholder(editTarget)}
-            className="w-full resize-none border-b-2 border-green-4 py-2 text-[15px] leading-relaxed text-ink outline-none placeholder:text-gray-2"
+            className="w-full resize-none border-b-2 border-green-4 py-2 text-15 leading-relaxed text-ink outline-none placeholder:text-gray-2"
           />
           {generate.isError && <ErrorText>{errorMessage(generate.error)}</ErrorText>}
         </Screen>
@@ -256,7 +256,7 @@ export function CreateShortformFlow() {
 
       {step === 'done' && (
         <div className="flex flex-1 flex-col items-center px-6 pb-[max(20px,env(safe-area-inset-bottom))]">
-          <p className="mt-10 text-[22px] font-bold text-green-4">업로드 성공!</p>
+          <p className="mt-10 text-22 font-bold text-green-4">업로드 성공!</p>
           <p className="mt-1 text-sm text-q-muted">이제 동네 손님들 피드에 내 가게 게시물이 보여요</p>
           <img src={pigeonUploaded} alt="" className="mt-8 h-[220px] w-auto animate-[rise-center_.5s_ease-out] object-contain" />
           <button
@@ -351,13 +351,13 @@ function StepSource({
       next={{ onClick: onNext, disabled: !ready }}
     >
       <label className="block">
-        <span className="text-[13px] font-bold text-ink">지도 링크</span>
+        <span className="text-13 font-bold text-ink">지도 링크</span>
         <input
           value={mapUrl}
           onChange={(e) => setMapUrl(e.target.value)}
           inputMode="url"
           placeholder="네이버지도·카카오맵 URL을 붙여넣어주세요"
-          className={`mt-1 h-11 w-full border-b-2 text-[15px] text-ink outline-none placeholder:text-gray-2 ${urlInvalid ? 'border-point-red' : 'border-green-4'}`}
+          className={`mt-1 h-11 w-full border-b-2 text-15 text-ink outline-none placeholder:text-gray-2 ${urlInvalid ? 'border-point-red' : 'border-green-4'}`}
         />
       </label>
       {urlInvalid ? (
@@ -383,9 +383,9 @@ function PhotoPicker({ label, files, setFiles, className = '' }: { label: string
   const fileRef = useRef<HTMLInputElement>(null)
   return (
     <div className={className}>
-      <span className="text-[13px] font-bold text-ink">{label}</span>
+      <span className="text-13 font-bold text-ink">{label}</span>
       <div className="mt-1 flex items-center gap-2 border-b-2 border-green-4 pb-1.5">
-        <span className="flex-1 truncate text-[15px] text-gray-2">{files.length ? `${files.length}장 선택됨` : '사진을 선택해주세요'}</span>
+        <span className="flex-1 truncate text-15 text-gray-2">{files.length ? `${files.length}장 선택됨` : '사진을 선택해주세요'}</span>
         <button type="button" onClick={() => fileRef.current?.click()} className="h-10 rounded-lg bg-green-4 px-5 text-sm font-bold text-white">
           추가
         </button>
@@ -439,8 +439,8 @@ function StepMenus({
       <dl className="mt-2">
         {[['가게명', storeName], ['주소', address]].map(([k, v]) => (
           <div key={k} className="flex h-12 items-center gap-4 border-b-2 border-green-4">
-            <dt className="w-12 shrink-0 text-[15px] text-green-4">{k}</dt>
-            <dd className="truncate text-[15px] text-ink">{v}</dd>
+            <dt className="w-12 shrink-0 text-15 text-green-4">{k}</dt>
+            <dd className="truncate text-15 text-ink">{v}</dd>
           </div>
         ))}
       </dl>
@@ -454,7 +454,7 @@ function StepMenus({
                 onChange={(e) => update(i, { name: e.target.value })}
                 placeholder="메뉴 입력"
                 aria-label="메뉴 이름"
-                className="min-w-0 flex-1 bg-transparent text-[15px] text-ink outline-none placeholder:text-gray-2"
+                className="min-w-0 flex-1 bg-transparent text-15 text-ink outline-none placeholder:text-gray-2"
               />
               <input
                 value={m.price === null ? '' : m.price.toLocaleString()}
@@ -465,9 +465,9 @@ function StepMenus({
                 inputMode="numeric"
                 aria-label="가격"
                 placeholder="가격"
-                className="w-20 bg-transparent text-right text-[15px] text-green-4 outline-none placeholder:text-gray-2"
+                className="w-20 bg-transparent text-right text-15 text-green-4 outline-none placeholder:text-gray-2"
               />
-              <span className="text-[15px] text-green-4">원</span>
+              <span className="text-15 text-green-4">원</span>
             </div>
             <button
               type="button"

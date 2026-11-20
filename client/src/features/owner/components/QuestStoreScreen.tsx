@@ -59,8 +59,8 @@ export function QuestStoreScreen() {
             <div className="flex items-center gap-3">
               <img src={OWNER_ILLUST.qr} alt="" className="h-16 w-auto object-contain" />
               <div className="min-w-0 flex-1">
-                <p className="text-[17px] font-bold text-q-text">퀘스트 가게 운영 중</p>
-                <p className="text-[13px] text-q-muted">
+                <p className="text-17 font-bold text-q-text">퀘스트 가게 운영 중</p>
+                <p className="text-13 text-q-muted">
                   {sub.expiresAt && untilText(sub.expiresAt)} · 월 구독
                 </p>
               </div>
@@ -70,7 +70,7 @@ export function QuestStoreScreen() {
 
           <Link to="/owner/quests" className="mt-3 flex items-center justify-between rounded-2xl bg-q-green px-5 py-4 text-white">
             <span>
-              <span className="block text-[15px] font-bold">참여할 퀘스트 고르기</span>
+              <span className="block text-15 font-bold">참여할 퀘스트 고르기</span>
               <span className="text-xs opacity-85">한식·카페 등 퀘스트에 참여해야 손님에게 보여요</span>
             </span>
             <span className="text-xl">›</span>
@@ -117,12 +117,12 @@ export function QuestStoreScreen() {
             <div className="flex min-h-full flex-col">
               <section className="flex min-h-[230px] flex-1 flex-col rounded-3xl bg-gradient-to-br from-q-green to-q-green-dark px-6 pt-6 pb-5 text-white">
                 <p className="text-xs font-bold opacity-80">{sub.status === 'EXPIRED' ? '이용 기간이 끝났어요' : '우리 가게를'}</p>
-                <h2 className="mt-1 text-[26px] leading-snug font-bold">
+                <h2 className="mt-1 text-26 leading-snug font-bold">
                   손님이 찾아오는
                   <br />
                   퀘스트 가게로
                 </h2>
-                <p className="mt-2 text-[13px] leading-relaxed opacity-85">
+                <p className="mt-2 text-13 leading-relaxed opacity-85">
                   동네 손님이 퀘스트를 하러
                   <br />
                   {storeName}에 직접 찾아와요
@@ -137,8 +137,8 @@ export function QuestStoreScreen() {
                       {b.icon}
                     </span>
                     <span>
-                      <span className="block text-[16px] font-bold text-q-text">{b.title}</span>
-                      <span className="text-[13px] text-q-muted">{b.text}</span>
+                      <span className="block text-16 font-bold text-q-text">{b.title}</span>
+                      <span className="text-13 text-q-muted">{b.text}</span>
                     </span>
                   </li>
                 ))}
@@ -147,7 +147,7 @@ export function QuestStoreScreen() {
               <HowItWorks />
 
               <OwnerCard title="이용 안내" className="mt-3">
-                <dl className="flex flex-col gap-2 text-[13px]">
+                <dl className="flex flex-col gap-2 text-13">
                   {TERMS.map(([label, value]) => (
                     <div key={label} className="flex gap-3">
                       <dt className="w-[84px] shrink-0 text-q-muted">{label}</dt>
@@ -185,7 +185,7 @@ export function QuestStoreScreen() {
             <Row label="상품" value="퀘스트 가게 월 구독 (30일)" />
             <Row label="금액" value="미정 · 해커톤 모의 결제" />
           </dl>
-          {subscribe.isError && <p className="mt-2 text-center text-[13px] text-point-red-dark">{errorMessage(subscribe.error)}</p>}
+          {subscribe.isError && <p className="mt-2 text-center text-13 text-point-red-dark">{errorMessage(subscribe.error)}</p>}
           <PrimaryButton
             className="mt-5"
             disabled={subscribe.isPending}
@@ -220,7 +220,7 @@ export function QuestStoreScreen() {
       {bigQr && qr.data && (
         <div role="dialog" aria-modal aria-label="방문 인증 QR" className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white px-8">
           <p className="text-sm font-bold text-q-green">잇츠 퀘스트 방문 인증</p>
-          <p className="mt-1 text-[26px] font-bold text-q-text">{storeName}</p>
+          <p className="mt-1 text-26 font-bold text-q-text">{storeName}</p>
           <div className="mt-6 rounded-3xl border-4 border-q-green p-5">
             <QRCodeSVG value={visitQrUrl(storeId, qr.data.qrToken)} size={260} fgColor="#1e6b45" level="M" />
           </div>
@@ -241,7 +241,7 @@ function QrBox({ url, code, storeName, size }: { url: string; code: string; stor
     <div className="qr-print mx-auto w-fit rounded-2xl border-2 border-dashed border-q-green px-5 pt-4 pb-3 text-center">
       <p className="hidden text-lg font-bold print:block">{storeName} · 잇츠 퀘스트 방문 인증</p>
       <QRCodeSVG value={url} size={size} fgColor="#1e6b45" level="M" className="mx-auto" />
-      <p className="mt-2 text-[11px] text-q-muted">QR이 안 찍히면 아래 코드를 입력</p>
+      <p className="mt-2 text-11 text-q-muted">QR이 안 찍히면 아래 코드를 입력</p>
       <p className="font-mono text-xl font-bold tracking-[0.2em] text-q-text">{code}</p>
     </div>
   )
@@ -252,7 +252,7 @@ function HowItWorks() {
     <OwnerCard title="이렇게 진행돼요" className="mt-3">
       <ol className="flex flex-col gap-2.5">
         {STEPS.map((step, i) => (
-          <li key={step} className="flex items-center gap-3 text-[13px] text-q-sub">
+          <li key={step} className="flex items-center gap-3 text-13 text-q-sub">
             <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-q-green text-xs font-bold text-white">
               {i + 1}
             </span>

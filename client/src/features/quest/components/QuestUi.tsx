@@ -39,7 +39,7 @@ export function FeedBowlIcon({ className = 'size-10' }: { className?: string }) 
 export function SectionTitle({ title, aside }: { title: string; aside?: ReactNode }) {
   return (
     <div className="mb-2.5 flex items-end justify-between">
-      <h2 className="text-[17px] font-bold text-q-text">{title}</h2>
+      <h2 className="text-17 font-bold text-q-text">{title}</h2>
       {aside && <span className="text-xs text-q-muted">{aside}</span>}
     </div>
   )
@@ -50,7 +50,7 @@ export function PrimaryButton(props: ButtonHTMLAttributes<HTMLButtonElement>) {
     <button
       type="button"
       {...props}
-      className={`h-[44px] w-full rounded-full bg-q-green text-[15px] font-bold text-white transition-opacity disabled:opacity-40 ${props.className ?? ''}`}
+      className={`h-[44px] w-full rounded-full bg-q-green text-15 font-bold text-white transition-opacity disabled:opacity-40 ${props.className ?? ''}`}
     />
   )
 }
@@ -60,7 +60,7 @@ export function OutlineButton(props: ButtonHTMLAttributes<HTMLButtonElement>) {
     <button
       type="button"
       {...props}
-      className={`h-[44px] w-full rounded-full border border-q-green bg-white text-[15px] font-bold text-q-green ${props.className ?? ''}`}
+      className={`h-[44px] w-full rounded-full border border-q-green bg-white text-15 font-bold text-q-green ${props.className ?? ''}`}
     />
   )
 }
@@ -106,7 +106,7 @@ export function CelebrationScreen({
             ))}
             <img src={image} alt="" className={`mx-auto ${imageSize} object-contain drop-shadow-md`} />
           </div>
-          <h1 className="text-center text-[24px] font-bold text-q-green">{title}</h1>
+          <h1 className="text-center text-24 font-bold text-q-green">{title}</h1>
           <div className="mt-1.5 text-center text-sm text-q-sub">{subtitle}</div>
           {children && <div className={compact ? 'mt-4' : 'mt-6'}>{children}</div>}
           <div className="mt-7 flex flex-col gap-2.5">{actions}</div>

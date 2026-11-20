@@ -59,7 +59,7 @@ export function OwnerStoreRegister() {
 
         <Field label="프로필 사진 (선택)" action={<FieldButton onClick={() => fileRef.current?.click()}>찾기</FieldButton>}>
           {image && <img src={image.preview} alt="" className="size-9 rounded-lg object-cover" />}
-          <span className={`min-w-0 flex-1 truncate px-1 text-[15px] ${image ? 'text-ink' : 'text-gray-2'}`}>{image?.file.name ?? '사진을 선택해주세요'}</span>
+          <span className={`min-w-0 flex-1 truncate px-1 text-15 ${image ? 'text-ink' : 'text-gray-2'}`}>{image?.file.name ?? '사진을 선택해주세요'}</span>
           <input
             ref={fileRef}
             type="file"
@@ -87,7 +87,7 @@ export function OwnerStoreRegister() {
             onChange={(e) => setCategory(e.target.value)}
             aria-label="업종"
             style={{ colorScheme: 'light' }}
-            className={`h-10 min-w-0 flex-1 bg-transparent px-1 text-[15px] outline-none ${category ? 'text-ink' : 'text-gray-2'}`}
+            className={`h-10 min-w-0 flex-1 bg-transparent px-1 text-15 outline-none ${category ? 'text-ink' : 'text-gray-2'}`}
           >
             <option value="" className="bg-white text-gray-2">
               대분류
@@ -101,7 +101,7 @@ export function OwnerStoreRegister() {
         </Field>
 
         {error && (
-          <p role="alert" className="mt-4 text-center text-[13px] font-medium text-point-red-dark">
+          <p role="alert" className="mt-4 text-center text-13 font-medium text-point-red-dark">
             {error}
           </p>
         )}

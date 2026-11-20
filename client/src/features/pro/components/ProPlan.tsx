@@ -58,13 +58,13 @@ export function ProPlan() {
         {/* min-h-full + 소개 박스 flex-1: 화면이 길면 소개 박스가 늘어나 빈 공간 없이 채움 */}
         <div className="flex min-h-full flex-col">
           <section className="flex min-h-[230px] flex-1 flex-col overflow-hidden rounded-3xl bg-gradient-to-br from-q-green to-q-green-dark px-6 pt-6 pb-5 text-white">
-            <span className="w-fit rounded-full bg-white/20 px-2.5 py-1 text-[11px] font-bold tracking-wider">PRO</span>
-            <h2 className="mt-3 text-[26px] leading-snug font-bold">
+            <span className="w-fit rounded-full bg-white/20 px-2.5 py-1 text-11 font-bold tracking-wider">PRO</span>
+            <h2 className="mt-3 text-26 leading-snug font-bold">
               홍보 게시물을
               <br />
               끝까지 내 마음대로
             </h2>
-            <p className="mt-2 text-[13px] leading-relaxed opacity-85">
+            <p className="mt-2 text-13 leading-relaxed opacity-85">
               사장님을 위한 잇츠 PRO 월 구독
               <br />
               {storeName} 게시물이 손님 피드 앞쪽에 떠요
@@ -75,12 +75,12 @@ export function ProPlan() {
           {isPro && expiresAt && (
             <section className="mt-3 rounded-2xl bg-white px-5 py-4">
               <div className="flex items-center justify-between">
-                <p className="text-[16px] font-bold text-q-text">PRO 이용 중</p>
+                <p className="text-16 font-bold text-q-text">PRO 이용 중</p>
                 <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${canceled ? 'bg-q-panel text-q-muted' : 'bg-q-mint text-q-green'}`}>
                   {canceled ? '해지 예약됨' : '자동 갱신'}
                 </span>
               </div>
-              <p className="mt-1 text-[13px] text-q-muted">
+              <p className="mt-1 text-13 text-q-muted">
                 {startedAt && `${untilText(startedAt).replace('까지', '')} 시작 · `}
                 {canceled ? `${untilText(expiresAt)} 이용 후 종료` : `다음 결제 ${untilText(expiresAt).replace('까지', '')}`}
               </p>
@@ -94,15 +94,15 @@ export function ProPlan() {
                   <img src={b.image} alt="" className="h-[60px] w-auto object-contain" />
                 </span>
                 <span>
-                  <span className="block text-[16px] font-bold text-q-text">{b.title}</span>
-                  <span className="text-[13px] text-q-muted">{b.description}</span>
+                  <span className="block text-16 font-bold text-q-text">{b.title}</span>
+                  <span className="text-13 text-q-muted">{b.description}</span>
                 </span>
               </li>
             ))}
           </ul>
 
           <section className="mt-3 rounded-2xl bg-white px-4 py-4">
-            <table className="w-full text-[13px]">
+            <table className="w-full text-13">
               <thead>
                 <tr className="text-xs text-q-muted">
                   <th className="pb-2 text-left font-medium">기능</th>
@@ -123,8 +123,8 @@ export function ProPlan() {
           </section>
 
           <section className="mt-3 rounded-2xl bg-white px-4 py-4">
-            <p className="mb-3 text-[15px] font-bold text-q-text">이용 안내</p>
-            <dl className="flex flex-col gap-2 text-[13px]">
+            <p className="mb-3 text-15 font-bold text-q-text">이용 안내</p>
+            <dl className="flex flex-col gap-2 text-13">
               {TERMS.map(([label, value]) => (
                 <div key={label} className="flex gap-3">
                   <dt className="w-[84px] shrink-0 text-q-muted">{label}</dt>

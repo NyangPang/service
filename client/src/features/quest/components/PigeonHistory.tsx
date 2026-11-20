@@ -28,7 +28,7 @@ export function PigeonHistory() {
             </span>
             <div className="flex-1 rounded-2xl border border-q-line bg-white px-4 py-3">
               <div className="flex items-center justify-between">
-                <p className="text-[15px] font-bold text-q-text">
+                <p className="text-15 font-bold text-q-text">
                   Lv. {item.fromLevel} → Lv. {item.toLevel}
                 </p>
                 <time className="text-xs text-q-muted" dateTime={item.createdAt}>
@@ -48,13 +48,13 @@ function RewardText({ item }: { item: HistoryItem }) {
   const { reward } = item
   if (reward.type === 'COUPON' && reward.userCoupon) {
     return (
-      <p className="mt-1 text-[13px] font-medium text-point-red-dark">
+      <p className="mt-1 text-13 font-medium text-point-red-dark">
         🎟 {reward.userCoupon.storeName} · {reward.userCoupon.title} ({untilText(reward.userCoupon.expiresAt)})
       </p>
     )
   }
   return (
-    <p className="mt-1 flex items-center gap-1 text-[13px] text-q-sub">
+    <p className="mt-1 flex items-center gap-1 text-13 text-q-sub">
       <FeedIcon className="size-4" />
       {reward.feedAmount > 0 ? `먹이 ${reward.feedAmount}개 획득` : '보상 없음'}
     </p>

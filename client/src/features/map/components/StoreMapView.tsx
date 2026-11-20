@@ -140,7 +140,7 @@ function KakaoStoreMap() {
           setQuestOnly((v) => !v)
           clearSelection()
         }}
-        className="absolute top-[78px] left-[14px] z-20 rounded-full border border-green-1 bg-white px-3 py-1.5 text-[13px] font-bold text-ink shadow-sm aria-pressed:border-green-6 aria-pressed:bg-green-6 aria-pressed:text-white"
+        className="absolute top-[78px] left-[14px] z-20 rounded-full border border-green-1 bg-white px-3 py-1.5 text-13 font-bold text-ink shadow-sm aria-pressed:border-green-6 aria-pressed:bg-green-6 aria-pressed:text-white"
       >
         🚩 퀘스트 가게만
       </button>

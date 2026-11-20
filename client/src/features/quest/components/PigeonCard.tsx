@@ -67,14 +67,14 @@ export function PigeonCard() {
     <section className="rounded-3xl bg-q-mint px-5 pt-4 pb-5">
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-1.5">
-          <span className="shrink-0 rounded-full bg-white px-3 py-1 text-[13px] font-bold text-q-green-dark">
+          <span className="shrink-0 rounded-full bg-white px-3 py-1 text-13 font-bold text-q-green-dark">
             {levelLabel(pigeon.level, pigeon.levelName)}
           </span>
           {breed && (
-            <span className="truncate rounded-full bg-white/70 px-2.5 py-1 text-[12px] font-bold text-q-green">{breed}</span>
+            <span className="truncate rounded-full bg-white/70 px-2.5 py-1 text-12 font-bold text-q-green">{breed}</span>
           )}
         </div>
-        <div className="flex shrink-0 gap-2.5 text-[13px] font-medium text-q-green">
+        <div className="flex shrink-0 gap-2.5 text-13 font-medium text-q-green">
           <Link to="/quest/album">앨범 ›</Link>
           <Link to="/quest/history">성장 기록 ›</Link>
         </div>
@@ -100,12 +100,12 @@ export function PigeonCard() {
 
       {pigeon.isMaxLevel ? (
         <div className="mt-3 text-center">
-          <p className="text-[15px] font-bold text-q-green">최고 레벨까지 키웠어요!</p>
+          <p className="text-15 font-bold text-q-green">최고 레벨까지 키웠어요!</p>
           <button
             type="button"
             disabled={graduate.isPending}
             onClick={doGraduate}
-            className="mt-3 h-12 w-full rounded-2xl bg-q-green text-[15px] font-bold text-white shadow-[0_6px_16px_rgba(30,142,90,0.3)] active:scale-[0.98] disabled:opacity-50"
+            className="mt-3 h-12 w-full rounded-2xl bg-q-green text-15 font-bold text-white shadow-[0_6px_16px_rgba(30,142,90,0.3)] active:scale-[0.98] disabled:opacity-50"
           >
             {graduate.isPending ? '졸업 준비 중...' : '🎓 졸업시키고 새 알 받기'}
           </button>
@@ -113,12 +113,12 @@ export function PigeonCard() {
         </div>
       ) : pigeon.isEgg ? (
         <div className="mt-3 text-center">
-          <p className="text-[15px] font-bold text-q-text">알을 품고 있어요</p>
+          <p className="text-15 font-bold text-q-text">알을 품고 있어요</p>
           <p className="mt-1 text-xs text-q-muted">먹이 1개를 주면 깨어나요 · 어떤 비둘기가 나올까요?</p>
         </div>
       ) : (
         <div className="mt-3">
-          <div className="flex justify-between text-[13px]">
+          <div className="flex justify-between text-13">
             <span className="font-bold text-q-text">다음 레벨까지</span>
             <span className="font-bold text-q-green">
               {pigeon.currentFeed} / {pigeon.requiredFeed}
@@ -136,7 +136,7 @@ export function PigeonCard() {
         <div className="mt-4 flex items-center gap-3 rounded-2xl bg-white px-4 py-3">
           <FeedBowlIcon className="h-11 w-12" />
           <div className="flex-1">
-            <p className="text-[11px] text-q-muted">보유 먹이</p>
+            <p className="text-11 text-q-muted">보유 먹이</p>
             <p className="text-xl leading-tight font-bold text-q-text tabular-nums">{feedBalance}개</p>
           </div>
           <div className="flex flex-col items-end gap-1">
@@ -153,7 +153,7 @@ export function PigeonCard() {
                 type="button"
                 disabled={busy}
                 onClick={() => giveFeed(Math.min(feedBalance, remaining))}
-                className="text-[11px] font-medium text-q-green underline"
+                className="text-11 font-medium text-q-green underline"
               >
                 {feedBalance >= remaining ? `레벨업까지 ${remaining}개 주기` : `${feedBalance}개 모두 주기`}
               </button>
@@ -164,7 +164,7 @@ export function PigeonCard() {
 
       {/* 최고 레벨이어도 먹이는 모아 둘 수 있음 (새 비둘기에게 이어짐) */}
       {pigeon.isMaxLevel && (
-        <p className="mt-4 text-center text-[13px] text-q-sub">
+        <p className="mt-4 text-center text-13 text-q-sub">
           보유 먹이 <b className="text-q-text">{feedBalance}개</b>
         </p>
       )}
@@ -180,8 +180,8 @@ export function PigeonCard() {
             className={`absolute top-1/2 left-3 size-6 -translate-y-1/2 ${today.dailyFeedClaimed ? 'opacity-40' : ''}`}
           />
           <span className="flex flex-1 flex-col items-center whitespace-nowrap">
-            <span className="text-[14px] font-bold">{today.dailyFeedClaimed ? '오늘 받았어요' : '무료 먹이 받기'}</span>
-            <span className="text-[11px] opacity-80">{today.dailyFeedClaimed ? '내일 또 받을 수 있어요' : '하루 1번'}</span>
+            <span className="text-14 font-bold">{today.dailyFeedClaimed ? '오늘 받았어요' : '무료 먹이 받기'}</span>
+            <span className="text-11 opacity-80">{today.dailyFeedClaimed ? '내일 또 받을 수 있어요' : '하루 1번'}</span>
           </span>
         </button>
         <button
@@ -190,15 +190,15 @@ export function PigeonCard() {
           onClick={() => setWatchingAd(true)}
           className="flex h-[52px] flex-col items-center justify-center rounded-2xl border border-q-green bg-white text-q-green disabled:border-transparent disabled:text-q-muted"
         >
-          <span className="text-[14px] font-bold">▶ 광고 보고 먹이</span>
-          <span className="text-[11px]">
+          <span className="text-14 font-bold">▶ 광고 보고 먹이</span>
+          <span className="text-11">
             오늘 {today.adFeedCount} / {today.adFeedLimit}
           </span>
         </button>
       </div>
 
       {toast && (
-        <p key={toast} role="status" className="mt-3 animate-[rise-center_.3s_ease-out] text-center text-[13px] font-bold text-q-green-dark">
+        <p key={toast} role="status" className="mt-3 animate-[rise-center_.3s_ease-out] text-center text-13 font-bold text-q-green-dark">
           {toast}
         </p>
       )}
@@ -235,13 +235,13 @@ function PigeonLoginPrompt() {
   return (
     <div className="flex flex-col items-center rounded-3xl bg-q-mint px-6 py-8 text-center">
       <img src={pigeonImage(0)} alt="" className="h-[110px] w-auto origin-bottom animate-[egg-wobble_2.4s_ease-in-out_infinite] object-contain" />
-      <p className="mt-4 text-[17px] font-bold text-q-text">로그인하고 알을 받아 보세요</p>
-      <p className="mt-1.5 text-[13px] leading-relaxed text-q-sub">
+      <p className="mt-4 text-17 font-bold text-q-text">로그인하고 알을 받아 보세요</p>
+      <p className="mt-1.5 text-13 leading-relaxed text-q-sub">
         한식·일식·중식·양식·마트·카페 중 어떤 비둘기가 나올까요?
         <br />
         레벨업하면 동네 가게 쿠폰도 받을 수 있어요
       </p>
-      <Link to="/login?next=/quest" className="mt-5 flex h-11 items-center rounded-xl bg-q-green px-6 text-[15px] font-bold text-white">
+      <Link to="/login?next=/quest" className="mt-5 flex h-11 items-center rounded-xl bg-q-green px-6 text-15 font-bold text-white">
         로그인하기
       </Link>
     </div>

@@ -12,6 +12,7 @@ import { errorMessage } from '@/shared/lib/error'
 import { CloseIcon, MenuIcon } from '@/shared/ui/icons'
 import { toast } from '@/stores/toastStore'
 import { useAuthStore, useMe } from '@/stores/authStore'
+import { useDisplayStore } from '@/stores/displayStore'
 import { MODE_HOME, useModeStore, type AppMode } from '@/stores/modeStore'
 
 export interface MenuItem {
@@ -46,7 +47,7 @@ function AccountSection({ onLoggedIn, onLoggedOut }: { onLoggedIn: (mode: AppMod
               if (m) onLoggedIn(modeOfRole(m.role))
             }}
           />
-          <p className="mt-3 text-center text-[12px] text-q-muted">
+          <p className="mt-3 text-center text-12 text-q-muted">
             아직 계정이 없나요?{' '}
             <Link to="/signup" className="font-bold text-green-4 underline">
               회원가입
@@ -66,13 +67,13 @@ function AccountSection({ onLoggedIn, onLoggedOut }: { onLoggedIn: (mode: AppMod
           {me.profileImageUrl ? <img src={me.profileImageUrl} alt="" className="size-full object-cover" /> : <img src={pigeonWalk} alt="" className="size-9 object-contain" />}
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-[15px] font-bold text-ink">{me.nickname} 님</span>
-          <span className="block truncate text-[11px] text-q-muted">
+          <span className="block truncate text-15 font-bold text-ink">{me.nickname} 님</span>
+          <span className="block truncate text-11 text-q-muted">
             {owner ? '사장님' : '손님'} · {me.email}
           </span>
         </span>
       </div>
-      <ul className="mt-1 text-[15px] text-ink">
+      <ul className="mt-1 text-15 text-ink">
         <li>
           <Link to={owner ? '/owner/profile' : '/profile'} className="flex justify-between border-b border-q-line py-3.5">
             프로필 <span className="text-q-muted">›</span>
@@ -99,6 +100,29 @@ function AccountSection({ onLoggedIn, onLoggedOut }: { onLoggedIn: (mode: AppMod
         </li>
       </ul>
     </section>
+  )
+}
+
+/** 큰글씨 모드 켜기/끄기 (앱 전체 글자 1.2배) */
+function LargeTextSwitch() {
+  const { fontSize, setFontSize } = useDisplayStore()
+  const on = fontSize === 'large'
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={on}
+      onClick={() => setFontSize(on ? 'normal' : 'large')}
+      className="flex w-full items-center justify-between gap-3 border-b border-q-line py-3.5 text-left"
+    >
+      <span>
+        <span className="block">큰글씨 모드</span>
+        <span className="block text-11 text-q-muted">앱 전체 글자를 크게 보여 줘요</span>
+      </span>
+      <span aria-hidden className={`relative h-7 w-12 shrink-0 rounded-full transition-colors ${on ? 'bg-green-4' : 'bg-q-track'}`}>
+        <span className={`absolute top-0.5 left-0.5 size-6 rounded-full bg-white shadow transition-transform ${on ? 'translate-x-5' : ''}`} />
+      </span>
+    </button>
   )
 }
 
@@ -181,16 +205,16 @@ export function SettingsDrawer({ buttonClassName, items }: { buttonClassName: st
                           active ? 'border-green-6 bg-green-6 text-white' : 'border-q-line bg-white text-ink'
                         }`}
                       >
-                        <span className="block text-[15px] font-bold">{m.label}</span>
-                        <span className={`text-[11px] ${active ? 'opacity-80' : 'text-q-muted'}`}>{active ? '지금 사용 중' : m.desc}</span>
+                        <span className="block text-15 font-bold">{m.label}</span>
+                        <span className={`text-11 ${active ? 'opacity-80' : 'text-q-muted'}`}>{active ? '지금 사용 중' : m.desc}</span>
                       </button>
                     )
                   })}
                 </div>
                 {ownerBlocked && (
                   <div role="alert" className="mt-2 rounded-2xl border border-point-orange bg-point-yellow/20 px-4 py-3">
-                    <p className="text-[13px] font-bold text-point-red-dark">사장님 모드는 사장님 계정으로 쓸 수 있어요</p>
-                    <p className="mt-0.5 text-[12px] text-q-sub">지금은 손님 계정({me?.nickname})으로 로그인되어 있어요</p>
+                    <p className="text-13 font-bold text-point-red-dark">사장님 모드는 사장님 계정으로 쓸 수 있어요</p>
+                    <p className="mt-0.5 text-12 text-q-sub">지금은 손님 계정({me?.nickname})으로 로그인되어 있어요</p>
                     <div className="mt-2.5 grid grid-cols-2 gap-2">
                       <button
                         type="button"
@@ -198,11 +222,11 @@ export function SettingsDrawer({ buttonClassName, items }: { buttonClassName: st
                           logout('로그아웃했어요 · 사장님 계정으로 로그인해 주세요')
                           setOwnerBlocked(false)
                         }}
-                        className="h-9 rounded-lg bg-white text-[12px] font-bold text-q-text"
+                        className="h-9 rounded-lg bg-white text-12 font-bold text-q-text"
                       >
                         다른 계정으로 로그인
                       </button>
-                      <Link to="/signup?role=OWNER" className="flex h-9 items-center justify-center rounded-lg bg-green-4 text-[12px] font-bold text-white">
+                      <Link to="/signup?role=OWNER" className="flex h-9 items-center justify-center rounded-lg bg-green-4 text-12 font-bold text-white">
                         사장님으로 가입
                       </Link>
                     </div>
@@ -215,7 +239,7 @@ export function SettingsDrawer({ buttonClassName, items }: { buttonClassName: st
                 <ul className="mt-1">
                   {items.map((item) => (
                     <li key={item.to}>
-                      <Link to={item.to} className="flex items-center gap-3 border-b border-q-line py-3.5 text-[15px] font-medium text-ink">
+                      <Link to={item.to} className="flex items-center gap-3 border-b border-q-line py-3.5 text-15 font-medium text-ink">
                         <span aria-hidden className="flex size-9 items-center justify-center overflow-hidden rounded-xl bg-q-mint text-sm">
                           {item.image ? <img src={item.image} alt="" className="size-8 object-contain" /> : item.icon}
                         </span>
@@ -237,7 +261,10 @@ export function SettingsDrawer({ buttonClassName, items }: { buttonClassName: st
 
               <section className="mt-6 px-5">
                 <h2 className="text-xs font-bold text-q-muted">앱 설정</h2>
-                <ul className="mt-1 text-[15px] text-ink">
+                <ul className="mt-1 text-15 text-ink">
+                  <li>
+                    <LargeTextSwitch />
+                  </li>
                   <li>
                     <button
                       type="button"

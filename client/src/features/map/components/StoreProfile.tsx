@@ -39,16 +39,16 @@ export function StoreProfile({ storeId }: { storeId: number }) {
         <div className="flex items-center gap-4">
           <StoreAvatar url={store.thumbnailUrl} className="size-[84px]" />
           <div className="min-w-0">
-            <h2 className="text-[22px] leading-tight font-bold text-q-text">{store.name}</h2>
-            <div className="mt-1.5 flex flex-wrap gap-1.5 text-[11px] font-bold">
+            <h2 className="text-22 leading-tight font-bold text-q-text">{store.name}</h2>
+            <div className="mt-1.5 flex flex-wrap gap-1.5 text-11 font-bold">
               <span className="rounded-full bg-green-4 px-2 py-0.5 text-white">{store.categoryName}</span>
               {summary?.isQuestStore && <span className="rounded-full bg-q-mint px-2 py-0.5 text-q-green">🚩 퀘스트 가게</span>}
               {store.accessibility.stepFree && <span className="rounded-full bg-q-panel px-2 py-0.5 text-q-sub">♿ 턱 없음</span>}
             </div>
-            <p className="mt-1.5 truncate text-[13px] text-q-muted">📍 {store.address}</p>
+            <p className="mt-1.5 truncate text-13 text-q-muted">📍 {store.address}</p>
           </div>
         </div>
-        {store.description && <p className="mt-4 text-[14px] leading-relaxed text-q-sub">{store.description}</p>}
+        {store.description && <p className="mt-4 text-14 leading-relaxed text-q-sub">{store.description}</p>}
 
         <div className={`mt-4 grid gap-2 ${couponCount > 0 ? 'grid-cols-4' : 'grid-cols-3'}`}>
           <Action label="위치 보기" onClick={() => navigate(`/map?storeId=${storeId}`)}>
@@ -83,7 +83,7 @@ export function StoreProfile({ storeId }: { storeId: number }) {
         <Link to="/quest" className="mx-5 mt-3 flex items-center gap-3 rounded-2xl bg-q-green px-4 py-3 text-white">
           <span className="text-xl">🚩</span>
           <span className="flex-1">
-            <span className="block text-[14px] font-bold">이 가게에서 방문 인증할 수 있어요</span>
+            <span className="block text-14 font-bold">이 가게에서 방문 인증할 수 있어요</span>
             <span className="text-xs opacity-85">GPS + 가게 QR로 인증하고 비둘기 먹이 받기</span>
           </span>
           <span className="text-lg">›</span>
@@ -109,12 +109,12 @@ export function StoreProfile({ storeId }: { storeId: number }) {
 
       {menus.length > 0 && (
         <section className="mx-5 mt-3 rounded-2xl bg-white px-5 py-4">
-          <h3 className="text-[15px] font-bold text-q-text">대표 메뉴</h3>
+          <h3 className="text-15 font-bold text-q-text">대표 메뉴</h3>
           <ul className="mt-2 flex flex-col gap-1.5">
             {menus.map((m) => {
               const [name, price] = m.split(' - ')
               return (
-                <li key={m} className="flex justify-between text-[14px]">
+                <li key={m} className="flex justify-between text-14">
                   <span className="text-q-text">{name}</span>
                   {price && <span className="font-bold text-q-green">{price}</span>}
                 </li>
@@ -125,9 +125,9 @@ export function StoreProfile({ storeId }: { storeId: number }) {
       )}
 
       <section className="mt-5">
-        <h3 className="px-5 text-[15px] font-bold text-q-text">홍보 게시물 {videos?.length ? <span className="text-q-green">{videos.length}</span> : null}</h3>
+        <h3 className="px-5 text-15 font-bold text-q-text">홍보 게시물 {videos?.length ? <span className="text-q-green">{videos.length}</span> : null}</h3>
         {videos && videos.length === 0 ? (
-          <p className="py-10 text-center text-[13px] text-q-muted">아직 올라온 게시물이 없어요</p>
+          <p className="py-10 text-center text-13 text-q-muted">아직 올라온 게시물이 없어요</p>
         ) : (
           <ul className="mt-2 grid grid-cols-3 gap-px">
             {videos?.map((v) => (
@@ -157,7 +157,7 @@ function Action({ label, onClick, accent = false, disabled = false, children }: 
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`flex flex-col items-center gap-1 rounded-xl py-2.5 text-[12px] font-bold disabled:opacity-40 ${
+      className={`flex flex-col items-center gap-1 rounded-xl py-2.5 text-12 font-bold disabled:opacity-40 ${
         accent ? 'bg-point-red text-white' : 'bg-q-mint text-q-green'
       }`}
     >
@@ -169,7 +169,7 @@ function Action({ label, onClick, accent = false, disabled = false, children }: 
 
 function InfoRow({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <div className="flex gap-4 border-b border-q-line py-3 text-[14px] last:border-b-0">
+    <div className="flex gap-4 border-b border-q-line py-3 text-14 last:border-b-0">
       <span className="w-14 shrink-0 text-q-muted">{label}</span>
       <span className="min-w-0 flex-1 text-q-text">{children}</span>
     </div>

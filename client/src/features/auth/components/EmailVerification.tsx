@@ -102,7 +102,7 @@ export function EmailVerification({
         error={badEmail || emailStatus?.error}
         action={
           verified ? (
-            <button type="button" onClick={reset} className="shrink-0 px-1 text-[12px] text-q-muted underline">
+            <button type="button" onClick={reset} className="shrink-0 px-1 text-12 text-q-muted underline">
               이메일 바꾸기
             </button>
           ) : (

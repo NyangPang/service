@@ -43,7 +43,7 @@ export function PostCarousel({
         ))}
       </div>
 
-      <span className="pointer-events-none absolute top-3 right-3 rounded-full bg-black/45 px-2.5 py-0.5 text-[12px] font-bold text-white tabular-nums backdrop-blur-sm">
+      <span className="pointer-events-none absolute top-3 right-3 rounded-full bg-black/45 px-2.5 py-0.5 text-12 font-bold text-white tabular-nums backdrop-blur-sm">
         {index + 1}/{images.length}
       </span>
       <div className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center gap-1.5" aria-hidden>

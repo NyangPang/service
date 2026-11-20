@@ -56,8 +56,8 @@ export function CouponCreateForm() {
     >
       <div className="mb-5 flex items-center gap-3 rounded-2xl bg-q-mint py-2 pr-4 pl-2">
         <img src={OWNER_ILLUST.couponNew} alt="" className="h-[80px] w-auto object-contain" />
-        <p className="text-[13px] leading-relaxed text-q-sub">
-          <b className="block text-[15px] text-q-text">우리 가게 쿠폰 만들기</b>
+        <p className="text-13 leading-relaxed text-q-sub">
+          <b className="block text-15 text-q-text">우리 가게 쿠폰 만들기</b>
           손님이 받아서 가게에서 바로 쓸 수 있어요
         </p>
       </div>
@@ -126,13 +126,13 @@ export function CouponCreateForm() {
 
       <div className="mt-5 rounded-2xl border border-dashed border-q-line px-4 py-3 text-center">
         <p className="text-xs text-q-muted">미리보기</p>
-        <p className="mt-0.5 text-[15px] font-bold text-q-text">{form.title.trim() || '쿠폰 이름'}</p>
+        <p className="mt-0.5 text-15 font-bold text-q-text">{form.title.trim() || '쿠폰 이름'}</p>
         <p className="text-sm font-bold text-point-red-dark">{body.discountValue > 0 ? discountText(body) : '-'}</p>
       </div>
 
       <p className="mt-3 text-center text-xs text-q-muted">할인 금액은 사장님 부담, 손님이 사용한 쿠폰 1건당 소액 수수료가 붙어요</p>
       {error && (
-        <p role="alert" className="mt-3 text-center text-[13px] font-medium text-point-red-dark">
+        <p role="alert" className="mt-3 text-center text-13 font-medium text-point-red-dark">
           {error}
         </p>
       )}
@@ -150,8 +150,8 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
   return (
     <div className="mb-4 block">
       <div className="mb-1.5 flex items-end justify-between">
-        <span className="text-[13px] font-bold text-q-text">{label}</span>
-        {hint && <span className="text-[11px] text-q-muted">{hint}</span>}
+        <span className="text-13 font-bold text-q-text">{label}</span>
+        {hint && <span className="text-11 text-q-muted">{hint}</span>}
       </div>
       {children}
     </div>

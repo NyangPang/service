@@ -74,10 +74,10 @@ export function AppShell({
         <SettingsDrawer buttonClassName={circleButton} items={menuItems} />
         <div className="flex min-w-0 flex-col items-center">
           {modeBadge && (
-            <span className="mb-0.5 rounded-full bg-green-6 px-2 py-px text-[10px] font-bold text-white">{modeBadge}</span>
+            <span className="mb-0.5 rounded-full bg-green-6 px-2 py-px text-10 font-bold text-white">{modeBadge}</span>
           )}
           {!immersive && (
-            <h1 className={`truncate font-bold text-ink ${modeBadge ? 'text-[21px] leading-tight' : 'text-[25px]'}`}>{title}</h1>
+            <h1 className={`truncate font-bold text-ink ${modeBadge ? 'text-21 leading-tight' : 'text-25'}`}>{title}</h1>
           )}
         </div>
         {showBack ? (
@@ -131,7 +131,7 @@ export function AppShell({
               end={end}
               aria-label={label}
               className={({ isActive }) =>
-                `flex items-center justify-center gap-1.5 rounded-full text-[13px] font-bold whitespace-nowrap transition-[height,color,background-color] duration-300 ${
+                `flex items-center justify-center gap-1.5 rounded-full text-13 font-bold whitespace-nowrap transition-[height,color,background-color] duration-300 ${
                   shrunk ? 'h-[34px]' : 'h-[50px]'
                 } ${
                   isActive
@@ -145,7 +145,7 @@ export function AppShell({
                   <span className={`flex items-center ${isActive ? 'scale-[0.8]' : 'scale-[0.72]'}`}>
                     <Icon />
                   </span>
-                  {!shrunk && <span className={isActive && !compact ? '' : 'text-[11px] leading-none'}>{label}</span>}
+                  {!shrunk && <span className={isActive && !compact ? '' : 'text-11 leading-none'}>{label}</span>}
                 </>
               )}
             </NavLink>

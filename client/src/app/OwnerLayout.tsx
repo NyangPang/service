@@ -45,8 +45,8 @@ export function OwnerLayout() {
   if (myStore.isError) {
     return (
       <div className="mx-auto flex h-full max-w-[430px] flex-col items-center justify-center gap-3 bg-white px-6 text-center">
-        <p className="text-[15px] text-ink">{errorMessage(myStore.error, '내 가게 정보를 불러오지 못했어요')}</p>
-        <button type="button" onClick={() => myStore.refetch()} className="h-11 rounded-xl bg-green-4 px-5 text-[14px] font-bold text-white">
+        <p className="text-15 text-ink">{errorMessage(myStore.error, '내 가게 정보를 불러오지 못했어요')}</p>
+        <button type="button" onClick={() => myStore.refetch()} className="h-11 rounded-xl bg-green-4 px-5 text-14 font-bold text-white">
           다시 불러오기
         </button>
       </div>
@@ -63,8 +63,8 @@ function OwnerAccountNotice({ nickname }: { nickname: string }) {
   return (
     <div className="mx-auto flex h-full max-w-[430px] flex-col items-center bg-white px-6 pt-[max(72px,env(safe-area-inset-top))] pb-[max(20px,env(safe-area-inset-bottom))] text-center">
       <img src={OWNER_ILLUST.pro} alt="" className="h-[150px] w-auto object-contain" />
-      <h1 className="mt-6 text-[22px] font-bold text-ink">사장님 계정으로 이용해 주세요</h1>
-      <p className="mt-2 text-[14px] leading-relaxed text-q-muted">
+      <h1 className="mt-6 text-22 font-bold text-ink">사장님 계정으로 이용해 주세요</h1>
+      <p className="mt-2 text-14 leading-relaxed text-q-muted">
         지금은 손님 계정({nickname})으로 로그인되어 있어요.
         <br />
         사장님 화면은 사장님 계정만 쓸 수 있어요.
@@ -89,7 +89,7 @@ function OwnerAccountNotice({ nickname }: { nickname: string }) {
             setMode('USER')
             navigate('/', { replace: true })
           }}
-          className="h-11 text-[14px] text-q-muted underline"
+          className="h-11 text-14 text-q-muted underline"
         >
           손님 화면으로 돌아가기
         </button>

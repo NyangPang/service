@@ -55,7 +55,7 @@ export function StoreCouponSheet({
                       onError: (e) => setMessage({ ok: false, text: errorMessage(e) }),
                     })
                   }
-                  className="h-9 rounded-full bg-q-green px-4 text-[13px] font-bold whitespace-nowrap text-white transition-transform active:scale-95 disabled:bg-q-mint disabled:text-q-green"
+                  className="h-9 rounded-full bg-q-green px-4 text-13 font-bold whitespace-nowrap text-white transition-transform active:scale-95 disabled:bg-q-mint disabled:text-q-green"
                 >
                   {c.alreadyDownloaded ? '✓ 받음' : '받기'}
                 </button>

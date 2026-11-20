@@ -23,7 +23,7 @@ export function OwnerCouponTabs() {
               role="tab"
               aria-selected={view === v.key}
               onClick={() => setParams(v.key === 'coupons' ? {} : { view: v.key }, { replace: true })}
-              className="h-9 rounded-full text-[14px] font-bold text-q-muted transition-colors aria-selected:bg-q-green aria-selected:text-white"
+              className="h-9 rounded-full text-14 font-bold text-q-muted transition-colors aria-selected:bg-q-green aria-selected:text-white"
             >
               {v.label}
             </button>

@@ -41,7 +41,7 @@ export function WelcomePage() {
   return (
     <div className="mx-auto flex h-full max-w-[430px] flex-col bg-white px-6 pt-[max(48px,env(safe-area-inset-top))] pb-[max(24px,env(safe-area-inset-bottom))]">
       <img src={logo} alt="잇츠" className="h-[56px] w-fit" />
-      <h1 className="mt-6 text-[26px] leading-snug font-bold text-ink">
+      <h1 className="mt-6 text-26 leading-snug font-bold text-ink">
         반가워요!
         <br />
         잇츠를 어떻게 쓰실 건가요?
@@ -63,13 +63,13 @@ export function WelcomePage() {
               }`}
             >
               <span className="min-w-0 flex-1">
-                <span className="block text-[19px] font-bold text-ink">{o.title}</span>
-                <span className="mt-0.5 block text-[13px] text-q-muted">{o.desc}</span>
+                <span className="block text-19 font-bold text-ink">{o.title}</span>
+                <span className="mt-0.5 block text-13 text-q-muted">{o.desc}</span>
                 <span className="mt-3 flex flex-wrap gap-1.5">
                   {o.points.map((p) => (
                     <span
                       key={p}
-                      className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${
+                      className={`rounded-full px-2.5 py-1 text-11 font-bold ${
                         active ? 'bg-white text-green-6' : 'bg-q-panel text-q-sub'
                       }`}
                     >
@@ -100,7 +100,7 @@ export function WelcomePage() {
       >
         {picked === 'OWNER' ? '사장님으로 시작하기' : picked === 'USER' ? '손님으로 시작하기' : '하나를 골라 주세요'}
       </button>
-      <p className="mt-4 text-center text-[13px] text-q-muted">
+      <p className="mt-4 text-center text-13 text-q-muted">
         이미 계정이 있나요?{' '}
         <Link to="/login" className="font-bold text-green-6 underline">
           로그인

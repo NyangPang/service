@@ -21,7 +21,7 @@ export function QuestHome() {
   return (
     <div className="h-full overflow-y-auto px-5 pb-8">
       {/* 떠 있는 ≡ · + 버튼(높이 76px) 사이 가운데 */}
-      <p className="flex h-[76px] items-center justify-center gap-1.5 text-[17px] font-bold text-q-green">
+      <p className="flex h-[76px] items-center justify-center gap-1.5 text-17 font-bold text-q-green">
         {neighborhood?.dong ?? '우리 동네'} <span aria-hidden className="size-2.5 rounded-full bg-q-green" />
       </p>
 
@@ -31,8 +31,8 @@ export function QuestHome() {
         to="/coupons"
         className="mt-3 flex items-center justify-between rounded-2xl border border-q-line bg-white px-4 py-3"
       >
-        <span className="text-[15px] font-bold text-q-text">내 쿠폰함</span>
-        <span className="text-[13px] font-medium text-q-green">
+        <span className="text-15 font-bold text-q-text">내 쿠폰함</span>
+        <span className="text-13 font-medium text-q-green">
           사용 가능 {coupons?.length ?? 0}장 ›
         </span>
       </Link>
@@ -106,9 +106,9 @@ function QuestCard({ quest }: { quest: Quest }) {
       </span>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
-          <p className="truncate text-[15px] font-bold text-q-text">{quest.title}</p>
+          <p className="truncate text-15 font-bold text-q-text">{quest.title}</p>
           {done && (
-            <span className="shrink-0 rounded-full bg-q-mint px-2 py-0.5 text-[11px] font-bold text-q-green">완료</span>
+            <span className="shrink-0 rounded-full bg-q-mint px-2 py-0.5 text-11 font-bold text-q-green">완료</span>
           )}
         </div>
         <p className="truncate text-xs text-q-muted">{desc}</p>
@@ -117,7 +117,7 @@ function QuestCard({ quest }: { quest: Quest }) {
             {quest.currentCount} / {quest.targetCount}
           </span>
           <ProgressBar value={quest.currentCount} max={quest.targetCount} className="h-1 w-[116px]" />
-          <span className="ml-auto flex shrink-0 items-center gap-1 text-[13px] font-bold text-q-green">
+          <span className="ml-auto flex shrink-0 items-center gap-1 text-13 font-bold text-q-green">
             <FeedIcon className="size-5" />
             먹이 {quest.rewardFeed}개
           </span>

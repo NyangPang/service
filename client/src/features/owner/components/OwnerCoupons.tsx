@@ -27,7 +27,7 @@ export function OwnerCoupons() {
       <Link to="/owner/coupons/new" className="flex items-center gap-3 overflow-hidden rounded-2xl bg-q-green py-2 pr-4 pl-3 text-white">
         <img src={OWNER_ILLUST.couponNew} alt="" className="-my-1 h-[76px] w-auto object-contain drop-shadow" />
         <span className="flex-1">
-          <span className="block text-[16px] font-bold">새 쿠폰 발행하기</span>
+          <span className="block text-16 font-bold">새 쿠폰 발행하기</span>
           <span className="text-xs opacity-85">손님을 부르는 할인 쿠폰을 만들어요</span>
         </span>
         <span className="text-xl">›</span>
@@ -41,7 +41,7 @@ export function OwnerCoupons() {
             role="tab"
             aria-selected={status === f.status}
             onClick={() => setStatus(f.status)}
-            className="rounded-full border border-q-line bg-white px-3.5 py-1.5 text-[13px] font-bold text-q-muted aria-selected:border-q-green aria-selected:bg-q-green aria-selected:text-white"
+            className="rounded-full border border-q-line bg-white px-3.5 py-1.5 text-13 font-bold text-q-muted aria-selected:border-q-green aria-selected:bg-q-green aria-selected:text-white"
           >
             {f.label}
           </button>
@@ -53,14 +53,14 @@ export function OwnerCoupons() {
       {coupons && coupons.length === 0 && (
         <p className="mt-3 rounded-2xl bg-white py-10 text-center text-sm text-q-muted">해당하는 쿠폰이 없어요</p>
       )}
-      {stop.isError && <p className="mt-3 text-center text-[13px] text-point-red-dark">{errorMessage(stop.error)}</p>}
+      {stop.isError && <p className="mt-3 text-center text-13 text-point-red-dark">{errorMessage(stop.error)}</p>}
 
       <ul className="mt-3 flex flex-col gap-2.5">
         {coupons?.map((c) => (
           <li key={c.couponId} className="rounded-2xl bg-white px-4 py-4">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <p className="truncate text-[16px] font-bold text-q-text">{c.title}</p>
+                <p className="truncate text-16 font-bold text-q-text">{c.title}</p>
                 <p className="text-xs text-q-muted">
                   {discountText(c)} · {minOrderText(c.minOrderAmount)}
                 </p>
@@ -75,13 +75,13 @@ export function OwnerCoupons() {
                 ['남은 수량', c.remainingQuantity],
               ].map(([label, value]) => (
                 <div key={label} className="rounded-xl bg-q-panel py-2">
-                  <p className="text-[11px] text-q-muted">{label}</p>
-                  <p className="text-[15px] font-bold text-q-text tabular-nums">{value}</p>
+                  <p className="text-11 text-q-muted">{label}</p>
+                  <p className="text-15 font-bold text-q-text tabular-nums">{value}</p>
                 </div>
               ))}
             </div>
             <ProgressBar value={c.issuedCount} max={c.totalQuantity} className="mt-2.5 h-1.5" />
-            <p className="mt-1 text-right text-[11px] text-q-muted">
+            <p className="mt-1 text-right text-11 text-q-muted">
               {c.issuedCount} / {c.totalQuantity}장 지급
             </p>
 

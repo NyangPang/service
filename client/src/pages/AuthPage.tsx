@@ -41,7 +41,7 @@ export function LoginPage() {
         <BackIcon />
       </button>
       <img src={logo} alt="잇츠" className="mt-6 h-[52px] w-fit" />
-      <h1 className="mt-5 text-[26px] leading-snug font-bold text-ink">
+      <h1 className="mt-5 text-26 leading-snug font-bold text-ink">
         다시 만나서
         <br />
         반가워요!
@@ -49,7 +49,7 @@ export function LoginPage() {
       <div className="mt-8">
         <LoginForm onSuccess={done} />
       </div>
-      <p className="mt-auto text-center text-[14px] text-q-muted">
+      <p className="mt-auto text-center text-14 text-q-muted">
         아직 계정이 없나요?{' '}
         <Link to="/signup" className="font-bold text-green-4 underline">
           회원가입

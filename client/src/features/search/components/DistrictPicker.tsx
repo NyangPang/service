@@ -23,7 +23,7 @@ export function DistrictPicker({ value, onChange }: { value: string | null; onCh
         onClick={() => setOpen(true)}
         aria-haspopup="dialog"
         aria-label={`지역 선택: ${value ?? '서울 전체'}`}
-        className={`flex h-9 min-w-0 items-center gap-1.5 rounded-full border pr-2.5 pl-3 text-[13px] font-bold transition-colors ${
+        className={`flex h-9 min-w-0 items-center gap-1.5 rounded-full border pr-2.5 pl-3 text-13 font-bold transition-colors ${
           value ? 'border-q-green bg-q-mint text-q-green' : 'border-q-line bg-white text-q-text'
         }`}
       >
@@ -38,7 +38,7 @@ export function DistrictPicker({ value, onChange }: { value: string | null; onCh
             type="button"
             onClick={() => pick(null)}
             aria-pressed={value === null}
-            className={`flex h-12 w-full items-center justify-between rounded-2xl px-4 text-[15px] font-bold transition-colors ${
+            className={`flex h-12 w-full items-center justify-between rounded-2xl px-4 text-15 font-bold transition-colors ${
               value === null ? 'bg-q-green text-white' : 'bg-q-panel text-q-text active:bg-q-mint'
             }`}
           >
@@ -70,9 +70,9 @@ export function DistrictPicker({ value, onChange }: { value: string | null; onCh
                           : 'border-q-line/70 bg-white text-q-sub active:bg-q-mint'
                     }`}
                   >
-                    <span className="text-[14px] font-bold">{name}</span>
+                    <span className="text-14 font-bold">{name}</span>
                     <span
-                      className={`mt-0.5 text-[11px] ${
+                      className={`mt-0.5 text-11 ${
                         selected ? 'text-white/85' : count ? 'font-medium text-q-green' : 'text-q-muted'
                       }`}
                     >

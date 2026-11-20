@@ -146,7 +146,7 @@ export function MapBottomSheet({
                     onClick={() => onCategoryChange(active ? null : c.key)}
                   >
                     <img src={c.icon} alt="" className="h-[68px] w-[68px] object-contain" />
-                    <span className={`text-[15px] text-green-6 ${active ? 'font-semibold' : ''}`}>{c.label}</span>
+                    <span className={`text-15 text-green-6 ${active ? 'font-semibold' : ''}`}>{c.label}</span>
                   </button>
                 </li>
               )

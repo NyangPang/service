@@ -85,7 +85,7 @@ export function StoreMarker({
           {couponCount > 0 && (
             <span
               aria-label={`쿠폰 ${couponCount}개`}
-              className="absolute -top-1.5 -right-3 rounded-full border border-white bg-point-red px-1.5 text-[10px] leading-4 font-bold text-white"
+              className="absolute -top-1.5 -right-3 rounded-full border border-white bg-point-red px-1.5 text-10 leading-4 font-bold text-white"
             >
               쿠폰
             </span>
@@ -117,7 +117,7 @@ function StorePopup({
           <div className="mt-1 flex items-center gap-1.5">
             <span className="truncate text-xs text-green-6/80">{store.categoryName}</span>
             {store.isQuestStore && (
-              <span className="shrink-0 rounded-full bg-green-6 px-1.5 py-px text-[10px] font-bold text-white">퀘스트 가게</span>
+              <span className="shrink-0 rounded-full bg-green-6 px-1.5 py-px text-10 font-bold text-white">퀘스트 가게</span>
             )}
           </div>
         </div>
