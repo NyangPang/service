@@ -25,7 +25,7 @@ const TERMS = [
   ['해지하면', '남은 기간까지 이용하고 그 뒤로 결제되지 않아요'],
 ]
 
-/** 잇다 PRO 구독 안내·가입·해지 (해커톤: 모의 결제) */
+/** 잇츠 PRO 구독 안내·가입·해지 (해커톤: 모의 결제) */
 export function ProPlan() {
   const navigate = useNavigate()
   const { data: pro, isPending } = useProQuery()
@@ -65,7 +65,7 @@ export function ProPlan() {
               끝까지 내 마음대로
             </h2>
             <p className="mt-2 text-[13px] leading-relaxed opacity-85">
-              사장님을 위한 잇다 PRO 월 구독
+              사장님을 위한 잇츠 PRO 월 구독
               <br />
               {storeName} 게시물이 손님 피드 앞쪽에 떠요
             </p>
@@ -165,7 +165,7 @@ export function ProPlan() {
       )}
 
       {paying && (
-        <Sheet title="잇다 PRO 구독" onClose={() => setPaying(false)}>
+        <Sheet title="잇츠 PRO 구독" onClose={() => setPaying(false)}>
           <dl className="rounded-2xl bg-q-panel px-4 py-3 text-sm">
             {[
               ['가게', storeName],

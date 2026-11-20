@@ -65,8 +65,14 @@ video:
 email-verification:
   # 보내는 사람 주소 (비우면 MAIL_USERNAME)
   from: ${MAIL_FROM:${MAIL_USERNAME:}}
+  # 받은 메일함에 보이는 보내는 사람 이름
+  from-name: ${MAIL_FROM_NAME:잇츠}
   # 메일 서버가 없을 때 인증번호를 응답(devCode)에 담을지 — 운영에선 false
   expose-code: false
+
+# 시연용 샘플 가게 125곳 + 영상 게시물 (SampleStoreInitializer). 운영은 EC2 .env 에 SAMPLE_DATA_ENABLED=true 로 켬
+sample-data:
+  enabled: ${SAMPLE_DATA_ENABLED:false}
 
 quest:
   # 방문 인증 GPS 반경 검사를 건너뜀 (개발·시연용, 운영은 false)

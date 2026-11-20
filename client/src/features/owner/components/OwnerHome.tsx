@@ -39,7 +39,7 @@ export function OwnerHome() {
         />
         <StatusTile
           to="/owner/pro"
-          label="잇다 PRO"
+          label="잇츠 PRO"
           value={isPro ? '이용 중' : '미구독'}
           sub={isPro ? '혜택 이용 중' : '피드 우선 노출'}
           on={isPro}

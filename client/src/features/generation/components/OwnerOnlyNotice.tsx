@@ -9,7 +9,7 @@ export function OwnerOnlyNotice() {
     <div className="mx-auto flex h-full max-w-[430px] flex-col bg-white px-6 pt-[max(72px,env(safe-area-inset-top))] pb-[max(20px,env(safe-area-inset-bottom))]">
       <h1 className="text-center text-[26px] font-bold tracking-tight text-ink">우리 동네 손님과 잇-다</h1>
       <p className="mt-6 text-center text-[15px] leading-relaxed font-medium text-green-4">
-        잇다에서는
+        잇츠에서는
         <br />
         사장님만 홍보 게시물을
         <br />

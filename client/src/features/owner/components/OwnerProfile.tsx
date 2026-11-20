@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import pigeonCrying from '@/assets/generation/pigeon-crying.jpg'
 import { useWithdraw } from '@/features/auth/hooks'
 import { useStoreShortforms } from '@/features/feed/hooks'
-import type { Shortform } from '@/features/feed/schema'
+import { ShortformThumb } from '@/features/feed/components/ShortformThumb'
 import { Dialog } from '@/features/generation/components/Dialog'
 import { errorMessage } from '@/shared/lib/error'
 import { squareThumbnail } from '@/shared/lib/image'
@@ -124,7 +124,7 @@ export function OwnerProfile() {
             {videos?.map((v) => (
               <li key={v.shortformId}>
                 <Link to="/owner/create" className="relative block aspect-[9/13] overflow-hidden bg-[#dde5e2]">
-                  <Thumb video={v} />
+                  <ShortformThumb video={v} />
                   <span className="absolute top-1.5 right-1.5 flex size-5 items-center justify-center rounded bg-white/90 text-q-text">
                     <span className="scale-[0.3]">
                       <PhotoIcon />
@@ -180,7 +180,7 @@ function NameEditor({ initial, saving, onSave, onCancel }: { initial: string; sa
           onChange={(e) => setName(e.target.value)}
           maxLength={30}
           autoFocus
-          placeholder="ex. 잇다가게 월계점"
+          placeholder="ex. 잇츠가게 성수점"
           className="h-9 min-w-0 flex-1 rounded-lg bg-q-panel px-3 text-[15px] text-ink outline-none"
         />
       </div>
@@ -250,19 +250,6 @@ function EditButtons({ saving, disabled, onSave, onCancel }: { saving: boolean; 
         {saving ? '저장 중...' : '저장'}
       </button>
     </div>
-  )
-}
-
-function Thumb({ video }: { video: Shortform }) {
-  if (!video.posterUrl) return null
-  const f = video.frame
-  return (
-    <img
-      src={video.posterUrl}
-      alt=""
-      className="absolute left-1/2 max-w-none -translate-x-1/2"
-      style={f ? { height: `${100 / f.height}%`, top: `${(-100 * f.top) / f.height}%` } : { height: '100%', top: 0 }}
-    />
   )
 }
 

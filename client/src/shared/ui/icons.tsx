@@ -81,6 +81,16 @@ export function MapNavIcon() {
   )
 }
 
+/** 하단 네비: 검색(돋보기) — 지도·깃발과 같은 선 굵기 */
+export function SearchNavIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <circle cx="10.5" cy="10.5" r="8" {...stroke} strokeWidth={1.9} />
+      <path d="M16.5 16.5L22.5 22.5" {...stroke} strokeWidth={1.9} />
+    </svg>
+  )
+}
+
 /** 하단 네비: 퀘스트(깃발) */
 export function FlagNavIcon() {
   return (

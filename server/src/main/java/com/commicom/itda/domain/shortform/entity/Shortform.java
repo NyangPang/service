@@ -35,9 +35,13 @@ public class Shortform extends BaseTimeEntity {
     @JoinColumn(nullable = false)
     private Store store;
 
-    /** AI 생성 이미지 URL */
+    /** AI 생성 이미지 URL. 영상 게시물이면 영상의 포스터(썸네일)로 쓴다 */
     @Column(nullable = false)
     private String imageUrl;
+
+    /** 홍보 영상 URL (영상 게시물만, 없으면 null). 있으면 피드에서 사진 대신 영상을 재생한다 */
+    @Column(length = 1000)
+    private String videoUrl;
 
     @Column(nullable = false, length = 200)
     private String title;
@@ -61,9 +65,11 @@ public class Shortform extends BaseTimeEntity {
     public static final int MAX_PHOTOS = 4;
 
     @Builder
-    private Shortform(Store store, String imageUrl, String title, String caption, List<String> photoUrls, Boolean published) {
+    private Shortform(Store store, String imageUrl, String videoUrl, String title, String caption, List<String> photoUrls,
+                      Boolean published) {
         this.store = store;
         this.imageUrl = imageUrl;
+        this.videoUrl = videoUrl;
         this.title = title;
         this.caption = caption;
         // 따로 정하지 않으면 공개 (샘플 데이터 등). AI 생성 결과는 false 로 만듦

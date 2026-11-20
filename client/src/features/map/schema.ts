@@ -112,5 +112,5 @@ export interface StoreEdit {
   thumbnailUrl?: string | null
 }
 
-/** 광운대 정문 근처 — 위치 권한이 없을 때 기본 중심 */
-export const DEFAULT_CENTER: LatLng = { lat: 37.6194, lng: 127.0597 }
+/** 서울시청 — 위치 권한이 없을 때 기본 중심 (서울 전역 서비스) */
+export const DEFAULT_CENTER: LatLng = { lat: 37.5666, lng: 126.9784 }

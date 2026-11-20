@@ -1,5 +1,5 @@
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import logo from '@/assets/logo-itda.svg'
+import logo from '@/assets/its-logo.svg'
 import { LoginForm } from '@/features/auth/components/LoginForm'
 import { MyProfile } from '@/features/auth/components/MyProfile'
 import { SignupFlow } from '@/features/auth/components/SignupFlow'
@@ -40,7 +40,7 @@ export function LoginPage() {
       >
         <BackIcon />
       </button>
-      <img src={logo} alt="잇다" className="mt-6 h-[52px] w-fit" />
+      <img src={logo} alt="잇츠" className="mt-6 h-[52px] w-fit" />
       <h1 className="mt-5 text-[26px] leading-snug font-bold text-ink">
         다시 만나서
         <br />

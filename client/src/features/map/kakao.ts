@@ -29,7 +29,7 @@ async function loadKakaoServices() {
 
 /**
  * 도로명 주소 → 좌표 (가게 등록·주소 수정 때 지도 위치용).
- * 카카오 키가 없는 개발 환경은 기본 중심(광운대 정문)으로.
+ * 카카오 키가 없는 개발 환경은 기본 중심(서울시청)으로.
  */
 export async function geocodeAddress(address: string): Promise<LatLng> {
   if (!KAKAO_KEY) return DEFAULT_CENTER
@@ -41,6 +41,29 @@ export async function geocodeAddress(address: string): Promise<LatLng> {
       } else {
         reject(new Error('주소 위치를 찾지 못했어요. 주소 찾기로 다시 골라 주세요'))
       }
+    })
+  })
+}
+
+export interface Neighborhood {
+  /** 자치구 (예: 성동구) */
+  gu: string
+  /** 행정동 (예: 성수1가1동) */
+  dong: string
+}
+
+/**
+ * 좌표 → 행정동 (카카오 coord2RegionCode). 퀘스트 화면의 "내 동네" 표시, 동네별 랭킹에 사용.
+ * 카카오 키가 없는 개발 환경이면 null.
+ */
+export async function neighborhoodOf(position: LatLng): Promise<Neighborhood | null> {
+  if (!KAKAO_KEY) return null
+  await loadKakaoServices()
+  return new Promise((resolve) => {
+    new kakao.maps.services.Geocoder().coord2RegionCode(position.lng, position.lat, (result, status) => {
+      // H = 행정동, B = 법정동. 동네 구분은 행정동 기준
+      const region = status === kakao.maps.services.Status.OK ? result.find((r) => r.region_type === 'H') : undefined
+      resolve(region ? { gu: region.region_2depth_name, dong: region.region_3depth_name } : null)
     })
   })
 }

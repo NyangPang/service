@@ -1,0 +1,63 @@
+# 프론트 배포: main 의 client/ 가 바뀌면 → 빌드 → S3 업로드 → CloudFront 캐시 비우기
+# 필요한 설정은 docs/deploy.md 참고
+name: Deploy client
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'client/**'
+      - '.github/workflows/deploy-client.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-client
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - name: 빌드
+        run: npm run build
+        env:
+          VITE_KAKAO_MAP_KEY: ${{ vars.VITE_KAKAO_MAP_KEY }}
+          # 비우면 같은 주소의 /api (CloudFront 가 /api/* 를 EC2 로 넘김 — docs/deploy.md)
+          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
+          VITE_USE_MOCK: 'false'
+          VITE_QUEST_GPS_BYPASS: 'false'
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION || 'ap-northeast-2' }}
+
+      # 파일 이름에 해시가 붙는 assets 는 오래 캐시, index.html 등은 매번 새로
+      # ⚠ FRONT_S3_BUCKET 은 프론트 전용 버킷이어야 함 (--delete 가 버킷의 다른 파일을 지움)
+      - name: S3 업로드
+        run: |
+          aws s3 sync dist/assets "s3://${{ vars.FRONT_S3_BUCKET }}/assets" --delete \
+            --cache-control "public,max-age=31536000,immutable"
+          aws s3 sync dist "s3://${{ vars.FRONT_S3_BUCKET }}" --delete --exclude "assets/*" \
+            --cache-control "no-cache"
+
+      - name: CloudFront 캐시 비우기
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "${{ vars.FRONT_CLOUDFRONT_ID }}" --paths "/*"

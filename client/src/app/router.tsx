@@ -20,6 +20,7 @@ import {
 } from '@/pages/OwnerPage'
 import { MyReviewsPage, OwnerNotificationsPage, OwnerReviewsPage, ReviewDrawPage, ReviewEditPage, ReviewWritePage } from '@/pages/ReviewPage'
 import { PigeonAlbumPage, PigeonHistoryPage, QuestPage, QuestScanPage, QuestVisitPage } from '@/pages/QuestPage'
+import { SearchPage } from '@/pages/SearchPage'
 
 export const router = createBrowserRouter([
   // 처음 실행: 손님 / 사장님 선택
@@ -42,6 +43,8 @@ export const router = createBrowserRouter([
       // 지도에서 진입하는 하위 화면: /map 하위라 지도 탭이 활성 상태로 유지됨
       { path: '/map/stores/:storeId/shortform', element: <StoreShortformPage />, handle: { title: '홍보 게시물', fixedNav: true } },
       { path: '/map/stores/:storeId', element: <StoreProfilePage />, handle: { title: '가게 프로필' } },
+      // 가게 검색 · 동네 랭킹 (지역·업종·기간별 실제 방문 많은 순)
+      { path: '/search', element: <SearchPage />, handle: { title: '검색' } },
       // 상단 바 없이 ≡ · + 버튼만 띄우고 그 사이에 동네 이름
       { path: '/quest', element: <QuestPage />, handle: { immersive: true } },
       // 퀘스트 하위 화면: /quest 하위라 퀘스트 탭이 활성 상태로 유지됨
@@ -76,7 +79,7 @@ export const router = createBrowserRouter([
       { path: 'redeem', element: <OwnerRedeemPage />, handle: { title: '쿠폰 사용 처리', action: null } },
       { path: 'create', element: <OwnerVideosPage />, handle: { title: '게시물 제작', action: null } },
       { path: 'quest-store', element: <QuestStorePage />, handle: { title: '퀘스트 가게' } },
-      { path: 'pro', element: <ProPage />, handle: { title: '잇다 PRO' } },
+      { path: 'pro', element: <ProPage />, handle: { title: '잇츠 PRO' } },
       // 예전 주소 호환 (정산은 쿠폰 탭 안으로, 내 영상은 제작 탭으로)
       { path: 'settlement', element: <Navigate to="/owner/coupons?view=settlement" replace /> },
       { path: 'videos', element: <Navigate to="/owner/create" replace /> },

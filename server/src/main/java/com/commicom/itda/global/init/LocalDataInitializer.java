@@ -24,6 +24,7 @@ import com.commicom.itda.domain.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.beans.factory.annotation.Value;
 import com.commicom.itda.global.util.KstTime;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
@@ -55,6 +56,15 @@ public class LocalDataInitializer implements ApplicationRunner {
     private final CouponRepository couponRepository;
     private final UserCouponRepository userCouponRepository;
     private final ReviewRepository reviewRepository;
+
+    /** 업로드 CloudFront 도메인 — S3 nyang-pang/sample/ 에 올려 둔 샘플 사진·영상 주소를 만든다 */
+    @Value("${aws.cloudfront.domain}")
+    private String cloudfrontDomain;
+
+    /** S3 nyang-pang/sample/ 의 샘플 파일 주소 */
+    private String sample(String file) {
+        return "https://" + cloudfrontDomain + "/sample/" + file;
+    }
 
     @Override
     public void run(ApplicationArguments args) {
@@ -157,6 +167,7 @@ public class LocalDataInitializer implements ApplicationRunner {
                         .address("서울 노원구 월계동 (샘플 주소)").latitude(37.6195).longitude(127.0600)
                         .phone("02-000-0001").businessHours("매일 11:00-21:00")
                         .description("떡볶이와 김밥이 맛있는 동네 분식집")
+                        .thumbnailUrl(sample("Group1.png"))
                         .stepFree(true).elevator(false)
                         .build(),
                 Store.builder()
@@ -164,6 +175,7 @@ public class LocalDataInitializer implements ApplicationRunner {
                         .address("서울 노원구 월계동 (샘플 주소)").latitude(37.6202).longitude(127.0578)
                         .phone("02-000-0002").businessHours("평일 08:00-22:00, 주말 10:00-20:00")
                         .description("학생 할인이 있는 핸드드립 카페")
+                        .thumbnailUrl(sample("Group2.png"))
                         .stepFree(false).elevator(false)
                         // 샘플 사장님(owner@test.com)의 가게
                         .owner(memberRepository.findByEmail("owner@test.com").orElse(null))
@@ -173,6 +185,7 @@ public class LocalDataInitializer implements ApplicationRunner {
                         .address("서울 노원구 월계동 (샘플 주소)").latitude(37.6178).longitude(127.0612)
                         .phone("02-000-0003").businessHours("화-일 09:00-20:00, 월요일 휴무")
                         .description("매일 아침 굽는 식빵과 소금빵")
+                        .thumbnailUrl(sample("Group3.png"))
                         .stepFree(true).elevator(true)
                         .build()
         ));
@@ -189,12 +202,15 @@ public class LocalDataInitializer implements ApplicationRunner {
         shortformRepository.saveAll(List.of(
                 Shortform.builder()
                         .store(stores.get(0))
-                        .imageUrl("https://example.com/sample-image-1.png")
+                        // 영상 게시물: 포스터는 가게 사진, 영상은 S3 샘플 (못 불러오면 포스터로 대신)
+                        .imageUrl(sample("Group1.png"))
+                        .videoUrl(sample("test.mp4"))
                         .title("월계 분식")
                         .build(),
                 Shortform.builder()
                         .store(stores.get(1))
-                        .imageUrl("https://example.com/sample-image-2.png")
+                        .imageUrl(sample("Group2.png"))
+                        .videoUrl(sample("test.mp4"))
                         .title("광운 카페")
                         .build()
         ));

@@ -67,14 +67,19 @@ public class EmailVerificationService {
 
         String code = String.format("%06d", RANDOM.nextInt(1_000_000));
         try {
-            mailService.send(email, "[잇다] 이메일 인증번호", """
-                    안녕하세요, 우리 동네 손님과 잇-다 입니다.
+            // 제목에도 번호를 넣어 알림·메일 목록에서 열지 않고 바로 볼 수 있게
+            mailService.send(email, "[잇츠] 인증번호 " + code, """
+                    안녕하세요, 우리 동네 가게와 손님을 잇는 잇츠예요 🕊️
 
-                    인증번호: %s
+                    인증번호  %s
 
                     회원가입 화면에 위 6자리 숫자를 입력해 주세요.
-                    인증번호는 %d분 동안 유효해요.
+                    인증번호는 %d분 동안만 쓸 수 있어요.
+
                     직접 요청하지 않았다면 이 메일은 무시하셔도 돼요.
+                    누군가 이메일 주소를 잘못 입력했을 수 있어요.
+
+                    — 잇츠 드림
                     """.formatted(code, CODE_TTL.toMinutes()));
         } catch (Exception e) {
             log.warn("인증 메일 발송 실패 to={}", email, e);

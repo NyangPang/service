@@ -37,7 +37,7 @@ export function OwnerSettlement() {
       {data && (
         <>
           <section className="mt-4 rounded-3xl bg-q-green-dark px-6 py-5 text-white">
-            <p className="text-xs opacity-80">{Number(m)}월 잇다 수수료</p>
+            <p className="text-xs opacity-80">{Number(m)}월 잇츠 수수료</p>
             <p className="mt-1 text-[30px] font-bold tabular-nums">{data.totalFee.toLocaleString()}원</p>
             <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
               <div className="rounded-xl bg-white/15 px-3 py-2">

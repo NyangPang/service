@@ -7,9 +7,12 @@ import { toast } from '@/stores/toastStore'
 import { useCanScrap, useIsScrapped, useToggleScrap } from '../hooks'
 import type { Shortform } from '../schema'
 import { PostCarousel } from './PostCarousel'
+import { PostVideo } from './PostVideo'
 
 interface Props {
   item: Shortform
+  /** 화면에 보이는 게시물 (영상이면 이때만 재생) */
+  active: boolean
   couponCount: number
   onOpenCoupons: () => void
 }
@@ -18,7 +21,7 @@ interface Props {
  * 피드 게시물 한 장 — 사장님이 AI로 만든 사진을 인스타그램 게시물처럼:
  * 가게 프로필 → 사진 → 버튼(스크랩·위치·공유·쿠폰) → 소개 글·메뉴·올린 날짜. 한 화면에 한 장씩 (위아래로 넘기기는 ShortformFeed)
  */
-export function ShortformItem({ item, couponCount, onOpenCoupons }: Props) {
+export function ShortformItem({ item, active, couponCount, onOpenCoupons }: Props) {
   const navigate = useNavigate()
   const [menusOpen, setMenusOpen] = useState(false)
   const scrapped = useIsScrapped(item.shortformId)
@@ -46,7 +49,7 @@ export function ShortformItem({ item, couponCount, onOpenCoupons }: Props) {
           aria-label={`${item.storeName} 프로필`}
           className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white ring-2 ring-green-4 ring-offset-2"
         >
-          {icon ? <img src={icon} alt="" className="size-8 object-contain" /> : null}
+          <StoreProfilePhoto url={item.storeThumbnailUrl} icon={icon} />
         </Link>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
@@ -68,7 +71,7 @@ export function ShortformItem({ item, couponCount, onOpenCoupons }: Props) {
 
       {/* 사진: 남는 높이를 모두 써서 화면을 채움 */}
       <div className="relative min-h-0 flex-1 overflow-hidden bg-q-mint">
-        <PostPhoto item={item} icon={icon} />
+        <PostPhoto item={item} icon={icon} active={active} />
       </div>
 
       {/* 버튼 */}
@@ -84,7 +87,7 @@ export function ShortformItem({ item, couponCount, onOpenCoupons }: Props) {
           label="공유"
           onClick={() =>
             shareLink({
-              title: `${item.storeName} | 잇다`,
+              title: `${item.storeName} | 잇츠`,
               text: `우리 동네 ${item.storeName} 게시물 보러 가기${item.description ? ` - ${item.description}` : ''}`,
               path: `/map/stores/${item.storeId}/shortform?start=${item.shortformId}`,
             })
@@ -136,22 +139,34 @@ export function ShortformItem({ item, couponCount, onOpenCoupons }: Props) {
   )
 }
 
-/** 게시물 사진 (여러 장이면 옆으로 넘김). 없거나 못 불러오면 업종 그림으로 채움 */
-function PostPhoto({ item, icon }: { item: Shortform; icon?: string }) {
+/** 게시물 사진 (여러 장이면 옆으로 넘김) 또는 홍보 영상. 없거나 못 불러오면 업종 그림으로 채움 */
+function PostPhoto({ item, icon, active }: { item: Shortform; icon?: string; active: boolean }) {
+  const alt = item.description || `${item.storeName} 사진`
+  const fallback = (
+    <div className="flex size-full flex-col items-center justify-center bg-gradient-to-br from-q-mint to-[#d7ebe0] text-center">
+      {icon && <img src={icon} alt="" className="h-[120px] w-auto object-contain opacity-90" />}
+      <p className="mt-3 text-[15px] font-bold text-green-6">{item.storeName}</p>
+      <p className="mt-0.5 text-[12px] text-q-muted">사진을 준비하고 있어요</p>
+    </div>
+  )
+  if (item.videoUrl) {
+    return <PostVideo url={item.videoUrl} posterUrl={item.posterUrl} alt={alt} active={active} frame={item.frame} fallback={fallback} />
+  }
   return (
     <PostCarousel
       images={item.images?.length ? item.images : item.posterUrl ? [item.posterUrl] : []}
-      alt={item.description || `${item.storeName} 사진`}
+      alt={alt}
       frame={item.frame}
-      fallback={
-        <div className="flex size-full flex-col items-center justify-center bg-gradient-to-br from-q-mint to-[#d7ebe0] text-center">
-          {icon && <img src={icon} alt="" className="h-[120px] w-auto object-contain opacity-90" />}
-          <p className="mt-3 text-[15px] font-bold text-green-6">{item.storeName}</p>
-          <p className="mt-0.5 text-[12px] text-q-muted">사진을 준비하고 있어요</p>
-        </div>
-      }
+      fallback={fallback}
     />
   )
+}
+
+/** 피드 상단 가게 프로필 사진. 없거나 못 불러오면 업종 그림 */
+function StoreProfilePhoto({ url, icon }: { url?: string | null; icon?: string }) {
+  const [failed, setFailed] = useState(false)
+  if (url && !failed) return <img src={url} alt="" onError={() => setFailed(true)} className="size-full object-cover" />
+  return icon ? <img src={icon} alt="" className="size-8 object-contain" /> : null
 }
 
 function ActionButton({ label, onClick, children, pressed }: { label: string; onClick: () => void; children: ReactNode; pressed?: boolean }) {

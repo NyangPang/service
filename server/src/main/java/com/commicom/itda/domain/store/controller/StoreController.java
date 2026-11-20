@@ -4,8 +4,11 @@ import com.commicom.itda.domain.store.dto.StoreCategoryResponse;
 import com.commicom.itda.domain.store.dto.StoreCreateRequest;
 import com.commicom.itda.domain.store.dto.StoreDetailResponse;
 import com.commicom.itda.domain.store.dto.StoreListResponse;
+import com.commicom.itda.domain.store.dto.StoreRankingDtos.DistrictResponse;
+import com.commicom.itda.domain.store.dto.StoreRankingDtos.StoreRankingResponse;
 import com.commicom.itda.domain.store.dto.StoreUpdateRequest;
 import com.commicom.itda.domain.store.entity.StoreCategory;
+import com.commicom.itda.domain.store.service.StoreRankingService;
 import com.commicom.itda.domain.store.service.StoreService;
 import com.commicom.itda.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,6 +38,7 @@ import java.util.List;
 public class StoreController {
 
     private final StoreService storeService;
+    private final StoreRankingService rankingService;
 
     @Operation(summary = "가게 목록 조회", description = "지도에 표시할 가게 목록을 조회한다. category 를 주면 업종으로 필터링한다.")
     @GetMapping
@@ -48,6 +52,24 @@ public class StoreController {
     @GetMapping("/categories")
     public ApiResponse<List<StoreCategoryResponse>> getCategories() {
         return ApiResponse.onSuccess(StoreCategoryResponse.all());
+    }
+
+    @Operation(summary = "가게 검색·동네 랭킹",
+            description = "기간 내 실제 방문 수(QR 방문 인증) 많은 순. 방문이 없는 가게도 뒤에 붙는다. "
+                    + "district(자치구)·category(업종)·q(가게 이름)로 거른다. days 는 7(기본)·14·31 만")
+    @GetMapping("/ranking")
+    public ApiResponse<StoreRankingResponse> getRanking(
+            @Parameter(description = "자치구 (예: 노원구). 없으면 전체 지역") @RequestParam(required = false) String district,
+            @Parameter(description = "업종 (없으면 모든 업종)") @RequestParam(required = false) StoreCategory category,
+            @Parameter(description = "가게 이름 검색어 (띄어쓰기·대소문자 무시)") @RequestParam(required = false) String q,
+            @Parameter(description = "집계 기간: 7·14·31일") @RequestParam(defaultValue = "7") int days) {
+        return ApiResponse.onSuccess(rankingService.getRanking(district, category, q, days));
+    }
+
+    @Operation(summary = "지역(자치구) 목록", description = "가게가 있는 자치구와 가게 수 (가나다 순). 랭킹의 지역 선택에 쓴다")
+    @GetMapping("/districts")
+    public ApiResponse<List<DistrictResponse>> getDistricts() {
+        return ApiResponse.onSuccess(rankingService.getDistricts());
     }
 
     @Operation(summary = "내 가게 조회", description = "로그인한 사장님의 가게. 아직 등록하지 않았으면 STORE404_2")

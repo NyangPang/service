@@ -82,7 +82,12 @@ export function ShortformFeed({ storeId, startId }: { storeId?: number; startId?
       <div ref={containerRef} className="h-full snap-y snap-mandatory overflow-y-auto overscroll-contain [scrollbar-width:none]">
         {items.map((item, i) => (
           <div key={item.shortformId} data-index={i} className="h-full snap-start snap-always">
-            <ShortformItem item={item} couponCount={couponCount(item.storeId)} onOpenCoupons={() => setCouponFor(item)} />
+            <ShortformItem
+              item={item}
+              active={i === activeIndex}
+              couponCount={couponCount(item.storeId)}
+              onOpenCoupons={() => setCouponFor(item)}
+            />
           </div>
         ))}
         {/* 다음 묶음이 있으면 마지막에 불러오는 중 한 장 */}
