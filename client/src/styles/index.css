@@ -137,21 +137,30 @@ body {
     opacity: 1;
   }
 }
-@keyframes splash-blob {
-  0% {
-    transform: scale(0) rotate(-12deg);
+/* 스플래시: 화면 가운데서 원이 퍼져 화면 끝(대각선)까지 덮음. 150% 면 어떤 비율 화면이든 모서리까지 닿음 */
+@keyframes splash-spread {
+  from {
+    clip-path: circle(0% at 50% 50%);
   }
-  60% {
-    transform: scale(1.1) rotate(0deg);
-  }
-  100% {
-    transform: scale(4.5) rotate(6deg);
+  to {
+    clip-path: circle(150% at 50% 50%);
   }
 }
+
 @keyframes splash-out {
   to {
     opacity: 0;
     visibility: hidden;
+  }
+}
+
+/* 움직임 줄이기 설정: 퍼짐·튀어나옴 없이 크림 화면 + 로고만 잠깐 보여 주고 사라짐 */
+@media (prefers-reduced-motion: reduce) {
+  .splash-spread {
+    display: none;
+  }
+  .splash-logo {
+    animation: none !important;
   }
 }
 

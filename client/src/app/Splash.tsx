@@ -1,9 +1,22 @@
 import { useState } from 'react'
-import logo from '@/assets/logo-itda.svg'
+import logo from '@/assets/its-logo.svg'
+import logoOnGreen from '@/assets/its-logo-white.svg'
 
 const SHOWN_KEY = 'itda-splash-shown'
-/** 전체 길이: 로고 0.5s → 덩어리 퍼짐 1.1s → 사라짐 0.4s */
-const TOTAL_MS = 2300
+
+/** 배경 크림색 → 퍼지는 초록 (로고 색) */
+const CREAM = '#fef9f3'
+const GREEN = '#24734f'
+
+/**
+ * 타이밍 (ms): 로고 등장 → 잠깐 멈춤 → 로고 중심에서 초록 원이 퍼져 화면을 채움 → 초록 화면 잠깐 → 사라짐.
+ * 퍼지는 원은 clip-path 라 레이아웃·그림 다시 그리기 없이 부드럽게 움직임
+ */
+const LOGO_IN = 500
+const SPREAD_DELAY = 750
+const SPREAD = 900
+const FADE_DELAY = SPREAD_DELAY + SPREAD + 250
+const FADE = 350
 
 /** 이번 접속에서 이미 봤으면 다시 안 보여 줌 (새로고침·화면 이동마다 뜨지 않게) */
 function shouldShow() {
@@ -19,8 +32,9 @@ function shouldShow() {
 const SHOW_ON_START = shouldShow()
 
 /**
- * 시작 스플래시 (Figma 온보딩 3:400 → 3:433 → 3:437)
- * 크림색 바탕 + 로고 → 연두색 덩어리가 가운데서 퍼져 화면을 채움 → 앱으로. 누르면 바로 넘어감.
+ * 시작 스플래시: 크림색 바탕 + 로고 → 로고 가운데서 초록 원이 바깥으로 퍼지며 화면 전체를 채움 → 앱으로.
+ * 원이 지나가는 자리에서 로고도 밝은 색으로 바뀜 (같은 자리에 겹친 두 로고를 원 모양으로 잘라 보여 줌).
+ * 누르면 바로 넘어감. 움직임 줄이기 설정이면 퍼짐 없이 짧게 보여 주고 사라짐 (index.css)
  */
 export function Splash() {
   const [visible, setVisible] = useState(SHOW_ON_START)
@@ -31,27 +45,34 @@ export function Splash() {
       role="presentation"
       onClick={() => setVisible(false)}
       onAnimationEnd={(e) => e.animationName === 'splash-out' && setVisible(false)}
-      className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-[#fef9f3]"
-      style={{ animation: `splash-out .4s ease-in ${TOTAL_MS - 400}ms forwards` }}
+      className="splash fixed inset-0 z-[100] overflow-hidden"
+      style={{ background: CREAM, animation: `splash-out ${FADE}ms ease-in ${FADE_DELAY}ms forwards` }}
     >
-      {/* Figma 홈 2의 울퉁불퉁한 연두 덩어리 */}
-      <svg
+      {/* 아래층: 크림 바탕 + 원래 색 로고 */}
+      <Logo />
+
+      {/* 위층: 초록 바탕 + 밝은 로고. 가운데서 원 모양으로 점점 크게 잘라 보여 줌 */}
+      <div
         aria-hidden
-        viewBox="0 0 300 390"
-        className="absolute w-[78%] max-w-[340px]"
-        style={{ animation: 'splash-blob 1.1s cubic-bezier(.5,0,.3,1) .45s both' }}
+        className="splash-spread absolute inset-0"
+        style={{ background: GREEN, animation: `splash-spread ${SPREAD}ms cubic-bezier(.65,0,.35,1) ${SPREAD_DELAY}ms both` }}
       >
-        <path
-          fill="#e0e5cf"
-          d="M110 14c26-4 70 14 104 12 16-1 20-14 32-6 22 16 38 60 40 84 2 24 6 70 6 120 0 40-14 30-16 60-2 30 6 60-24 70-36 12-84 22-120 22-30 0-74-20-92-38-24-24-10-70-16-110-4-30-14-50-18-80-4-34 18-62 46-70 24-6 34-4 46-30 4-10 6-32 12-34Z"
-        />
-      </svg>
-      <span
-        className="relative flex items-center rounded-2xl bg-[#e0e5cf] px-3 py-2"
-        style={{ animation: 'splash-pop .5s cubic-bezier(.3,1.4,.5,1) both' }}
-      >
-        <img src={logo} alt="잇츠" className="h-12 w-auto" />
-      </span>
+        <Logo light />
+      </div>
+    </div>
+  )
+}
+
+function Logo({ light = false }: { light?: boolean }) {
+  return (
+    <div className="absolute inset-0 flex items-center justify-center">
+      <img
+        // 밝은 로고: 초록 위에서 보이게 만든 초록 배경용 로고 (두 파일은 viewBox가 같아야 겹친 자리가 딱 맞음)
+        src={light ? logoOnGreen : logo}
+        alt={light ? '' : '잇츠'}
+        className="splash-logo h-14 w-auto"
+        style={{ animation: `splash-pop ${LOGO_IN}ms cubic-bezier(.3,1.4,.5,1) both` }}
+      />
     </div>
   )
 }
