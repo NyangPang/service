@@ -13,7 +13,7 @@ const Loading = () => <div className="mx-5 mt-6 h-40 animate-pulse rounded-2xl b
 /** 손님 마이페이지 > 내 리뷰 */
 export const MyReviewsPage = () => <MyReviews />
 
-/** 리뷰 쓰기 (?visitId=) — 내 QR 방문 인증이면 몇 번이든 (뽑기는 그 인증의 첫 리뷰에만) */
+/** 리뷰 쓰기 (?visitId=) — 아직 리뷰를 안 쓴 내 QR 방문 인증만 (인증 1건당 1개) */
 export function ReviewWritePage() {
   const me = useMe()
   const { pathname, search } = useLocation()

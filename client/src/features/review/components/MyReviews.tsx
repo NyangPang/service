@@ -12,7 +12,7 @@ import { ReviewCard } from './ReviewUi'
 
 /**
  * 손님 마이페이지 > 내 리뷰.
- * 위: 리뷰를 쓸 수 있는 QR 방문 인증 (리뷰는 여러 개 가능, 인증당 첫 리뷰에 뽑기 3회) / 아래: 내가 쓴 리뷰 (수정·삭제·남은 뽑기)
+ * 위: 리뷰를 쓸 수 있는 QR 방문 인증 (인증 1건당 리뷰 1개, 쓰면 뽑기 3회) / 아래: 내가 쓴 리뷰 (수정·삭제·남은 뽑기)
  */
 export function MyReviews() {
   const me = useMe()
@@ -44,8 +44,8 @@ export function MyReviews() {
   }
 
   const leftOf = (r: Review) => r.drawsLeft ?? 0
-  const rewardVisits = writable?.filter((v) => v.rewardAvailable) ?? []
-  const otherVisits = writable?.filter((v) => !v.rewardAvailable) ?? []
+  // 아직 리뷰를 안 쓴 QR 방문 인증만 옴 (인증 1건당 리뷰 1개)
+  const rewardVisits = writable ?? []
 
   return (
     <div className="h-full overflow-y-auto bg-surface pb-10">
@@ -68,33 +68,6 @@ export function MyReviews() {
             ))}
           </ul>
         </section>
-      )}
-
-      {/* 보상을 이미 받은 인증도 리뷰는 더 쓸 수 있음 (뽑기 없음) */}
-      {otherVisits.length > 0 && (
-        <details className="group mx-5 mt-4 rounded-2xl bg-q-panel px-4 py-3">
-          <summary className="flex cursor-pointer list-none items-center justify-between text-14 font-bold text-q-text">
-            다른 방문 인증으로 리뷰 더 쓰기
-            <span aria-hidden className="text-q-muted transition-transform group-open:rotate-90">
-              ›
-            </span>
-          </summary>
-          <ul className="mt-2 flex flex-col">
-            {otherVisits.map((v) => (
-              <li key={v.visitId} className="border-t border-q-line first:border-t-0">
-                <Link to={`/profile/reviews/new?visitId=${v.visitId}`} className="flex items-center gap-3 py-2.5">
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-14 font-medium text-q-text">{v.storeName}</span>
-                    <span className="block text-12 text-q-muted">
-                      {formatReviewDate(v.visitedAt)} 방문 인증 · 리뷰 {v.reviewCount}개 · 보상 받음
-                    </span>
-                  </span>
-                  <span className="shrink-0 text-13 font-bold text-green-4">리뷰 쓰기 ›</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </details>
       )}
 
       <section className="mt-6">
@@ -147,8 +120,8 @@ export function MyReviews() {
           title="리뷰를 지울까요?"
           text={
             leftOf(deleting) > 0
-              ? `남은 보상 뽑기 ${leftOf(deleting)}회가 사라져요. 같은 방문 인증으로 리뷰를 다시 써도 보상은 없어요`
-              : `${deleting.storeName} 리뷰가 지워져요`
+              ? `남은 보상 뽑기 ${leftOf(deleting)}회가 사라지고, 이 방문 인증으로는 리뷰를 다시 쓸 수 없어요`
+              : `${deleting.storeName} 리뷰가 지워지고, 이 방문 인증으로는 리뷰를 다시 쓸 수 없어요`
           }
           image={pigeonCrying}
           primary={{ label: '아니요', onClick: () => setDeleting(null) }}

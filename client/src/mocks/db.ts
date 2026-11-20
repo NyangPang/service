@@ -966,7 +966,7 @@ export const mockCouponApi = {
     }),
 }
 
-/* ── 리뷰 (QR 방문 인증으로 여러 개 쓸 수 있음. 뽑기 3회는 인증당 첫 리뷰에만) ── */
+/* ── 리뷰 (QR 방문 인증 1건당 리뷰 1개, 쓰면 뽑기 3회. 지우면 남은 뽑기는 사라지고 그 인증으로 다시 못 씀) ── */
 
 function reviews() {
   return (db().reviews ??= [])
@@ -1054,13 +1054,12 @@ export const mockReviewApi = {
       return { count: rows.length, reviews: rows.map((r) => reviewView(r, me, drawsLeftOf(r.reviewId))) }
     }),
 
-  /** 내 방문 인증 전부 (최근 순) + 보상 여부 · 그 인증으로 쓴 리뷰 수 */
+  /** 아직 리뷰를 안 쓴 내 방문 인증 (최근 순). 리뷰를 지운 인증도 빠짐 (인증 1건당 리뷰 1개) */
   writableVisits: () =>
     respond<WritableVisit[]>(() => {
-      const mine = reviews().filter((r) => r.mine)
-      const rewarded = new Set(tickets().map((t) => t.visitId))
+      const used = new Set([...tickets().map((t) => t.visitId), ...reviews().filter((r) => r.mine).map((r) => r.visitId)])
       return [...db().visits]
-        .filter((v) => v.visitId != null)
+        .filter((v) => v.visitId != null && !used.has(v.visitId))
         .sort((a, b) => b.date.localeCompare(a.date) || (b.visitId ?? 0) - (a.visitId ?? 0))
         .map((v) => ({
           visitId: v.visitId!,
@@ -1068,8 +1067,8 @@ export const mockReviewApi = {
           storeName: storeName(v.storeId),
           storeThumbnailUrl: MOCK_STORES.find((s) => s.storeId === v.storeId)?.thumbnailUrl ?? null,
           visitedAt: `${v.date}T12:00:00+09:00`,
-          rewardAvailable: !rewarded.has(v.visitId!),
-          reviewCount: mine.filter((r) => r.visitId === v.visitId).length,
+          rewardAvailable: true,
+          reviewCount: 0,
         }))
     }),
 
@@ -1077,6 +1076,10 @@ export const mockReviewApi = {
     respond<CreateReviewResult>(() => {
       const visit = db().visits.find((v) => v.visitId === visitId)
       if (!visit) fail(404, 'REVIEW404_2', '방문 인증 기록을 찾을 수 없어요')
+      // 인증 1건당 리뷰 1개 (지운 리뷰도 포함 — 뽑기권이 남아 있음)
+      if (tickets().some((t) => t.visitId === visitId) || reviews().some((r) => r.mine && r.visitId === visitId)) {
+        fail(409, 'REVIEW409', '이 방문 인증으로는 이미 리뷰를 썼어요')
+      }
       const videoCount = media.videoUrl ? 1 : 0
       validateReview(body, media.photoUrls.length + videoCount, videoCount)
       const at = kstIso()
@@ -1086,12 +1089,8 @@ export const mockReviewApi = {
         photoUrls: media.photoUrls, videoUrl: media.videoUrl, createdAt: at, updatedAt: at,
       }
       reviews().push(row)
-      // 이 인증으로 처음 쓰는 리뷰일 때만 뽑기 3회 (두 번째 리뷰부터, 또는 보상 받은 리뷰를 지운 뒤엔 없음)
-      let drawsGranted = 0
-      if (!tickets().some((t) => t.visitId === visitId)) {
-        tickets().push({ visitId, reviewId: row.reviewId, remaining: REVIEW_DRAWS })
-        drawsGranted = REVIEW_DRAWS
-      }
+      tickets().push({ visitId, reviewId: row.reviewId, remaining: REVIEW_DRAWS })
+      const drawsGranted = REVIEW_DRAWS
       // 리뷰가 등록되면 그 가게 사장님에게 알림 (목업 사장님 = "내 가게")
       ;(db().notifications ??= []).unshift({
         notificationId: nextId(), forStoreId: visit.storeId, type: 'REVIEW_CREATED', title: '새 리뷰가 등록됐어요',
