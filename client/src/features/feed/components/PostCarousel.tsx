@@ -43,7 +43,7 @@ export function PostCarousel({
         ))}
       </div>
 
-      <span className="pointer-events-none absolute top-3 right-3 rounded-full bg-black/45 px-2.5 py-0.5 text-[12px] font-bold text-white tabular-nums backdrop-blur-sm">
+      <span className="pointer-events-none absolute top-3 right-3 rounded-full bg-black/45 px-2.5 py-0.5 text-12 font-bold text-white tabular-nums backdrop-blur-sm">
         {index + 1}/{images.length}
       </span>
       <div className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center gap-1.5" aria-hidden>
@@ -65,7 +65,7 @@ function ArrowButton({ side, onClick }: { side: 'left' | 'right'; onClick: () =>
       type="button"
       onClick={onClick}
       aria-label={side === 'left' ? '이전 사진' : '다음 사진'}
-      className={`absolute top-1/2 ${side === 'left' ? 'left-2' : 'right-2'} hidden size-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-lg font-bold text-ink shadow group-hover:flex`}
+      className={`absolute top-1/2 ${side === 'left' ? 'left-2' : 'right-2'} hidden size-8 -translate-y-1/2 items-center justify-center rounded-full bg-surface/85 text-lg font-bold text-ink shadow group-hover:flex`}
     >
       {side === 'left' ? '‹' : '›'}
     </button>

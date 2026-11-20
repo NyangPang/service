@@ -57,7 +57,7 @@ export function StoreSearch() {
 
   return (
     <div className="h-full overflow-y-auto pb-8">
-      <div className="sticky top-0 z-10 bg-white px-5 pt-3 pb-3">
+      <div className="sticky top-0 z-10 bg-surface px-5 pt-3 pb-3">
         <label className="flex h-12 items-center gap-2 rounded-full border border-q-line bg-q-panel px-4 text-q-muted focus-within:border-q-green">
           <SearchIcon />
           <input
@@ -67,7 +67,7 @@ export function StoreSearch() {
             enterKeyHint="search"
             placeholder="가게 이름을 검색해 보세요"
             aria-label="가게 이름 검색"
-            className="min-w-0 flex-1 bg-transparent text-[15px] text-q-text outline-none placeholder:text-q-muted [&::-webkit-search-cancel-button]:hidden"
+            className="min-w-0 flex-1 bg-transparent text-15 text-q-text outline-none placeholder:text-q-muted [&::-webkit-search-cancel-button]:hidden"
           />
           {input && (
             <button type="button" aria-label="검색어 지우기" onClick={() => changeInput('')} className="flex size-7 items-center justify-center">
@@ -86,7 +86,7 @@ export function StoreSearch() {
                 role="radio"
                 aria-checked={days === p}
                 onClick={() => update({ days: p === RANKING_PERIODS[0] ? null : String(p) })}
-                className={`h-8 rounded-full px-3 text-[13px] font-bold transition-colors ${
+                className={`h-8 rounded-full px-3 text-13 font-bold transition-colors ${
                   days === p ? 'bg-q-green text-white' : 'text-q-sub'
                 }`}
               >
@@ -107,8 +107,8 @@ export function StoreSearch() {
                   type="button"
                   aria-pressed={selected}
                   onClick={() => update({ category: c.code })}
-                  className={`rounded-full border px-3 py-1.5 text-[13px] font-medium whitespace-nowrap ${
-                    selected ? 'border-q-green bg-q-green text-white' : 'border-q-line bg-white text-q-sub'
+                  className={`rounded-full border px-3 py-1.5 text-13 font-medium whitespace-nowrap ${
+                    selected ? 'border-q-green bg-q-green text-white' : 'border-q-line bg-surface text-q-sub'
                   }`}
                 >
                   {c.name}
@@ -121,7 +121,7 @@ export function StoreSearch() {
 
       <section className="px-5" aria-busy={isFetching}>
         <div className="mb-2.5">
-          <h2 className="text-[17px] font-bold text-q-text">
+          <h2 className="text-17 font-bold text-q-text">
             {searching ? `'${q}' 검색 결과` : `${scope} 인기 순위`}
             {data && <span className="ml-1.5 text-sm font-medium text-q-muted">{data.stores.length}곳</span>}
           </h2>
@@ -163,7 +163,7 @@ function RankingRow({ store, showRank }: { store: RankedStore; showRank: boolean
         {showRank && (
           <span
             aria-label={`${store.rank}위`}
-            className={`flex size-7 shrink-0 items-center justify-center rounded-full text-[13px] font-bold ${
+            className={`flex size-7 shrink-0 items-center justify-center rounded-full text-13 font-bold ${
               store.visitCount > 0 && store.rank <= 3 ? MEDAL[store.rank - 1] : 'text-q-sub'
             }`}
           >
@@ -172,9 +172,9 @@ function RankingRow({ store, showRank }: { store: RankedStore; showRank: boolean
         )}
         <StoreAvatar url={store.thumbnailUrl} className="size-11" />
         <div className="min-w-0 flex-1">
-          <p className="truncate text-[15px] font-bold text-q-text">{store.name}</p>
+          <p className="truncate text-15 font-bold text-q-text">{store.name}</p>
           <p className="truncate text-xs text-q-muted">
-            <span className="font-medium text-q-green">{store.categoryName}</span>
+            <span className="font-medium text-fg-q-green">{store.categoryName}</span>
             {store.district && ` · ${store.district}`}
           </p>
         </div>

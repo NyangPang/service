@@ -55,9 +55,9 @@ export function AddressSearch({ onSelect, onClose }: { onSelect: (address: strin
 
   return (
     <div role="dialog" aria-modal aria-label="주소 검색" className="fixed inset-0 z-50 flex items-end justify-center bg-black/40">
-      <div className="flex h-[78%] w-full max-w-[430px] animate-[rise_.25s_ease-out] flex-col rounded-t-3xl bg-white pt-3">
+      <div className="flex h-[78%] w-full max-w-[430px] animate-[rise_.25s_ease-out] flex-col rounded-t-3xl bg-surface pt-3">
         <div className="flex items-center justify-between px-5 pb-2">
-          <p className="text-[16px] font-bold text-ink">주소 검색</p>
+          <p className="text-16 font-bold text-ink">주소 검색</p>
           <button type="button" aria-label="닫기" onClick={onClose} className="flex size-9 items-center justify-center text-q-muted">
             <CloseIcon />
           </button>

@@ -149,16 +149,16 @@ export function SignupFlow({ initialRole }: { initialRole?: Role }) {
   const accountReady = emailVerified && password.length >= PASSWORD_MIN && (owner || nickChecked === 'ok')
 
   return (
-    <div className="mx-auto flex h-full max-w-[430px] flex-col bg-white">
+    <div className="mx-auto flex h-full max-w-[430px] flex-col bg-surface">
       {step !== 'welcome' && (
         <header className="flex h-[68px] shrink-0 items-center justify-between px-[18px] pt-[env(safe-area-inset-top)]">
           <span className="size-[44px]" />
-          {step !== 'choose' && <h1 className="text-[22px] font-bold text-ink">회원가입</h1>}
+          {step !== 'choose' && <h1 className="text-22 font-bold text-ink">회원가입</h1>}
           <button
             type="button"
             aria-label="뒤로"
             onClick={back}
-            className="flex size-[44px] items-center justify-center rounded-full border border-mint-line bg-white text-green-6 shadow-[0_4px_14px_rgba(8,104,22,0.14)]"
+            className="flex size-[44px] items-center justify-center rounded-full border border-mint-line bg-surface text-fg-green-6 shadow-[0_4px_14px_rgba(8,104,22,0.14)]"
           >
             <BackIcon />
           </button>
@@ -169,7 +169,7 @@ export function SignupFlow({ initialRole }: { initialRole?: Role }) {
         <div className="flex flex-1 flex-col px-6 pb-[max(20px,env(safe-area-inset-bottom))]">
           <div className="mt-4 flex flex-col items-center">
             <StoreAvatar url={null} className="size-[76px]" />
-            <h1 className="mt-4 text-[28px] font-bold tracking-tight text-ink">회원가입</h1>
+            <h1 className="mt-4 text-28 font-bold tracking-tight text-ink">회원가입</h1>
           </div>
           <div className="mt-auto mb-auto flex flex-col gap-4 pt-10">
             {(['OWNER', 'RESIDENT'] as const).map((r) => (
@@ -180,13 +180,13 @@ export function SignupFlow({ initialRole }: { initialRole?: Role }) {
                   setRole(r)
                   setStep(r === 'OWNER' ? 'store' : 'account')
                 }}
-                className="h-[53px] rounded-xl bg-green-4 text-[16px] font-medium text-white active:scale-[0.98]"
+                className="h-[53px] rounded-xl bg-green-4 text-16 font-medium text-white active:scale-[0.98]"
               >
                 {r === 'OWNER' ? '사장님으로 가입할래요' : '손님으로 가입할래요'}
               </button>
             ))}
           </div>
-          <button type="button" onClick={() => navigate(-1)} className="mx-auto mb-6 text-[14px] text-ink underline">
+          <button type="button" onClick={() => navigate(-1)} className="mx-auto mb-6 text-14 text-ink underline">
             이전으로 돌아가기
           </button>
         </div>
@@ -200,7 +200,7 @@ export function SignupFlow({ initialRole }: { initialRole?: Role }) {
         >
           <Field label="프로필 사진 (선택)" action={<FieldButton onClick={() => fileRef.current?.click()}>찾기</FieldButton>}>
             {image && <img src={image.preview} alt="" className="size-9 rounded-lg object-cover" />}
-            <span className={`min-w-0 flex-1 truncate px-1 text-[15px] ${image ? 'text-ink' : 'text-gray-2'}`}>{image?.file.name ?? '사진을 선택해주세요'}</span>
+            <span className={`min-w-0 flex-1 truncate px-1 text-15 ${image ? 'text-ink' : 'text-gray-2'}`}>{image?.file.name ?? '사진을 선택해주세요'}</span>
             <input
               ref={fileRef}
               type="file"
@@ -236,13 +236,13 @@ export function SignupFlow({ initialRole }: { initialRole?: Role }) {
               aria-label="업종 대분류"
               // 고르기 전엔 연한 글자지만, 펼친 목록은 항상 흰 바탕 + 진한 글자 (목록이 선택칸 색을 물려받아 하얗게 보이던 문제)
               style={{ colorScheme: 'light' }}
-              className={`h-10 min-w-0 flex-1 bg-transparent px-1 text-[15px] outline-none ${category ? 'text-ink' : 'text-gray-2'}`}
+              className={`h-10 min-w-0 flex-1 bg-transparent px-1 text-15 outline-none ${category ? 'text-ink' : 'text-gray-2'}`}
             >
-              <option value="" className="bg-white text-gray-2">
+              <option value="" className="bg-surface text-gray-2">
                 대분류
               </option>
               {STORE_CATEGORIES.map((c) => (
-                <option key={c.code} value={c.code} className="bg-white text-ink">
+                <option key={c.code} value={c.code} className="bg-surface text-ink">
                   {c.name}
                 </option>
               ))}
@@ -251,7 +251,7 @@ export function SignupFlow({ initialRole }: { initialRole?: Role }) {
             <FieldInput value={subCategory} onChange={(e) => setSubCategory(e.target.value)} placeholder="소분류 (직접입력)" maxLength={20} aria-label="업종 소분류" />
           </Field>
           {error && (
-            <p role="alert" className="mt-4 text-center text-[13px] font-medium text-point-red-dark">
+            <p role="alert" className="mt-4 text-center text-13 font-medium text-fg-red">
               {error}
             </p>
           )}
@@ -313,7 +313,7 @@ export function SignupFlow({ initialRole }: { initialRole?: Role }) {
             <PasswordInput autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="비밀번호를 입력해주세요" maxLength={64} />
           </Field>
           {error && (
-            <p role="alert" className="mt-4 text-center text-[13px] font-medium text-point-red-dark">
+            <p role="alert" className="mt-4 text-center text-13 font-medium text-fg-red">
               {error}
             </p>
           )}

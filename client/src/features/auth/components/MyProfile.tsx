@@ -32,11 +32,11 @@ export function MyProfile() {
     return (
       <div className="flex h-full flex-col items-center justify-center px-8 text-center">
         <img src={pigeonWalk} alt="" className="h-24 w-auto object-contain" />
-        <p className="mt-4 text-[16px] font-bold text-ink">로그인하면 프로필을 볼 수 있어요</p>
-        <Link to="/login?next=/profile" className="mt-5 flex h-11 w-full items-center justify-center rounded-xl bg-green-4 text-[15px] font-bold text-white">
+        <p className="mt-4 text-16 font-bold text-ink">로그인하면 프로필을 볼 수 있어요</p>
+        <Link to="/login?next=/profile" className="mt-5 flex h-11 w-full items-center justify-center rounded-xl bg-green-4 text-15 font-bold text-white">
           로그인
         </Link>
-        <Link to="/signup" className="mt-3 text-[13px] text-q-muted underline">
+        <Link to="/signup" className="mt-3 text-13 text-q-muted underline">
           회원가입
         </Link>
       </div>
@@ -76,7 +76,7 @@ export function MyProfile() {
   const pwShort = password !== '' && password.length < PASSWORD_MIN
 
   return (
-    <div className="h-full overflow-y-auto bg-white px-5 pt-16 pb-10">
+    <div className="h-full overflow-y-auto bg-surface px-5 pt-16 pb-10">
       <Field
         label="닉네임"
         status={nickStatus?.text}
@@ -133,8 +133,8 @@ export function MyProfile() {
         />
       </Field>
 
-      <p className="mt-6 text-center text-[12px] text-q-muted">{me.email}</p>
-      <button type="button" onClick={() => setConfirmWithdraw(true)} className="mx-auto mt-3 block text-[12px] text-gray-2 underline">
+      <p className="mt-6 text-center text-12 text-q-muted">{me.email}</p>
+      <button type="button" onClick={() => setConfirmWithdraw(true)} className="mx-auto mt-3 block text-12 text-gray-2 underline">
         회원탈퇴
       </button>
 

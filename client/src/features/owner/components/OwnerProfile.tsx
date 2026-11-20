@@ -63,18 +63,18 @@ export function OwnerProfile() {
     }
   }
 
-  if (!store) return <div className="h-full animate-pulse bg-white" />
+  if (!store) return <div className="h-full animate-pulse bg-surface" />
 
   return (
-    <div className="h-full overflow-y-auto bg-white pb-10">
+    <div className="h-full overflow-y-auto bg-surface pb-10">
       <section className="px-5 pt-6">
-        <h2 className="text-[13px] font-bold text-ink">가게 정보</h2>
+        <h2 className="text-13 font-bold text-ink">가게 정보</h2>
 
         <div className="mt-4 flex items-start justify-between border-b-2 border-green-4 pb-3">
-          <span className="pt-1 pl-1 text-[15px] text-green-4">프로필 사진</span>
+          <span className="pt-1 pl-1 text-15 text-green-4">프로필 사진</span>
           <button type="button" aria-label="프로필 사진 바꾸기" onClick={() => fileRef.current?.click()} className="relative" disabled={saving}>
             <StoreAvatar url={store.thumbnailUrl} className="size-[92px]" />
-            <span className="absolute -right-1.5 -bottom-1.5 flex size-8 items-center justify-center rounded-full border-2 border-white bg-green-4 text-white">
+            <span className="absolute -right-1.5 -bottom-1.5 flex size-8 items-center justify-center rounded-full border-2 border-surface bg-green-4 text-white">
               <PencilIcon />
             </span>
           </button>
@@ -91,17 +91,17 @@ export function OwnerProfile() {
         ) : (
           <Row label="주소" value={store.address} onEdit={() => setEditing('address')} />
         )}
-        {error && <p role="alert" className="mt-2 text-[13px] text-point-red-dark">{error}</p>}
+        {error && <p role="alert" className="mt-2 text-13 text-fg-red">{error}</p>}
 
         <Link
           to={`/map/stores/${storeId}`}
-          className="mt-4 flex h-11 items-center justify-center rounded-xl bg-q-panel text-[14px] font-bold text-green-4"
+          className="mt-4 flex h-11 items-center justify-center rounded-xl bg-q-panel text-14 font-bold text-green-4"
         >
           손님에게 보이는 우리 가게 보기 ›
         </Link>
 
         {me && (
-          <button type="button" onClick={() => setConfirmWithdraw(true)} className="mx-auto mt-6 block text-[12px] text-gray-2 underline">
+          <button type="button" onClick={() => setConfirmWithdraw(true)} className="mx-auto mt-6 block text-12 text-gray-2 underline">
             회원탈퇴
           </button>
         )}
@@ -109,7 +109,7 @@ export function OwnerProfile() {
 
       <section className="mt-8">
         <div className="flex items-center justify-between px-5">
-          <h2 className="text-[13px] font-bold text-ink">내 게시물</h2>
+          <h2 className="text-13 font-bold text-ink">내 게시물</h2>
           {videos && videos.length > 0 && (
             <Link to="/owner/create" className="text-xs font-medium text-green-4">
               관리하기 ›
@@ -117,14 +117,14 @@ export function OwnerProfile() {
           )}
         </div>
         {videos && videos.length === 0 ? (
-          <p className="py-14 text-center text-[14px] text-green-4">업로드한 게시물이 없습니다</p>
+          <p className="py-14 text-center text-14 text-green-4">업로드한 게시물이 없습니다</p>
         ) : (
-          <ul className="mt-3 grid grid-cols-3 gap-px bg-white">
+          <ul className="mt-3 grid grid-cols-3 gap-px bg-surface">
             {videos?.map((v) => (
               <li key={v.shortformId}>
-                <Link to="/owner/create" className="relative block aspect-[9/13] overflow-hidden bg-[#dde5e2]">
+                <Link to="/owner/create" className="relative block aspect-[9/13] overflow-hidden bg-[#dde5e2] dark:bg-q-panel">
                   <ShortformThumb video={v} />
-                  <span className="absolute top-1.5 right-1.5 flex size-5 items-center justify-center rounded bg-white/90 text-q-text">
+                  <span className="absolute top-1.5 right-1.5 flex size-5 items-center justify-center rounded bg-surface/90 text-q-text">
                     <span className="scale-[0.3]">
                       <PhotoIcon />
                     </span>
@@ -155,8 +155,8 @@ export function OwnerProfile() {
 function Row({ label, value, onEdit }: { label: string; value: string; onEdit: () => void }) {
   return (
     <button type="button" onClick={onEdit} className="flex w-full items-center gap-4 border-b-2 border-green-4 px-1 py-3.5 text-left">
-      <span className="w-14 shrink-0 text-[15px] text-green-4">{label}</span>
-      <span className="min-w-0 flex-1 truncate text-[15px] text-ink">{value}</span>
+      <span className="w-14 shrink-0 text-15 text-green-4">{label}</span>
+      <span className="min-w-0 flex-1 truncate text-15 text-ink">{value}</span>
       <span aria-hidden className="text-green-4">
         <PencilIcon />
       </span>
@@ -171,14 +171,14 @@ function NameEditor({ initial, saving, onSave, onCancel }: { initial: string; sa
   return (
     <div className="border-b-2 border-green-4 px-1 py-2.5">
       <div className="flex items-center gap-4">
-        <span className="w-14 shrink-0 text-[15px] text-green-4">가게명</span>
+        <span className="w-14 shrink-0 text-15 text-green-4">가게명</span>
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
           maxLength={30}
           autoFocus
           placeholder="ex. 잇츠가게 성수점"
-          className="h-9 min-w-0 flex-1 rounded-lg bg-q-panel px-3 text-[15px] text-ink outline-none"
+          className="h-9 min-w-0 flex-1 rounded-lg bg-q-panel px-3 text-15 text-ink outline-none"
         />
       </div>
       <EditButtons saving={saving} disabled={!ok} onSave={() => onSave(name.trim())} onCancel={onCancel} />
@@ -206,14 +206,14 @@ function AddressEditor({
   return (
     <div className="border-b-2 border-green-4 px-1 py-2.5">
       <div className="flex items-center gap-4">
-        <span className="w-14 shrink-0 text-[15px] text-green-4">주소</span>
+        <span className="w-14 shrink-0 text-15 text-green-4">주소</span>
         <input
           value={road}
           onChange={(e) => setRoad(e.target.value)}
           placeholder="주소를 입력해주세요"
-          className="h-9 min-w-0 flex-1 rounded-lg bg-q-panel px-3 text-[15px] text-ink outline-none"
+          className="h-9 min-w-0 flex-1 rounded-lg bg-q-panel px-3 text-15 text-ink outline-none"
         />
-        <button type="button" onClick={() => setSearching(true)} className="h-9 shrink-0 rounded-lg bg-green-4 px-3 text-[13px] font-bold text-white">
+        <button type="button" onClick={() => setSearching(true)} className="h-9 shrink-0 rounded-lg bg-green-4 px-3 text-13 font-bold text-white">
           찾기
         </button>
       </div>
@@ -221,7 +221,7 @@ function AddressEditor({
         value={detail}
         onChange={(e) => setDetail(e.target.value)}
         placeholder="상세주소 (선택)"
-        className="mt-2 ml-[72px] h-9 w-[calc(100%-72px)] rounded-lg bg-q-panel px-3 text-[15px] text-ink outline-none"
+        className="mt-2 ml-[72px] h-9 w-[calc(100%-72px)] rounded-lg bg-q-panel px-3 text-15 text-ink outline-none"
       />
       <EditButtons saving={saving} disabled={!road.trim()} onSave={() => onSave({ roadAddress: road.trim(), addressDetail: detail.trim() })} onCancel={onCancel} />
       {searching && (
@@ -240,10 +240,10 @@ function AddressEditor({
 function EditButtons({ saving, disabled, onSave, onCancel }: { saving: boolean; disabled: boolean; onSave: () => void; onCancel: () => void }) {
   return (
     <div className="mt-2.5 flex justify-end gap-2">
-      <button type="button" onClick={onCancel} className="h-9 rounded-lg bg-q-panel px-4 text-[13px] font-bold text-green-4">
+      <button type="button" onClick={onCancel} className="h-9 rounded-lg bg-q-panel px-4 text-13 font-bold text-green-4">
         취소
       </button>
-      <button type="button" onClick={onSave} disabled={disabled || saving} className="h-9 rounded-lg bg-green-4 px-4 text-[13px] font-bold text-white disabled:bg-green-1">
+      <button type="button" onClick={onSave} disabled={disabled || saving} className="h-9 rounded-lg bg-green-4 px-4 text-13 font-bold text-white disabled:bg-green-1">
         {saving ? '저장 중...' : '저장'}
       </button>
     </div>

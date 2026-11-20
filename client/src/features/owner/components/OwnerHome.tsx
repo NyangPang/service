@@ -25,8 +25,8 @@ export function OwnerHome() {
 
   return (
     <OwnerScreen>
-      <p className="text-[13px] text-q-muted">안녕하세요, 사장님</p>
-      <h2 className="text-[24px] font-bold text-q-text">{storeName}</h2>
+      <p className="text-13 text-q-muted">안녕하세요, 사장님</p>
+      <h2 className="text-24 font-bold text-q-text">{storeName}</h2>
 
       <div className="mt-4 grid grid-cols-2 gap-2.5">
         <StatusTile
@@ -51,14 +51,14 @@ export function OwnerHome() {
         <Link to="/owner/quest-store" className="mt-3 flex items-center gap-3 overflow-hidden rounded-2xl bg-q-green py-2 pr-4 pl-3 text-white">
           <img src={OWNER_ILLUST.qr} alt="" className="-my-1 h-[72px] w-auto object-contain drop-shadow" />
           <span className="flex-1">
-            <span className="block text-[15px] font-bold">퀘스트 가게로 등록해 보세요</span>
+            <span className="block text-15 font-bold">퀘스트 가게로 등록해 보세요</span>
             <span className="text-xs opacity-85">손님이 방문 인증하러 우리 가게에 와요</span>
           </span>
           <span className="text-xl">›</span>
         </Link>
       )}
 
-      <OwnerCard title="이번 달 쿠폰" className="mt-3" aside={<Link to="/owner/coupons?view=settlement" className="text-xs font-medium text-q-green">정산 보기 ›</Link>}>
+      <OwnerCard title="이번 달 쿠폰" className="mt-3" aside={<Link to="/owner/coupons?view=settlement" className="text-xs font-medium text-fg-q-green">정산 보기 ›</Link>}>
         <dl className="grid grid-cols-3 gap-2 text-center">
           <Stat label="발행 중" value={`${activeCoupons.length}종`} />
           <Stat label="사용" value={`${settlement?.usedCount ?? 0}건`} />
@@ -107,12 +107,12 @@ function StatusTile({
   return (
     <Link
       to={to}
-      className={`relative overflow-hidden rounded-2xl px-4 pt-3.5 pb-3 ${on ? 'bg-q-green text-white' : 'bg-white text-q-text'}`}
+      className={`relative overflow-hidden rounded-2xl px-4 pt-3.5 pb-3 ${on ? 'bg-q-green text-white' : 'bg-surface text-q-text'}`}
     >
       <img src={image} alt="" className="absolute -right-2 -bottom-2 h-[66px] w-auto object-contain opacity-95" />
       <span className={`relative block text-xs ${on ? 'opacity-80' : 'text-q-muted'}`}>{label}</span>
       <span className="relative mt-0.5 block text-lg font-bold">{value}</span>
-      <span className={`relative mt-3 block max-w-[62%] truncate text-[11px] leading-tight ${on ? 'opacity-85' : 'text-q-muted'}`}>{sub} ›</span>
+      <span className={`relative mt-3 block max-w-[62%] truncate text-11 leading-tight ${on ? 'opacity-85' : 'text-q-muted'}`}>{sub} ›</span>
     </Link>
   )
 }
@@ -120,8 +120,8 @@ function StatusTile({
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-xl bg-q-panel py-2.5">
-      <dt className="text-[11px] text-q-muted">{label}</dt>
-      <dd className="text-[15px] font-bold text-q-text">{value}</dd>
+      <dt className="text-11 text-q-muted">{label}</dt>
+      <dd className="text-15 font-bold text-q-text">{value}</dd>
     </div>
   )
 }
@@ -132,7 +132,7 @@ function Shortcut({ to, image, label }: { to: string; image: string; label: stri
       <span aria-hidden className="flex size-[52px] items-center justify-center rounded-2xl bg-q-mint">
         <img src={image} alt="" className="size-11 object-contain" />
       </span>
-      <span className="text-[11px] font-medium whitespace-nowrap text-q-sub">{label}</span>
+      <span className="text-11 font-medium whitespace-nowrap text-q-sub">{label}</span>
     </Link>
   )
 }

@@ -21,7 +21,7 @@ export function Toaster() {
         key={current.id}
         role="status"
         aria-live="polite"
-        className={`max-w-[380px] animate-[toast_2.2s_ease-in-out_forwards] rounded-full px-4 py-2.5 text-center text-[14px] font-bold shadow-[0_6px_20px_rgba(0,0,0,0.18)] ${
+        className={`max-w-[380px] animate-[toast_2.2s_ease-in-out_forwards] rounded-full px-4 py-2.5 text-center text-14 font-bold shadow-[0_6px_20px_rgba(0,0,0,0.18)] ${
           current.tone === 'error' ? 'bg-point-red-dark text-white' : 'bg-ink/90 text-white backdrop-blur'
         }`}
       >

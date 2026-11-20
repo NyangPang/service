@@ -48,7 +48,7 @@ export function OwnerStoreRegister() {
   }
 
   return (
-    <div className="mx-auto flex h-full max-w-[430px] flex-col bg-white pt-[env(safe-area-inset-top)]">
+    <div className="mx-auto flex h-full max-w-[430px] flex-col bg-surface pt-[env(safe-area-inset-top)]">
       <Screen
         hero={<Hero sub={'아직 등록한 가게가 없어요\n가게 정보를 알려 주세요'} plain />}
         next={{ label: submitting ? '등록 중...' : '가게 등록하기', onClick: submit, disabled: !ready || submitting }}
@@ -59,7 +59,7 @@ export function OwnerStoreRegister() {
 
         <Field label="프로필 사진 (선택)" action={<FieldButton onClick={() => fileRef.current?.click()}>찾기</FieldButton>}>
           {image && <img src={image.preview} alt="" className="size-9 rounded-lg object-cover" />}
-          <span className={`min-w-0 flex-1 truncate px-1 text-[15px] ${image ? 'text-ink' : 'text-gray-2'}`}>{image?.file.name ?? '사진을 선택해주세요'}</span>
+          <span className={`min-w-0 flex-1 truncate px-1 text-15 ${image ? 'text-ink' : 'text-gray-2'}`}>{image?.file.name ?? '사진을 선택해주세요'}</span>
           <input
             ref={fileRef}
             type="file"
@@ -87,13 +87,13 @@ export function OwnerStoreRegister() {
             onChange={(e) => setCategory(e.target.value)}
             aria-label="업종"
             style={{ colorScheme: 'light' }}
-            className={`h-10 min-w-0 flex-1 bg-transparent px-1 text-[15px] outline-none ${category ? 'text-ink' : 'text-gray-2'}`}
+            className={`h-10 min-w-0 flex-1 bg-transparent px-1 text-15 outline-none ${category ? 'text-ink' : 'text-gray-2'}`}
           >
-            <option value="" className="bg-white text-gray-2">
+            <option value="" className="bg-surface text-gray-2">
               대분류
             </option>
             {STORE_CATEGORIES.map((c) => (
-              <option key={c.code} value={c.code} className="bg-white text-ink">
+              <option key={c.code} value={c.code} className="bg-surface text-ink">
                 {c.name}
               </option>
             ))}
@@ -101,7 +101,7 @@ export function OwnerStoreRegister() {
         </Field>
 
         {error && (
-          <p role="alert" className="mt-4 text-center text-[13px] font-medium text-point-red-dark">
+          <p role="alert" className="mt-4 text-center text-13 font-medium text-fg-red">
             {error}
           </p>
         )}

@@ -28,7 +28,7 @@ export function OwnerLoginGate({
   if (access.pending) {
     return (
       <OwnerScreen>
-        <div className="h-60 animate-pulse rounded-2xl bg-white" />
+        <div className="h-60 animate-pulse rounded-2xl bg-surface" />
       </OwnerScreen>
     )
   }
@@ -36,14 +36,14 @@ export function OwnerLoginGate({
 
   return (
     <div className="flex h-full flex-col bg-q-panel px-5 pt-4 pb-4">
-      <section className="flex flex-1 flex-col items-center justify-center rounded-3xl bg-white px-6 py-8 text-center">
+      <section className="flex flex-1 flex-col items-center justify-center rounded-3xl bg-surface px-6 py-8 text-center">
         <img src={image} alt="" className="h-[150px] w-auto object-contain drop-shadow" />
-        <p className="mt-5 text-[20px] font-bold text-q-text">{title}</p>
-        <p className="mt-2 text-[14px] leading-relaxed whitespace-pre-line text-q-muted">{description}</p>
+        <p className="mt-5 text-20 font-bold text-q-text">{title}</p>
+        <p className="mt-2 text-14 leading-relaxed whitespace-pre-line text-q-muted">{description}</p>
       </section>
       <div className="mt-4 flex flex-col gap-2">
         <PrimaryButton onClick={() => navigate(`/login?next=${encodeURIComponent(pathname)}`)}>사장님 계정으로 로그인</PrimaryButton>
-        <Link to="/signup?role=OWNER" className="py-2 text-center text-[13px] text-q-muted underline">
+        <Link to="/signup?role=OWNER" className="py-2 text-center text-13 text-q-muted underline">
           아직 계정이 없어요 · 사장님으로 가입하기
         </Link>
       </div>

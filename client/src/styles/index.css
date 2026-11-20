@@ -1,5 +1,8 @@
 @import 'tailwindcss';
 
+/* 다크모드: <html data-theme="dark"> (stores/displayStore.ts 가 붙임). 토큰으로 안 되는 곳만 dark:bg-... 처럼 씀 */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
 /* Figma(컴미컴) 디자인 토큰 */
 @theme {
   --color-green-1: #cbd7ce;
@@ -36,6 +39,52 @@
   --color-q-cream: #fff6dd;
   --color-q-ground: #efe6d6;
 
+  /*
+   * 다크모드에서 바뀌는 용도별 색 (밝은 화면에서는 원래 색 그대로)
+   * - surface: 카드·시트·화면 바탕 (bg-white 대신 bg-surface. 사진·초록 위의 흰색은 그대로 bg-white)
+   * - fg-*: 글자·테두리용 초록/빨강. 진한 초록 글자는 어두운 바탕에서 안 보여서 다크에서는 밝은 초록
+   *   (버튼 바탕은 bg-green-6 / bg-q-green 그대로 — 흰 글자가 잘 보이게)
+   */
+  --color-surface: #ffffff;
+  --color-fg-green-6: #086816;
+  --color-fg-q-green: #1e8e5a;
+  --color-fg-red: #d25131;
+
+  /*
+   * 글자 크기: 전부 --font-scale 을 곱해서 큰글씨 모드(설정)에서 한꺼번에 커짐.
+   * 픽셀 크기는 text-[13px] 대신 text-13 처럼 씀 (text-[Npx] 로 쓰면 큰글씨 모드에서 안 커짐)
+   */
+  --text-xs: calc(0.75rem * var(--font-scale));
+  --text-sm: calc(0.875rem * var(--font-scale));
+  --text-base: calc(1rem * var(--font-scale));
+  --text-lg: calc(1.125rem * var(--font-scale));
+  --text-xl: calc(1.25rem * var(--font-scale));
+  --text-2xl: calc(1.5rem * var(--font-scale));
+  --text-3xl: calc(1.875rem * var(--font-scale));
+  --text-4xl: calc(2.25rem * var(--font-scale));
+  --text-9: calc(9px * var(--font-scale));
+  --text-10: calc(10px * var(--font-scale));
+  --text-11: calc(11px * var(--font-scale));
+  --text-12: calc(12px * var(--font-scale));
+  --text-13: calc(13px * var(--font-scale));
+  --text-14: calc(14px * var(--font-scale));
+  --text-15: calc(15px * var(--font-scale));
+  --text-16: calc(16px * var(--font-scale));
+  --text-17: calc(17px * var(--font-scale));
+  --text-18: calc(18px * var(--font-scale));
+  --text-19: calc(19px * var(--font-scale));
+  --text-20: calc(20px * var(--font-scale));
+  --text-21: calc(21px * var(--font-scale));
+  --text-22: calc(22px * var(--font-scale));
+  --text-24: calc(24px * var(--font-scale));
+  --text-25: calc(25px * var(--font-scale));
+  --text-26: calc(26px * var(--font-scale));
+  --text-28: calc(28px * var(--font-scale));
+  --text-30: calc(30px * var(--font-scale));
+  --text-32: calc(32px * var(--font-scale));
+  --text-34: calc(34px * var(--font-scale));
+  --text-38: calc(38px * var(--font-scale));
+
   --font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   /* Figma 타이틀 폰트 Jalnan 2 — 웹폰트가 없어 같은 계열의 여기어때 잘난체(Jalnan)로 (아래 @font-face) */
   --font-title: 'Jalnan 2', 'Jalnan', 'Pretendard', sans-serif;
@@ -50,6 +99,47 @@
   font-display: swap;
 }
 
+/* 큰글씨 모드: <html data-font-size="large"> (stores/displayStore.ts 가 붙임) */
+:root {
+  --font-scale: 1;
+}
+:root[data-font-size='large'] {
+  --font-scale: 1.2;
+}
+
+/* 다크모드 색: 위 @theme 토큰을 덮어씀 (초록빛이 살짝 도는 어두운 회색) */
+:root {
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --color-gray-1: #101412; /* 화면 바탕 */
+  --color-surface: #1a1f1c; /* 카드·시트 */
+  --color-q-panel: #222824;
+  --color-q-card: #1f2521;
+  --color-q-mint: #183024;
+  --color-q-cream: #2a2619;
+  --color-q-ground: #2a251c;
+  --color-q-line: #2c332f;
+  --color-q-track: #353d38;
+  --color-green-1: #233328;
+  --color-mint: #1c3a25;
+  --color-mint-line: #2e5a3b;
+  --color-handle: #4b534e;
+
+  --color-q-text: #eef1ef;
+  --color-q-sub: #b9c0bc;
+  --color-q-muted: #8d958f;
+  --color-ink: #e4e8e5;
+  --color-gray-2: #6c736f;
+  --color-neutral-900: #eef1ef;
+
+  --color-fg-green-6: #6fd48b;
+  --color-fg-q-green: #5cc98f;
+  --color-fg-red: #f08a6e;
+}
+
 html,
 body,
 #root {
@@ -57,7 +147,7 @@ body,
 }
 
 body {
-  @apply bg-gray-1 font-sans text-neutral-900 antialiased;
+  @apply bg-gray-1 font-sans text-base text-neutral-900 antialiased;
 }
 
 /* 사장님 방문 인증 QR 인쇄: QR 카드만 종이 가운데에 크게 */

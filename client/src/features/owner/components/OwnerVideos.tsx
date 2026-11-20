@@ -34,7 +34,7 @@ export function OwnerVideos() {
       >
         <img src={OWNER_ILLUST.videoEdit} alt="" className="-my-1 h-[84px] w-auto object-contain drop-shadow" />
         <span className="flex-1">
-          <span className="block text-[17px] font-bold">새 게시물 만들기</span>
+          <span className="block text-17 font-bold">새 게시물 만들기</span>
           <span className="block text-xs leading-relaxed break-keep opacity-85">
             사진·메뉴판만 있으면
             <br />
@@ -49,30 +49,30 @@ export function OwnerVideos() {
       </button>
 
       <div className="mt-5">
-        <p className="text-[13px] text-q-muted">손님 피드에 공개 중</p>
-        <h2 className="text-[20px] font-bold text-q-text">
-          우리 가게 게시물 <span className="text-q-green">{videos?.length ?? 0}</span>개
+        <p className="text-13 text-q-muted">손님 피드에 공개 중</p>
+        <h2 className="text-20 font-bold text-q-text">
+          우리 가게 게시물 <span className="text-fg-q-green">{videos?.length ?? 0}</span>개
         </h2>
       </div>
 
       {isLoading && (
         <div className="mt-4 grid grid-cols-2 gap-3">
           {[0, 1].map((i) => (
-            <div key={i} className="aspect-[9/14] animate-pulse rounded-2xl bg-white" />
+            <div key={i} className="aspect-[9/14] animate-pulse rounded-2xl bg-surface" />
           ))}
         </div>
       )}
       {isError && <p className="py-10 text-center text-sm text-q-muted">게시물을 불러오지 못했어요</p>}
 
       {videos && videos.length === 0 && (
-        <div className="mt-6 flex flex-col items-center rounded-2xl bg-white px-6 py-8 text-center">
+        <div className="mt-6 flex flex-col items-center rounded-2xl bg-surface px-6 py-8 text-center">
           <img src={OWNER_ILLUST.videoEdit} alt="" className="h-[120px] w-auto object-contain" />
-          <p className="mt-3 text-[16px] font-bold text-q-text">아직 올린 게시물이 없어요</p>
-          <p className="mt-1 text-[13px] leading-relaxed text-q-muted">지도 링크나 메뉴판만 있으면 홍보 게시물을 만들어 드려요</p>
+          <p className="mt-3 text-16 font-bold text-q-text">아직 올린 게시물이 없어요</p>
+          <p className="mt-1 text-13 leading-relaxed text-q-muted">지도 링크나 메뉴판만 있으면 홍보 게시물을 만들어 드려요</p>
           <button
             type="button"
             onClick={() => navigate('/create')}
-            className="mt-5 h-11 w-full rounded-xl bg-green-4 text-[15px] font-bold text-white"
+            className="mt-5 h-11 w-full rounded-xl bg-green-4 text-15 font-bold text-white"
           >
             첫 게시물 만들기
           </button>
@@ -87,19 +87,19 @@ export function OwnerVideos() {
                 <span className="relative block aspect-[9/14] overflow-hidden rounded-2xl bg-q-mint">
                   <ShortformThumb video={v} />
                   {i === 0 && (
-                    <span className="absolute top-2 left-2 rounded-full bg-point-orange px-2 py-0.5 text-[10px] font-bold text-white">NEW</span>
+                    <span className="absolute top-2 left-2 rounded-full bg-point-orange px-2 py-0.5 text-10 font-bold text-white">NEW</span>
                   )}
                   <span className="absolute top-2 right-2 flex size-7 items-center justify-center rounded-full bg-black/35 text-white backdrop-blur-sm">
                     <span className="scale-[0.4]">
                       <PhotoIcon />
                     </span>
                   </span>
-                  <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-2.5 pt-6 pb-2 text-[11px] font-medium text-white/90">
+                  <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-2.5 pt-6 pb-2 text-11 font-medium text-white/90">
                     {formatDate(v.createdAt)}
-                    {v.updatedAt && <span className="ml-1 rounded bg-white/25 px-1 text-[10px]">수정됨</span>}
+                    {v.updatedAt && <span className="ml-1 rounded bg-white/25 px-1 text-10">수정됨</span>}
                   </span>
                 </span>
-                <span className="mt-1.5 line-clamp-2 block text-[13px] leading-snug font-bold text-q-text">{v.description || v.storeName}</span>
+                <span className="mt-1.5 line-clamp-2 block text-13 leading-snug font-bold text-q-text">{v.description || v.storeName}</span>
               </button>
             </li>
           ))}
@@ -120,11 +120,11 @@ function VideoDetail({ video, onClose }: { video: Shortform; onClose: () => void
 
   return (
     <div role="dialog" aria-modal aria-label="게시물 보기" className="fixed inset-0 z-40 flex items-end justify-center bg-black/50">
-      <div className="max-h-full w-full max-w-[430px] animate-[rise_.3s_ease-out] overflow-y-auto rounded-t-3xl bg-white px-5 pt-4 pb-[max(20px,env(safe-area-inset-bottom))]">
+      <div className="max-h-full w-full max-w-[430px] animate-[rise_.3s_ease-out] overflow-y-auto rounded-t-3xl bg-surface px-5 pt-4 pb-[max(20px,env(safe-area-inset-bottom))]">
         <div className="flex items-center justify-between">
-          <p className="text-[13px] text-q-muted">
+          <p className="text-13 text-q-muted">
             {formatDate(video.createdAt)} 업로드
-            {video.updatedAt && <span className="text-q-green"> · {formatDate(video.updatedAt)} 수정</span>}
+            {video.updatedAt && <span className="text-fg-q-green"> · {formatDate(video.updatedAt)} 수정</span>}
           </p>
           <button type="button" aria-label="닫기" onClick={onClose} className="flex size-9 items-center justify-center rounded-full bg-q-panel text-q-text">
             <span className="scale-[0.8]">
@@ -141,12 +141,12 @@ function VideoDetail({ video, onClose }: { video: Shortform; onClose: () => void
           )}
         </div>
 
-        <p className="mt-4 text-[16px] font-bold text-q-text">{video.description || video.storeName}</p>
-        {video.menus.length > 0 && <p className="mt-1 line-clamp-2 text-[13px] text-q-muted">{video.menus.join(' · ')}</p>}
+        <p className="mt-4 text-16 font-bold text-q-text">{video.description || video.storeName}</p>
+        {video.menus.length > 0 && <p className="mt-1 line-clamp-2 text-13 text-q-muted">{video.menus.join(' · ')}</p>}
 
         <div className="mt-5 grid grid-cols-4 gap-2">
           <Action label="손님 화면" onClick={() => navigate(`/map/stores/${video.storeId}/shortform?start=${video.shortformId}`)}>
-            <span className="scale-[0.55] text-q-green">
+            <span className="scale-[0.55] text-fg-q-green">
               <PhotoIcon />
             </span>
           </Action>
@@ -158,7 +158,7 @@ function VideoDetail({ video, onClose }: { video: Shortform; onClose: () => void
             <a
               href={video.posterUrl ?? undefined}
               download={`${video.storeName}-게시물${video.posterUrl?.match(/\.\w+(?=$|\?)/)?.[0] ?? ''}`}
-              className="flex flex-col items-center gap-1 rounded-xl bg-q-panel py-3 text-[12px] font-bold text-q-text active:bg-q-mint"
+              className="flex flex-col items-center gap-1 rounded-xl bg-q-panel py-3 text-12 font-bold text-q-text active:bg-q-mint"
             >
               <img src={OWNER_ILLUST.videoDownload} alt="" className="size-9 object-contain" />
               다운로드
@@ -228,9 +228,9 @@ function Action({
     <button
       type="button"
       onClick={onClick}
-      className={`relative flex flex-col items-center gap-1 rounded-xl bg-q-panel py-3 text-[12px] font-bold active:bg-q-mint ${danger ? 'text-point-red-dark' : 'text-q-text'}`}
+      className={`relative flex flex-col items-center gap-1 rounded-xl bg-q-panel py-3 text-12 font-bold active:bg-q-mint ${danger ? 'text-fg-red' : 'text-q-text'}`}
     >
-      {pro && <span className="absolute top-1 right-1 rounded-full bg-green-6 px-1.5 text-[9px] leading-4 font-bold text-white">PRO</span>}
+      {pro && <span className="absolute top-1 right-1 rounded-full bg-green-6 px-1.5 text-9 leading-4 font-bold text-white">PRO</span>}
       <span className="flex size-9 items-center justify-center">{children}</span>
       {label}
     </button>
