@@ -50,12 +50,12 @@ export function ReviewCard({ review, variant, actions }: { review: Review; varia
   return (
     <article className="border-b border-q-line px-5 py-4">
       {review.hidden && (
-        <p className="mb-2.5 rounded-lg bg-q-panel px-3 py-2 text-[12px] text-q-muted">
+        <p className="mb-2.5 rounded-lg bg-q-panel px-3 py-2 text-12 text-q-muted">
           {variant === 'mine' ? '사장님이 숨긴 리뷰예요. 다른 손님에게는 보이지 않아요' : '숨긴 리뷰예요. 손님에게는 보이지 않아요'}
         </p>
       )}
       {review.privateReview && !review.hidden && (
-        <p className="mb-2.5 rounded-lg bg-q-cream px-3 py-2 text-[12px] text-q-sub">
+        <p className="mb-2.5 rounded-lg bg-q-cream px-3 py-2 text-12 text-q-sub">
           🔒 {variant === 'mine' ? '비공개 리뷰예요. 사장님만 볼 수 있어요' : '비공개 리뷰예요. 사장님에게만 보여요'}
         </p>
       )}
@@ -64,8 +64,8 @@ export function ReviewCard({ review, variant, actions }: { review: Review; varia
           {avatar ? <img src={avatar} alt="" className="size-full object-cover" /> : <img src={pigeonWalk} alt="" className="size-8 object-contain" />}
         </span>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-[15px] font-bold text-q-text">{variant === 'mine' ? review.storeName : review.nickname}</p>
-          <p className="mt-0.5 flex items-center gap-1.5 text-[12px] text-q-muted">
+          <p className="truncate text-15 font-bold text-q-text">{variant === 'mine' ? review.storeName : review.nickname}</p>
+          <p className="mt-0.5 flex items-center gap-1.5 text-12 text-q-muted">
             <Stars rating={review.rating} size="size-3.5" />
             <span>
               {formatReviewDate(review.createdAt)}
@@ -81,7 +81,7 @@ export function ReviewCard({ review, variant, actions }: { review: Review; varia
         <ul className="mt-3 flex gap-1.5 overflow-x-auto">
           {review.videoUrl && (
             <li className="shrink-0">
-              <video src={review.videoUrl} controls playsInline preload="metadata" className="size-[104px] rounded-xl bg-ink object-cover" />
+              <video src={review.videoUrl} controls playsInline preload="metadata" className="size-[104px] rounded-xl bg-ink object-cover dark:bg-black" />
             </li>
           )}
           {review.photoUrls.map((url) => (
@@ -92,9 +92,9 @@ export function ReviewCard({ review, variant, actions }: { review: Review; varia
         </ul>
       )}
 
-      <p className={`mt-3 text-[14px] leading-relaxed whitespace-pre-line text-q-sub ${long && !expanded ? 'line-clamp-3' : ''}`}>{review.content}</p>
+      <p className={`mt-3 text-14 leading-relaxed whitespace-pre-line text-q-sub ${long && !expanded ? 'line-clamp-3' : ''}`}>{review.content}</p>
       {long && (
-        <button type="button" onClick={() => setExpanded((v) => !v)} className="mt-1 text-[12px] font-medium text-q-muted">
+        <button type="button" onClick={() => setExpanded((v) => !v)} className="mt-1 text-12 font-medium text-q-muted">
           {expanded ? '접기' : '더 보기'}
         </button>
       )}
@@ -117,10 +117,10 @@ export function RatingSummary({
 }) {
   return (
     <div className="flex items-center gap-3 rounded-2xl bg-q-panel px-4 py-3.5">
-      <span className="text-[28px] leading-none font-bold text-q-text">{count ? average.toFixed(1) : '-'}</span>
+      <span className="text-28 leading-none font-bold text-q-text">{count ? average.toFixed(1) : '-'}</span>
       <span className="flex flex-col gap-1">
         <Stars rating={average} />
-        <span className="text-[12px] text-q-muted">
+        <span className="text-12 text-q-muted">
           공개 리뷰 {count}개{privateCount > 0 && ` · 비공개 ${privateCount}개`}{hiddenCount > 0 && ` · 숨김 ${hiddenCount}개`}
         </span>
       </span>

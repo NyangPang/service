@@ -84,6 +84,7 @@
   --text-32: calc(32px * var(--font-scale));
   --text-34: calc(34px * var(--font-scale));
   --text-38: calc(38px * var(--font-scale));
+  --text-40: calc(40px * var(--font-scale));
 
   --font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   /* Figma 타이틀 폰트 Jalnan 2 — 웹폰트가 없어 같은 계열의 여기어때 잘난체(Jalnan)로 (아래 @font-face) */

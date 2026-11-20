@@ -54,16 +54,16 @@ export interface StoreReviewList {
   reviews: Review[]
 }
 
-/** GET /api/reviews/writable-visits — 내 QR 방문 인증 전부 (같은 인증으로 리뷰를 여러 개 쓸 수 있음) */
+/** GET /api/reviews/writable-visits — 아직 리뷰를 안 쓴 내 QR 방문 인증 (인증 1건당 리뷰 1개, 지운 인증도 빠짐) */
 export interface WritableVisit {
   visitId: number
   storeId: number
   storeName: string
   storeThumbnailUrl: string | null
   visitedAt: string
-  /** 이 인증으로 리뷰를 쓰면 뽑기 3회를 받는지 (false = 이미 보상을 받음 → 더 써도 뽑기 없음) */
+  /** 항상 true (예전 화면 호환) */
   rewardAvailable: boolean
-  /** 이 인증으로 쓴 리뷰 수 */
+  /** 항상 0 (예전 화면 호환) */
   reviewCount: number
 }
 
