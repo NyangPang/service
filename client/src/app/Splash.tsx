@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import logo from '@/assets/its-logo.svg'
+import logoOnGreen from '@/assets/its-logo-white.svg'
 
 const SHOWN_KEY = 'itda-splash-shown'
 
@@ -66,11 +67,11 @@ function Logo({ light = false }: { light?: boolean }) {
   return (
     <div className="absolute inset-0 flex items-center justify-center">
       <img
-        src={logo}
+        // 밝은 로고: 초록 위에서 보이게 만든 초록 배경용 로고 (두 파일은 viewBox가 같아야 겹친 자리가 딱 맞음)
+        src={light ? logoOnGreen : logo}
         alt={light ? '' : '잇츠'}
         className="splash-logo h-14 w-auto"
-        // 밝은 로고: 초록 위에서 보이게 흰색으로
-        style={{ animation: `splash-pop ${LOGO_IN}ms cubic-bezier(.3,1.4,.5,1) both`, filter: light ? 'brightness(0) invert(1)' : undefined }}
+        style={{ animation: `splash-pop ${LOGO_IN}ms cubic-bezier(.3,1.4,.5,1) both` }}
       />
     </div>
   )
