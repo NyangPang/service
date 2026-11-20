@@ -1,5 +1,5 @@
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import logo from '@/assets/its-logo.svg'
+import { AppLogo } from '@/shared/ui/AppLogo'
 import { LoginForm } from '@/features/auth/components/LoginForm'
 import { MyProfile } from '@/features/auth/components/MyProfile'
 import { SignupFlow } from '@/features/auth/components/SignupFlow'
@@ -31,17 +31,17 @@ export function LoginPage() {
   }
 
   return (
-    <div className="mx-auto flex h-full max-w-[430px] flex-col bg-white px-6 pt-[max(16px,env(safe-area-inset-top))] pb-[max(24px,env(safe-area-inset-bottom))]">
+    <div className="mx-auto flex h-full max-w-[430px] flex-col bg-surface px-6 pt-[max(16px,env(safe-area-inset-top))] pb-[max(24px,env(safe-area-inset-bottom))]">
       <button
         type="button"
         aria-label="뒤로"
         onClick={() => navigate(-1)}
-        className="mt-2 flex size-[44px] items-center justify-center self-end rounded-full border border-mint-line bg-white text-green-6 shadow-[0_4px_14px_rgba(8,104,22,0.14)]"
+        className="mt-2 flex size-[44px] items-center justify-center self-end rounded-full border border-mint-line bg-surface text-fg-green-6 shadow-[0_4px_14px_rgba(8,104,22,0.14)]"
       >
         <BackIcon />
       </button>
-      <img src={logo} alt="잇츠" className="mt-6 h-[52px] w-fit" />
-      <h1 className="mt-5 text-[26px] leading-snug font-bold text-ink">
+      <AppLogo className="mt-6 h-[52px] w-fit" />
+      <h1 className="mt-5 text-26 leading-snug font-bold text-ink">
         다시 만나서
         <br />
         반가워요!
@@ -49,7 +49,7 @@ export function LoginPage() {
       <div className="mt-8">
         <LoginForm onSuccess={done} />
       </div>
-      <p className="mt-auto text-center text-[14px] text-q-muted">
+      <p className="mt-auto text-center text-14 text-q-muted">
         아직 계정이 없나요?{' '}
         <Link to="/signup" className="font-bold text-green-4 underline">
           회원가입

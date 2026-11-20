@@ -78,7 +78,7 @@ export function ShortformFeed({ storeId, startId }: { storeId?: number; startId?
   const couponCount = (id: number) => stores?.find((s) => s.storeId === id)?.availableCouponCount ?? 0
 
   return (
-    <div className="relative h-full bg-white">
+    <div className="relative h-full bg-surface">
       <div ref={containerRef} className="h-full snap-y snap-mandatory overflow-y-auto overscroll-contain [scrollbar-width:none]">
         {items.map((item, i) => (
           <div key={item.shortformId} data-index={i} className="h-full snap-start snap-always">
@@ -103,19 +103,19 @@ export function ShortformFeed({ storeId, startId }: { storeId?: number; startId?
         {!hasNextPage && (
           <div className="flex h-full snap-start flex-col items-center justify-center bg-q-panel px-8 text-center text-ink">
             <img src={pigeonUploaded} alt="" className="h-[150px] w-auto object-contain" />
-            <p className="mt-5 text-[20px] font-bold">게시물을 다 봤어요!</p>
-            <p className="mt-1.5 text-[14px] text-q-muted">
+            <p className="mt-5 text-20 font-bold">게시물을 다 봤어요!</p>
+            <p className="mt-1.5 text-14 text-q-muted">
               {storeId ? '이 가게 게시물은 여기까지예요' : `동네 가게 게시물 ${items.length}개를 모두 구경했어요`}
             </p>
             <div className="mt-7 flex w-full max-w-[280px] flex-col gap-2.5">
               <button
                 type="button"
                 onClick={() => containerRef.current?.scrollTo({ top: 0, behavior: 'smooth' })}
-                className="h-12 rounded-full bg-green-4 text-[15px] font-bold text-white"
+                className="h-12 rounded-full bg-green-4 text-15 font-bold text-white"
               >
                 처음부터 다시 보기
               </button>
-              <button type="button" onClick={() => navigate('/map')} className="h-12 rounded-full bg-white text-[15px] font-bold text-green-6">
+              <button type="button" onClick={() => navigate('/map')} className="h-12 rounded-full bg-surface text-15 font-bold text-fg-green-6">
                 지도에서 가게 둘러보기
               </button>
             </div>
@@ -163,7 +163,7 @@ function FeedGuide() {
       {/* 아이콘: 2026-10-09 사용자 제공 */}
       <GuideRow icon={guideSwipe} motion="animate-[guide-swipe_1.6s_ease-in-out_infinite]" title="위로 넘기면 다음 게시물" sub="동네 가게 게시물을 하나씩 구경해요" />
       <GuideRow icon={guideScrap} title="마음에 들면 스크랩" sub="사진 아래 버튼으로 스크랩·위치·공유, 쿠폰도 바로 받아요" />
-      <span className="mt-2 rounded-full bg-white px-6 py-2.5 text-[15px] font-bold text-ink">알겠어요</span>
+      <span className="mt-2 rounded-full bg-surface px-6 py-2.5 text-15 font-bold text-ink">알겠어요</span>
     </button>
   )
 }
@@ -173,8 +173,8 @@ function GuideRow({ icon, motion = '', title, sub }: { icon: string; motion?: st
     <span className="flex w-full max-w-[290px] items-center gap-4 text-left">
       <img src={icon} alt="" className={`size-16 shrink-0 object-contain drop-shadow-lg ${motion}`} />
       <span>
-        <span className="block text-[17px] font-bold">{title}</span>
-        <span className="block text-[13px] break-keep text-white/75">{sub}</span>
+        <span className="block text-17 font-bold">{title}</span>
+        <span className="block text-13 break-keep text-white/75">{sub}</span>
       </span>
     </span>
   )

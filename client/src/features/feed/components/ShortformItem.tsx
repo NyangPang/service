@@ -41,30 +41,30 @@ export function ShortformItem({ item, active, couponCount, onOpenCoupons }: Prop
   }
 
   return (
-    <article className="flex h-full flex-col bg-white" aria-label={`${item.storeName} 홍보 게시물`}>
+    <article className="flex h-full flex-col bg-surface" aria-label={`${item.storeName} 홍보 게시물`}>
       {/* 가게 프로필 */}
       <header className="flex shrink-0 items-center gap-2.5 px-4 py-2.5">
         <Link
           to={`/map/stores/${item.storeId}`}
           aria-label={`${item.storeName} 프로필`}
-          className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white ring-2 ring-green-4 ring-offset-2"
+          className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-surface ring-2 ring-green-4 ring-offset-2 ring-offset-surface"
         >
           <StoreProfilePhoto url={item.storeThumbnailUrl} icon={icon} />
         </Link>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
-            <Link to={`/map/stores/${item.storeId}`} className="truncate text-[15px] font-bold text-ink">
+            <Link to={`/map/stores/${item.storeId}`} className="truncate text-15 font-bold text-ink">
               {item.storeName}
             </Link>
             {/* PRO 가게(우선 노출)는 손님에게도 알 수 있게 표시 */}
-            {item.promoted && <span className="shrink-0 rounded-full bg-point-yellow px-1.5 py-px text-[10px] font-bold text-ink">추천</span>}
+            {item.promoted && <span className="shrink-0 rounded-full bg-point-yellow px-1.5 py-px text-10 font-bold text-ink">추천</span>}
           </div>
-          <Link to={`/map?storeId=${item.storeId}`} className="block truncate text-[12px] text-q-muted">
+          <Link to={`/map?storeId=${item.storeId}`} className="block truncate text-12 text-q-muted">
             {item.categoryName && <span className="font-medium text-green-4">{item.categoryName} · </span>}
             {item.address}
           </Link>
         </div>
-        <Link to={`/map/stores/${item.storeId}`} className="shrink-0 rounded-full border border-q-line px-3 py-1.5 text-[12px] font-bold text-green-6">
+        <Link to={`/map/stores/${item.storeId}`} className="shrink-0 rounded-full border border-q-line px-3 py-1.5 text-12 font-bold text-fg-green-6">
           가게 보기
         </Link>
       </header>
@@ -99,7 +99,7 @@ export function ShortformItem({ item, active, couponCount, onOpenCoupons }: Prop
           <button
             type="button"
             onClick={onOpenCoupons}
-            className="mr-2.5 ml-auto flex h-9 items-center gap-1.5 rounded-full bg-point-red px-3.5 text-[13px] font-bold text-white active:scale-95"
+            className="mr-2.5 ml-auto flex h-9 items-center gap-1.5 rounded-full bg-point-red px-3.5 text-13 font-bold text-white active:scale-95"
           >
             <span className="scale-[0.8]">
               <TicketSmallIcon />
@@ -112,13 +112,13 @@ export function ShortformItem({ item, active, couponCount, onOpenCoupons }: Prop
       {/* 소개 글 */}
       <div className="shrink-0 px-4 pb-3">
         {item.description && (
-          <p className="line-clamp-2 text-[14px] leading-snug text-ink">
+          <p className="line-clamp-2 text-14 leading-snug text-ink">
             <span className="mr-1.5 font-bold">{item.storeName}</span>
             {item.description}
           </p>
         )}
         {item.menus.length > 0 && (
-          <button type="button" onClick={() => setMenusOpen((v) => !v)} className="mt-1 block w-full text-left text-[13px] text-q-sub">
+          <button type="button" onClick={() => setMenusOpen((v) => !v)} className="mt-1 block w-full text-left text-13 text-q-sub">
             {menusOpen ? (
               <span className="flex flex-col gap-0.5">
                 {item.menus.map((m) => (
@@ -133,7 +133,7 @@ export function ShortformItem({ item, active, couponCount, onOpenCoupons }: Prop
             )}
           </button>
         )}
-        {item.createdAt && <p className="mt-1 text-[11px] text-q-muted">{timeAgo(item.createdAt)}</p>}
+        {item.createdAt && <p className="mt-1 text-11 text-q-muted">{timeAgo(item.createdAt)}</p>}
       </div>
     </article>
   )
@@ -143,10 +143,10 @@ export function ShortformItem({ item, active, couponCount, onOpenCoupons }: Prop
 function PostPhoto({ item, icon, active }: { item: Shortform; icon?: string; active: boolean }) {
   const alt = item.description || `${item.storeName} 사진`
   const fallback = (
-    <div className="flex size-full flex-col items-center justify-center bg-gradient-to-br from-q-mint to-[#d7ebe0] text-center">
+    <div className="flex size-full flex-col items-center justify-center bg-gradient-to-br from-q-mint to-[#d7ebe0] dark:to-q-panel text-center">
       {icon && <img src={icon} alt="" className="h-[120px] w-auto object-contain opacity-90" />}
-      <p className="mt-3 text-[15px] font-bold text-green-6">{item.storeName}</p>
-      <p className="mt-0.5 text-[12px] text-q-muted">사진을 준비하고 있어요</p>
+      <p className="mt-3 text-15 font-bold text-fg-green-6">{item.storeName}</p>
+      <p className="mt-0.5 text-12 text-q-muted">사진을 준비하고 있어요</p>
     </div>
   )
   if (item.videoUrl) {

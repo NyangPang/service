@@ -80,7 +80,7 @@ export function MapBottomSheet({
 
   return (
     <section
-      className="absolute inset-x-0 bottom-0 z-20 rounded-t-3xl border-t border-green-1 bg-white px-5 pb-4 shadow-[0_-6px_20px_rgba(8,104,22,0.08)]"
+      className="absolute inset-x-0 bottom-0 z-20 rounded-t-3xl border-t border-green-1 bg-surface px-5 pb-4 shadow-[0_-6px_20px_rgba(8,104,22,0.08)]"
       style={{
         transform: `translateY(calc(${base} + ${dragY}px))`,
         transition: dragging ? 'none' : 'transform 280ms cubic-bezier(.2,.8,.2,1)',
@@ -104,8 +104,8 @@ export function MapBottomSheet({
         <span className="block h-1 w-12 rounded-full bg-handle" />
       </div>
 
-      <label className="flex h-[52px] items-center gap-3 rounded-full border border-[#e6e8e6] bg-white px-5 shadow-[0_0_10px_rgba(0,0,0,0.04)]">
-        <span className="text-[#6c727a]">
+      <label className="flex h-[52px] items-center gap-3 rounded-full border border-q-line bg-surface px-5 shadow-[0_0_10px_rgba(0,0,0,0.04)]">
+        <span className="text-q-sub">
           <SearchIcon />
         </span>
         <input
@@ -114,7 +114,7 @@ export function MapBottomSheet({
           onChange={(e) => onKeywordChange(e.target.value)}
           onFocus={() => setState('expanded')}
           placeholder="가게 이름을 검색해 보세요"
-          className="w-full bg-transparent text-base text-ink outline-none placeholder:text-[#8a9097]"
+          className="w-full bg-transparent text-base text-ink outline-none placeholder:text-q-muted"
         />
       </label>
 
@@ -146,7 +146,7 @@ export function MapBottomSheet({
                     onClick={() => onCategoryChange(active ? null : c.key)}
                   >
                     <img src={c.icon} alt="" className="h-[68px] w-[68px] object-contain" />
-                    <span className={`text-[15px] text-green-6 ${active ? 'font-semibold' : ''}`}>{c.label}</span>
+                    <span className={`text-15 text-fg-green-6 ${active ? 'font-semibold' : ''}`}>{c.label}</span>
                   </button>
                 </li>
               )

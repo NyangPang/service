@@ -34,7 +34,7 @@ export function MyCoupons() {
             role="tab"
             aria-selected={tab.status === status}
             onClick={() => setStatus(tab.status)}
-            className="h-9 rounded-full text-[13px] font-bold text-q-muted aria-selected:bg-white aria-selected:text-q-green aria-selected:shadow-sm"
+            className="h-9 rounded-full text-13 font-bold text-q-muted aria-selected:bg-surface aria-selected:text-fg-q-green aria-selected:shadow-sm"
           >
             {tab.label}
           </button>
@@ -73,7 +73,7 @@ export function MyCoupons() {
               ]}
               dimmed={c.status !== 'AVAILABLE'}
               onClick={c.status === 'AVAILABLE' ? () => setOpened(c) : undefined}
-              action={c.status === 'AVAILABLE' ? <span className="text-[13px] font-bold text-q-green">사용 ›</span> : undefined}
+              action={c.status === 'AVAILABLE' ? <span className="text-13 font-bold text-fg-q-green">사용 ›</span> : undefined}
             />
           </li>
         ))}
@@ -81,15 +81,15 @@ export function MyCoupons() {
 
       {opened && (
         <Sheet title="쿠폰 사용하기" onClose={() => setOpened(null)}>
-          <p className="text-center text-[15px] font-bold text-q-text">{opened.storeName}</p>
+          <p className="text-center text-15 font-bold text-q-text">{opened.storeName}</p>
           <p className="mt-1 text-center text-sm text-q-sub">
             {opened.title} · {discountText(opened)}
           </p>
           <div className="mx-auto mt-5 w-fit rounded-2xl border-2 border-dashed border-q-green px-8 py-5 text-center">
             <p className="text-xs text-q-muted">사용 코드</p>
-            <p className="mt-1 font-mono text-[34px] font-bold tracking-[0.25em] text-q-text">{opened.redeemCode}</p>
+            <p className="mt-1 font-mono text-34 font-bold tracking-[0.25em] text-q-text">{opened.redeemCode}</p>
           </div>
-          <p className="mt-4 text-center text-[13px] leading-relaxed text-q-muted">
+          <p className="mt-4 text-center text-13 leading-relaxed text-q-muted">
             결제할 때 사장님께 이 코드를 보여주세요.
             <br />
             {minOrderText(opened.minOrderAmount)} · {untilText(opened.expiresAt)}

@@ -13,8 +13,8 @@ export function ScrapGrid() {
     return (
       <div className="flex h-full flex-col items-center justify-center px-8 text-center">
         <img src={OWNER_ILLUST.videoDownload} alt="" className="h-[110px] w-auto object-contain opacity-90" />
-        <p className="mt-3 text-[16px] font-bold text-ink">로그인하면 스크랩한 게시물을 볼 수 있어요</p>
-        <Link to="/login?next=/scraps" className="mt-5 flex h-11 w-full items-center justify-center rounded-xl bg-green-4 text-[15px] font-bold text-white">
+        <p className="mt-3 text-16 font-bold text-ink">로그인하면 스크랩한 게시물을 볼 수 있어요</p>
+        <Link to="/login?next=/scraps" className="mt-5 flex h-11 w-full items-center justify-center rounded-xl bg-green-4 text-15 font-bold text-white">
           로그인
         </Link>
       </div>
@@ -39,12 +39,12 @@ export function ScrapGrid() {
         <li key={s.shortformId}>
           <Link to={`/?start=${s.shortformId}`} className="relative block aspect-[9/13] overflow-hidden bg-q-mint">
             <ShortformThumb video={s} />
-            <span className="absolute top-1.5 right-1.5 flex size-6 items-center justify-center rounded-md bg-white/90 text-q-text">
+            <span className="absolute top-1.5 right-1.5 flex size-6 items-center justify-center rounded-md bg-surface/90 text-q-text">
               <span className="scale-[0.35]">
                 <PhotoIcon />
               </span>
             </span>
-            <span className="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-black/70 to-transparent px-1.5 pt-4 pb-1 text-[11px] font-bold text-white">
+            <span className="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-black/70 to-transparent px-1.5 pt-4 pb-1 text-11 font-bold text-white">
               {s.storeName}
             </span>
           </Link>

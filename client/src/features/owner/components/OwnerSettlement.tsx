@@ -15,7 +15,7 @@ export function OwnerSettlement() {
   return (
     <OwnerScreen>
       <div className="flex items-center justify-center gap-4">
-        <button type="button" aria-label="이전 달" onClick={() => setMonth(shiftMonth(month, -1))} className="size-9 rounded-full bg-white text-lg text-q-sub">
+        <button type="button" aria-label="이전 달" onClick={() => setMonth(shiftMonth(month, -1))} className="size-9 rounded-full bg-surface text-lg text-q-sub">
           ‹
         </button>
         <p className="text-lg font-bold text-q-text tabular-nums">
@@ -26,26 +26,26 @@ export function OwnerSettlement() {
           aria-label="다음 달"
           disabled={month >= thisMonth}
           onClick={() => setMonth(shiftMonth(month, 1))}
-          className="size-9 rounded-full bg-white text-lg text-q-sub disabled:opacity-30"
+          className="size-9 rounded-full bg-surface text-lg text-q-sub disabled:opacity-30"
         >
           ›
         </button>
       </div>
 
-      {isLoading && <div className="mt-4 h-40 animate-pulse rounded-2xl bg-white" />}
+      {isLoading && <div className="mt-4 h-40 animate-pulse rounded-2xl bg-surface" />}
       {isError && <p className="py-10 text-center text-sm text-q-muted">정산 내역을 불러오지 못했어요</p>}
       {data && (
         <>
           <section className="mt-4 rounded-3xl bg-q-green-dark px-6 py-5 text-white">
             <p className="text-xs opacity-80">{Number(m)}월 잇츠 수수료</p>
-            <p className="mt-1 text-[30px] font-bold tabular-nums">{data.totalFee.toLocaleString()}원</p>
+            <p className="mt-1 text-30 font-bold tabular-nums">{data.totalFee.toLocaleString()}원</p>
             <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
               <div className="rounded-xl bg-white/15 px-3 py-2">
-                <p className="text-[11px] opacity-80">쿠폰 사용</p>
+                <p className="text-11 opacity-80">쿠폰 사용</p>
                 <p className="font-bold">{data.usedCount}건</p>
               </div>
               <div className="rounded-xl bg-white/15 px-3 py-2">
-                <p className="text-[11px] opacity-80">손님 할인 (사장님 부담)</p>
+                <p className="text-11 opacity-80">손님 할인 (사장님 부담)</p>
                 <p className="font-bold">{data.totalDiscount.toLocaleString()}원</p>
               </div>
             </div>
@@ -64,7 +64,7 @@ export function OwnerSettlement() {
                     </div>
                     <div className="shrink-0 text-right text-xs">
                       <p className="text-q-sub">할인 {item.discountValue.toLocaleString()}원</p>
-                      <p className="font-bold text-q-green">수수료 {item.fee}원</p>
+                      <p className="font-bold text-fg-q-green">수수료 {item.fee}원</p>
                     </div>
                   </li>
                 ))}

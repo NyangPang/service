@@ -13,10 +13,10 @@ export function OwnerCard({
   className?: string
 }) {
   return (
-    <section className={`rounded-2xl bg-white px-5 py-4 ${className}`}>
+    <section className={`rounded-2xl bg-surface px-5 py-4 ${className}`}>
       {(title || aside) && (
         <header className="mb-3 flex items-center justify-between gap-2">
-          {title && <h3 className="text-[16px] font-bold text-q-text">{title}</h3>}
+          {title && <h3 className="text-16 font-bold text-q-text">{title}</h3>}
           {aside}
         </header>
       )}
@@ -27,12 +27,12 @@ export function OwnerCard({
 
 export function CouponStatusBadge({ status }: { status: CouponStatus }) {
   const map = {
-    ACTIVE: ['발행 중', 'bg-q-mint text-q-green'],
+    ACTIVE: ['발행 중', 'bg-q-mint text-fg-q-green'],
     STOPPED: ['중지', 'bg-q-panel text-q-muted'],
-    SOLD_OUT: ['소진', 'bg-point-yellow/40 text-point-red-dark'],
+    SOLD_OUT: ['소진', 'bg-point-yellow/40 text-fg-red'],
   } as const
   const [label, className] = map[status]
-  return <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold ${className}`}>{label}</span>
+  return <span className={`shrink-0 rounded-full px-2 py-0.5 text-11 font-bold ${className}`}>{label}</span>
 }
 
 /** 사장님 화면 공통 배경 (연한 회녹색 위에 흰 카드) */

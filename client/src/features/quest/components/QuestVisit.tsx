@@ -76,7 +76,7 @@ export function QuestVisit({ quest }: { quest: Quest }) {
 
   return (
     <div className="h-full overflow-y-auto px-5 pt-4 pb-8">
-      <p className="mb-3 text-center text-[13px] text-q-muted">
+      <p className="mb-3 text-center text-13 text-q-muted">
         {quest.title} · {quest.currentCount} / {quest.targetCount}
       </p>
 
@@ -88,9 +88,9 @@ export function QuestVisit({ quest }: { quest: Quest }) {
       {store && (
         <>
           <section className="rounded-2xl bg-q-mint px-4 py-5 text-center">
-            <h2 className="text-[21px] font-bold text-q-text">{store.name}</h2>
-            <p className="mt-1 text-[13px] text-q-muted">{store.address}</p>
-            {me && <p className="mt-1 text-xs font-medium text-q-green">여기서 약 {formatDistance(distanceTo(me, store))}</p>}
+            <h2 className="text-21 font-bold text-q-text">{store.name}</h2>
+            <p className="mt-1 text-13 text-q-muted">{store.address}</p>
+            {me && <p className="mt-1 text-xs font-medium text-fg-q-green">여기서 약 {formatDistance(distanceTo(me, store))}</p>}
           </section>
 
           {sorted.length > 1 && (
@@ -107,8 +107,8 @@ export function QuestVisit({ quest }: { quest: Quest }) {
                         setQrToken('')
                         setError(null)
                       }}
-                      className={`rounded-full border px-3 py-1.5 text-[13px] font-medium ${
-                        selected ? 'border-q-green bg-q-green text-white' : 'border-q-line bg-white text-q-sub'
+                      className={`rounded-full border px-3 py-1.5 text-13 font-medium ${
+                        selected ? 'border-q-green bg-q-green text-white' : 'border-q-line bg-surface text-q-sub'
                       }`}
                     >
                       {s.name}
@@ -119,7 +119,7 @@ export function QuestVisit({ quest }: { quest: Quest }) {
             </ul>
           )}
 
-          <p className="mt-5 text-center text-[13px] leading-relaxed text-q-muted">
+          <p className="mt-5 text-center text-13 leading-relaxed text-q-muted">
             매장에 도착한 후 가게의 QR 코드 값을 입력하고
             <br />
             아래 버튼을 눌러 방문 인증을 완료해주세요.
@@ -130,7 +130,7 @@ export function QuestVisit({ quest }: { quest: Quest }) {
           </div>
 
           <label className="mt-5 block">
-            <span className="text-[13px] font-bold text-q-text">QR 코드 값</span>
+            <span className="text-13 font-bold text-q-text">QR 코드 값</span>
             <input
               value={qrToken}
               onChange={(e) => setQrToken(e.target.value)}
@@ -150,21 +150,21 @@ export function QuestVisit({ quest }: { quest: Quest }) {
             {locating ? '위치 확인 중...' : '방문 인증하기'}
           </PrimaryButton>
           {error && (
-            <p role="alert" className="mt-2.5 text-center text-[13px] font-medium text-point-red-dark">
+            <p role="alert" className="mt-2.5 text-center text-13 font-medium text-fg-red">
               {error}
             </p>
           )}
 
           <section className="mt-6 rounded-2xl bg-q-panel px-4 py-4">
             <h3 className="mb-2 text-sm font-bold text-q-text">인증 조건</h3>
-            <ul className="flex flex-col gap-1.5 text-[13px] text-q-sub">
+            <ul className="flex flex-col gap-1.5 text-13 text-q-sub">
               {[
                 `매장 반경 ${VISIT_RADIUS_M}m 이내 + 가게 QR 코드`,
                 '같은 가게는 하루 1회만 인증 가능',
                 '한 퀘스트에서는 서로 다른 가게만 인정',
               ].map((text) => (
                 <li key={text} className="flex gap-2">
-                  <span aria-hidden className="font-bold text-q-green">✓</span>
+                  <span aria-hidden className="font-bold text-fg-q-green">✓</span>
                   {text}
                 </li>
               ))}
@@ -215,11 +215,11 @@ export function QuestVisit({ quest }: { quest: Quest }) {
 function RewardBox({ title, caption }: { title: string; caption: string }) {
   return (
     <div className="rounded-2xl bg-q-panel px-4 py-5 text-center">
-      <p className="flex items-center justify-center gap-2.5 text-[18px] font-bold text-q-text">
+      <p className="flex items-center justify-center gap-2.5 text-18 font-bold text-q-text">
         <FeedIcon className="size-8" />
         {title}
       </p>
-      <p className="mt-2 text-[13px] text-q-green">{caption}</p>
+      <p className="mt-2 text-13 text-fg-q-green">{caption}</p>
     </div>
   )
 }

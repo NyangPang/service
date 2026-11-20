@@ -29,7 +29,7 @@ const DEFAULT_ACTION = { label: '게시물 만들기', to: '/create' }
 
 /** 하단 네비와 같은 톤: 흰 바탕 + 민트 테두리 + 초록 그림자 */
 const circleButton =
-  'flex size-[46px] shrink-0 items-center justify-center rounded-full border border-mint-line bg-white text-green-6 shadow-[0_4px_14px_rgba(8,104,22,0.14)] transition-colors active:bg-mint'
+  'flex size-[46px] shrink-0 items-center justify-center rounded-full border border-mint-line bg-surface text-fg-green-6 shadow-[0_4px_14px_rgba(8,104,22,0.14)] transition-colors active:bg-mint'
 /** 주요 동작(숏폼 만들기)은 하단 네비의 선택된 탭처럼 진한 초록 */
 const primaryCircleButton =
   'flex size-[46px] shrink-0 items-center justify-center rounded-full bg-green-6 text-white shadow-[0_4px_10px_rgba(8,104,22,0.3)] transition-colors active:bg-green-6/90'
@@ -68,19 +68,19 @@ export function AppShell({
   if (mode === 'OWNER' && pathname === '/') return <Navigate to="/owner" replace />
 
   return (
-    <div className="relative mx-auto flex h-full max-w-[430px] flex-col bg-white">
+    <div className="relative mx-auto flex h-full max-w-[430px] flex-col bg-surface">
       <header
         className={`flex h-[76px] shrink-0 items-center justify-between gap-2 px-[18px] pt-[env(safe-area-inset-top)] ${
-          immersive ? 'absolute inset-x-0 top-0 z-30' : 'border-b border-green-1 bg-white'
+          immersive ? 'absolute inset-x-0 top-0 z-30' : 'border-b border-green-1 bg-surface'
         }`}
       >
         <SettingsDrawer buttonClassName={circleButton} items={menuItems} />
         <div className="flex min-w-0 flex-col items-center">
           {modeBadge && (
-            <span className="mb-0.5 rounded-full bg-green-6 px-2 py-px text-[10px] font-bold text-white">{modeBadge}</span>
+            <span className="mb-0.5 rounded-full bg-green-6 px-2 py-px text-10 font-bold text-white">{modeBadge}</span>
           )}
           {!immersive && (
-            <h1 className={`truncate font-bold text-ink ${modeBadge ? 'text-[21px] leading-tight' : 'text-[25px]'}`}>{title}</h1>
+            <h1 className={`truncate font-bold text-ink ${modeBadge ? 'text-21 leading-tight' : 'text-25'}`}>{title}</h1>
           )}
         </div>
         <div className="flex shrink-0 items-center gap-2">
@@ -117,7 +117,7 @@ export function AppShell({
           shrunk ? 'px-12 pt-1.5' : 'px-5 pt-3'
         } ${
           // 영상 위(z-10~20)에는 뜨되, 설정 서랍이 들어 있는 상단 바(z-30)보다는 아래
-          overlayNav ? 'absolute inset-x-0 bottom-0 z-[25] bg-transparent' : 'bg-white'
+          overlayNav ? 'absolute inset-x-0 bottom-0 z-[25] bg-transparent' : 'bg-surface'
         }`}
       >
         <div
@@ -126,7 +126,7 @@ export function AppShell({
           } ${
             overlayNav
               ? 'border-white/25 bg-white/10 backdrop-blur-md'
-              : 'border-mint-line bg-white shadow-[0_6px_20px_rgba(8,104,22,0.14)]'
+              : 'border-mint-line bg-surface shadow-[0_6px_20px_rgba(8,104,22,0.14)]'
           }`}
           style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}
         >
@@ -137,12 +137,12 @@ export function AppShell({
               end={end}
               aria-label={label}
               className={({ isActive }) =>
-                `flex items-center justify-center gap-1.5 rounded-full text-[13px] font-bold whitespace-nowrap transition-[height,color,background-color] duration-300 ${
+                `flex items-center justify-center gap-1.5 rounded-full text-13 font-bold whitespace-nowrap transition-[height,color,background-color] duration-300 ${
                   shrunk ? 'h-[34px]' : 'h-[50px]'
                 } ${
                   isActive
                     ? `bg-green-6 text-white shadow-[0_4px_10px_rgba(8,104,22,0.3)] ${compact ? 'flex-col gap-0.5' : ''}`
-                    : `flex-col gap-0.5 ${overlayNav ? 'text-white/80 hover:text-white' : 'text-green-6/55 hover:text-green-6'}`
+                    : `flex-col gap-0.5 ${overlayNav ? 'text-white/80 hover:text-white' : 'text-fg-green-6/55 hover:text-fg-green-6'}`
                 }`
               }
             >
@@ -151,7 +151,7 @@ export function AppShell({
                   <span className={`flex items-center ${isActive ? 'scale-[0.8]' : 'scale-[0.72]'}`}>
                     <Icon />
                   </span>
-                  {!shrunk && <span className={isActive && !compact ? '' : 'text-[11px] leading-none'}>{label}</span>}
+                  {!shrunk && <span className={isActive && !compact ? '' : 'text-11 leading-none'}>{label}</span>}
                 </>
               )}
             </NavLink>

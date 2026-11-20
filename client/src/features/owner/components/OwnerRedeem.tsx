@@ -34,12 +34,12 @@ export function OwnerRedeem() {
   if (done) {
     return (
       <OwnerScreen>
-        <section className="rounded-3xl bg-white px-6 py-8 text-center">
+        <section className="rounded-3xl bg-surface px-6 py-8 text-center">
           <img src={OWNER_ILLUST.coupon} alt="" className="mx-auto h-[130px] w-auto object-contain drop-shadow" />
-          <p className="mt-3 text-sm font-bold text-q-green">사용 처리 완료</p>
+          <p className="mt-3 text-sm font-bold text-fg-q-green">사용 처리 완료</p>
           <p className="mt-1 text-xl font-bold text-q-text">{done.title}</p>
-          <p className="mt-3 text-[32px] font-bold text-point-red-dark">{discountText(done)}</p>
-          <p className="mt-4 rounded-xl bg-point-yellow/30 px-4 py-3 text-[13px] text-q-sub">
+          <p className="mt-3 text-32 font-bold text-fg-red">{discountText(done)}</p>
+          <p className="mt-4 rounded-xl bg-point-yellow/30 px-4 py-3 text-13 text-q-sub">
             {minOrderText(done.minOrderAmount)}
             <br />
             주문 금액은 계산대에서 직접 확인해 주세요
@@ -57,7 +57,7 @@ export function OwnerRedeem() {
     <OwnerScreen>
       <OwnerCard>
         <img src={OWNER_ILLUST.coupon} alt="" className="mx-auto mb-2 h-[92px] w-auto object-contain" />
-        <p className="text-center text-[15px] font-bold text-q-text">손님 쿠폰의 사용 코드를 입력하세요</p>
+        <p className="text-center text-15 font-bold text-q-text">손님 쿠폰의 사용 코드를 입력하세요</p>
         <p className="mt-1 text-center text-xs text-q-muted">손님 앱 → 내 쿠폰함 → 사용하기에 나오는 6자리</p>
 
         {/* 칸 6개처럼 보이지만 실제 입력은 숨긴 input 하나 */}
@@ -87,7 +87,7 @@ export function OwnerRedeem() {
         />
 
         {redeem.isError && (
-          <p role="alert" className="mt-3 text-center text-[13px] font-medium text-point-red-dark">
+          <p role="alert" className="mt-3 text-center text-13 font-medium text-fg-red">
             {errorMessage(redeem.error)}
           </p>
         )}
@@ -106,7 +106,7 @@ export function OwnerRedeem() {
         {today.length === 0 ? (
           <p className="py-3 text-center text-sm text-q-muted">아직 없어요</p>
         ) : (
-          <ul className="flex flex-col gap-2 text-[13px]">
+          <ul className="flex flex-col gap-2 text-13">
             {today.map((item) => (
               <li key={item.userCouponId} className="flex justify-between">
                 <span className="truncate text-q-text">{item.title}</span>

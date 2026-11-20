@@ -33,18 +33,18 @@ export function ReviseShortformFlow({ shortformId }: { shortformId: number }) {
   const backToList = () => navigate('/owner/videos', { replace: true })
 
   return (
-    <div className="mx-auto flex h-full max-w-[430px] flex-col bg-white">
+    <div className="mx-auto flex h-full max-w-[430px] flex-col bg-surface">
       <header className="flex h-[68px] shrink-0 items-center justify-between px-[18px] pt-[env(safe-area-inset-top)]">
         <button
           type="button"
           aria-label="닫기"
           onClick={backToList}
-          className="flex size-[44px] items-center justify-center rounded-full border border-mint-line bg-white text-green-6 shadow-[0_4px_14px_rgba(8,104,22,0.14)]"
+          className="flex size-[44px] items-center justify-center rounded-full border border-mint-line bg-surface text-fg-green-6 shadow-[0_4px_14px_rgba(8,104,22,0.14)]"
         >
           <CloseIcon />
         </button>
-        <p className="flex items-center gap-1.5 text-[17px] font-bold text-ink">
-          게시물 수정 <span className="rounded-full bg-green-6 px-1.5 text-[10px] leading-4 text-white">PRO</span>
+        <p className="flex items-center gap-1.5 text-17 font-bold text-ink">
+          게시물 수정 <span className="rounded-full bg-green-6 px-1.5 text-10 leading-4 text-white">PRO</span>
         </p>
         <span className="size-[44px]" />
       </header>
@@ -126,7 +126,7 @@ function Revise({ original, onExit }: { original: Shortform; onExit: () => void 
                   setText('')
                   setStep('input')
                 }}
-                className="h-12 rounded-xl bg-green-4 text-[15px] font-bold text-white active:scale-[0.98]"
+                className="h-12 rounded-xl bg-green-4 text-15 font-bold text-white active:scale-[0.98]"
               >
                 {label}
               </button>
@@ -154,7 +154,7 @@ function Revise({ original, onExit }: { original: Shortform; onExit: () => void 
             maxLength={200}
             autoFocus
             placeholder={editPlaceholder(target)}
-            className="w-full resize-none border-b-2 border-green-4 py-2 text-[15px] leading-relaxed text-ink outline-none placeholder:text-gray-2"
+            className="w-full resize-none border-b-2 border-green-4 py-2 text-15 leading-relaxed text-ink outline-none placeholder:text-gray-2"
           />
           <p className="mt-1 text-right text-xs text-gray-2">{text.length} / 200</p>
           {generate.isError && <ErrorText>{errorMessage(generate.error)}</ErrorText>}
@@ -177,7 +177,7 @@ function Revise({ original, onExit }: { original: Shortform; onExit: () => void 
           prev={{ label: '다시 수정', onClick: restart }}
           next={{ label: '이걸로 교체', onClick: () => setModal('replace'), disabled: !detail.data }}
         >
-          <p className="mb-2 text-center text-[13px] font-bold text-green-4">새 버전이 완성됐어요</p>
+          <p className="mb-2 text-center text-13 font-bold text-green-4">새 버전이 완성됐어요</p>
           <div className="relative mx-auto aspect-[4/5] w-full max-w-[260px] overflow-hidden rounded-3xl bg-green-1 shadow-[0_10px_30px_rgba(8,104,22,0.18)]">
             {detail.data ? (
               <PostCarousel images={detail.data.imageUrls ?? (detail.data.imageUrl ? [detail.data.imageUrl] : [])} alt={detail.data.title} frame={detail.data.frame} />
@@ -187,12 +187,12 @@ function Revise({ original, onExit }: { original: Shortform; onExit: () => void 
           </div>
           {detail.data && (
             <div className="mx-auto mt-4 max-w-[300px]">
-              <p className="text-[16px] font-bold text-ink">{detail.data.title}</p>
-              {detail.data.caption && <p className="mt-1 text-[14px] leading-relaxed text-q-sub">{detail.data.caption}</p>}
+              <p className="text-16 font-bold text-ink">{detail.data.title}</p>
+              {detail.data.caption && <p className="mt-1 text-14 leading-relaxed text-q-sub">{detail.data.caption}</p>}
             </div>
           )}
           {replace.isError && <ErrorText>{errorMessage(replace.error)}</ErrorText>}
-          <button type="button" onClick={() => setModal('discard')} className="mx-auto mt-4 block text-[13px] text-q-muted underline">
+          <button type="button" onClick={() => setModal('discard')} className="mx-auto mt-4 block text-13 text-q-muted underline">
             그만두고 지금 게시물 유지하기
           </button>
         </Screen>
@@ -200,7 +200,7 @@ function Revise({ original, onExit }: { original: Shortform; onExit: () => void 
 
       {step === 'done' && (
         <div className="flex flex-1 flex-col items-center px-6 pb-[max(20px,env(safe-area-inset-bottom))]">
-          <p className="mt-10 text-[22px] font-bold text-green-4">교체 완료!</p>
+          <p className="mt-10 text-22 font-bold text-green-4">교체 완료!</p>
           <p className="mt-1 text-sm text-q-muted">이제 손님 피드에 새 버전이 보여요</p>
           <img src={pigeonUploaded} alt="" className="mt-8 h-[220px] w-auto animate-[rise-center_.5s_ease-out] object-contain" />
           <button type="button" onClick={onExit} className="mt-auto h-[52px] w-full rounded-xl bg-green-4 text-base font-bold text-white">
@@ -255,8 +255,8 @@ function OriginalCard({ video }: { video: Shortform }) {
         <ShortformThumb video={video} />
       </span>
       <span className="min-w-0">
-        <span className="text-[11px] font-bold text-q-green">지금 공개 중인 게시물</span>
-        <span className="mt-0.5 line-clamp-2 block text-[14px] font-bold text-q-text">{video.description || video.storeName}</span>
+        <span className="text-11 font-bold text-fg-q-green">지금 공개 중인 게시물</span>
+        <span className="mt-0.5 line-clamp-2 block text-14 font-bold text-q-text">{video.description || video.storeName}</span>
       </span>
     </div>
   )

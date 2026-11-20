@@ -12,7 +12,7 @@ export function HatchScreen({ breed, onDone }: { breed: PigeonBreed; onDone: () 
       title="알이 깨어났어요!"
       subtitle={
         <>
-          <p className="text-[17px] font-bold text-q-text">
+          <p className="text-17 font-bold text-q-text">
             {b.emoji} {b.name} 비둘기가 태어났어요
           </p>
           <p className="mt-1 text-xs text-q-muted">Lv.10까지 키우면 이렇게 {b.name} 비둘기의 모습이 돼요</p>
@@ -38,7 +38,7 @@ export function GraduationScreen({ graduated, onDone }: { graduated: AlbumItem; 
       title={`🎓 ${graduated.generation}번째 비둘기 졸업!`}
       subtitle={
         <>
-          <p className="text-[17px] font-bold text-q-text">
+          <p className="text-17 font-bold text-q-text">
             {b.emoji} {b.name} 비둘기와 {graduated.days}일을 함께했어요
           </p>
           {graduated.rewardCouponCount > 0 && (
@@ -63,7 +63,7 @@ export function GraduationScreen({ graduated, onDone }: { graduated: AlbumItem; 
     >
       <div className="flex items-center gap-3 rounded-2xl bg-q-mint px-4 py-3">
         <img src={PIGEON_EGG_IMAGE} alt="" className="h-12 w-auto" />
-        <p className="text-[13px] leading-relaxed text-q-sub">
+        <p className="text-13 leading-relaxed text-q-sub">
           새 알이 도착했어요!
           <br />
           모은 먹이는 그대로 이어져요

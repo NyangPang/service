@@ -26,9 +26,9 @@ export function SignupWelcome({ role, name }: { role: 'RESIDENT' | 'OWNER'; name
   const owner = role === 'OWNER'
 
   return (
-    <div className="relative flex flex-1 flex-col overflow-hidden bg-gradient-to-b from-[#fef9f3] via-[#f4f6ea] to-[#e0e5cf] px-6 pt-[max(40px,env(safe-area-inset-top))] pb-[max(20px,env(safe-area-inset-bottom))]">
+    <div className="relative flex flex-1 flex-col overflow-hidden bg-gradient-to-b from-[#fef9f3] via-[#f4f6ea] to-[#e0e5cf] dark:from-gray-1 dark:via-gray-1 dark:to-q-panel px-6 pt-[max(40px,env(safe-area-inset-top))] pb-[max(20px,env(safe-area-inset-bottom))]">
       <div className="my-auto flex flex-col items-center text-center">
-        <span className="animate-[rise-center_.4s_ease-out] rounded-full bg-green-6 px-3.5 py-1.5 text-[13px] font-bold text-white shadow-[0_4px_12px_rgba(8,104,22,0.25)]">
+        <span className="animate-[rise-center_.4s_ease-out] rounded-full bg-green-6 px-3.5 py-1.5 text-13 font-bold text-white shadow-[0_4px_12px_rgba(8,104,22,0.25)]">
           {c.badge}
         </span>
 
@@ -39,16 +39,16 @@ export function SignupWelcome({ role, name }: { role: 'RESIDENT' | 'OWNER'; name
           <span aria-hidden className="mx-auto mt-1 block h-3 w-28 rounded-[50%] bg-green-6/10 blur-[2px]" />
         </div>
 
-        <h1 className="mt-6 font-title text-[30px] leading-[1.35] text-green-6">
+        <h1 className="mt-6 font-title text-30 leading-[1.35] text-fg-green-6">
           <span className="break-keep">{name}</span> 님,
           <br />
           반가워요!
         </h1>
-        <p className="mt-3 text-[15px] leading-relaxed whitespace-pre-line text-q-sub">{c.sub}</p>
+        <p className="mt-3 text-15 leading-relaxed whitespace-pre-line text-q-sub">{c.sub}</p>
 
         <ul className="mt-6 flex flex-wrap justify-center gap-2">
           {c.chips.map((chip) => (
-            <li key={chip} className="rounded-full border border-mint-line bg-white/80 px-3 py-1.5 text-[13px] font-bold text-green-6">
+            <li key={chip} className="rounded-full border border-mint-line bg-surface/80 px-3 py-1.5 text-13 font-bold text-fg-green-6">
               {chip}
             </li>
           ))}
@@ -60,7 +60,7 @@ export function SignupWelcome({ role, name }: { role: 'RESIDENT' | 'OWNER'; name
           <button
             type="button"
             onClick={() => navigate('/create', { replace: true })}
-            className="h-[52px] rounded-xl border-2 border-green-4 bg-white text-base font-bold text-green-4"
+            className="h-[52px] rounded-xl border-2 border-green-4 bg-surface text-base font-bold text-green-4"
           >
             첫 홍보 게시물 만들기
           </button>

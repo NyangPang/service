@@ -19,7 +19,7 @@ export function Field({
 }) {
   return (
     <div className="mt-6 first:mt-0">
-      <p className="flex items-baseline gap-2 text-[12px] font-medium text-ink">
+      <p className="flex items-baseline gap-2 text-12 font-medium text-ink">
         {label}
         {status && <span className={error ? 'text-point-red' : 'text-green-4'}>{status}</span>}
       </p>
@@ -35,7 +35,7 @@ export function FieldInput(props: InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...props}
-      className={`h-10 min-w-0 flex-1 bg-transparent px-1 text-[15px] text-ink outline-none placeholder:text-gray-2 ${props.className ?? ''}`}
+      className={`h-10 min-w-0 flex-1 bg-transparent px-1 text-15 text-ink outline-none placeholder:text-gray-2 ${props.className ?? ''}`}
     />
   )
 }
@@ -60,7 +60,7 @@ export function FieldButton({ children, onClick, disabled }: { children: ReactNo
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="h-9 shrink-0 rounded-lg bg-green-4 px-4 text-[13px] font-bold text-white transition-colors disabled:bg-green-1"
+      className="h-9 shrink-0 rounded-lg bg-green-4 px-4 text-13 font-bold text-white transition-colors disabled:bg-green-1"
     >
       {children}
     </button>
