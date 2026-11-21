@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class StoryboardPrompt {
 
     /** 프롬프트를 바꾸면 올린다 — 결과 JSON의 meta.prompt_version에 남음 */
-    public static final String VERSION = "v16";
+    public static final String VERSION = "v18";
 
     private final String template;
     private final String fixTemplate;

@@ -39,6 +39,7 @@ class VideoStyleTest {
         assertThat(text).isEqualTo(prompt.build(menu, "한마디", "서울 성동구", VideoOptions.NONE))
                 .doesNotContain("{style", "[영상 스타일", "[강조 포인트]")
                 .contains("써 주세요.\n\n[가게 정보]")
+                .contains("ㄴ 받침이 있는 글자로 끝내지 않습니다.")
                 .contains("generated 사진은 detail 장면에 쓰지 않습니다.\n\n[출력 형식 예시]");
     }
 
