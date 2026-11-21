@@ -142,6 +142,21 @@ class VideoTemplateTest {
         assertThat(over).doesNotExist();
     }
 
+    @Test
+    void 엔딩_카드는_연한_초록_배경에_로고와_흰_안내_카드(@TempDir Path dir) throws Exception {
+        Path png = dir.resolve("end.png");
+        new CaptionRenderer().renderEndCard("골목카페", png);
+        BufferedImage img = ImageIO.read(png.toFile());
+        assertThat(img.getWidth()).isEqualTo(CaptionRenderer.W);
+        assertThat(img.getHeight()).isEqualTo(CaptionRenderer.H);
+        assertThat(img.getRGB(10, 10) & 0xFFFFFF).isEqualTo(CaptionRenderer.BRAND_LIGHT.getRGB() & 0xFFFFFF);
+        // 로고 글자색(#256846)이 위쪽에, 흰 안내 카드가 그 아래에
+        assertThat(hasColor(img, new Color(0x256846), 430, 800)).isTrue();
+        assertThat(hasColor(img, Color.WHITE, 950, 1400)).isTrue();
+        // 영상에는 QR을 넣지 않음: 아래쪽은 배경색 그대로
+        assertThat(img.getRGB(540, 1700) & 0xFFFFFF).isEqualTo(CaptionRenderer.BRAND_LIGHT.getRGB() & 0xFFFFFF);
+    }
+
     /** y0~y1 줄 안에 그 색 픽셀이 있는지 */
     private static boolean hasColor(BufferedImage img, Color c, int y0, int y1) {
         for (int y = y0; y < y1; y++) {
