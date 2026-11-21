@@ -19,10 +19,6 @@ spring:
       aws:
         access-key: ${AWS_ACCESS_KEY_ID:local-dummy}
         secret-key: ${AWS_SECRET_ACCESS_KEY:local-dummy}
-      converse:
-        chat:
-          options:
-            model: ${BEDROCK_MODEL_ID:local-dummy}
 
 # 로컬 전용 기본값 — 운영(prod)에서는 반드시 환경변수로 넣어야 함
 jwt:

@@ -8,7 +8,7 @@
 | **B 파트 (영상 생성)** | 장면 JSON → Runway 클립 · TTS · FFmpeg 합성 → 재생성 · 다운로드 |
 
 - **원칙**: A 파트는 검증을 통과한 JSON만 B 파트로 넘긴다. B 파트는 아래 규칙이 지켜졌다고 보고 써도 된다.
-- **전제**: 영상 모델은 Runway Gen-4 Turbo (실제 가게 사진 → 5초 클립)
+- **영상 모델**: Runway Gemini Omni 1.2 Flash(사진 사이 전환), Gen-4 Turbo(단일 사진 클립)
 - **더미**: [`storyboard-samples/`](storyboard-samples/) — 업종별 3쌍 (`*.storyboard.json` + 짝이 되는 `*.menu.json`)
 - **상태**: 초안. [6. 정할 것](#6-정할-것)을 합의하면 v1.0으로 고정
 
@@ -69,7 +69,7 @@
 | `id` | int | ✅ | 장면 고유 번호. 순서가 바뀌어도 유지 (수정 변경분이 이 값으로 장면을 가리킴) |
 | `order` | int | ✅ | 재생 순서, 1부터 연속 |
 | `type` | enum | ✅ | `hook` / `menu` / `detail` / `review` / `cta`. 처음은 `hook`, 마지막은 `cta` |
-| `duration` | number | ✅ | 초, 0.5 단위, 1.5~5 (Runway 클립 5초). `hook`은 2 이하 |
+| `duration` | number | ✅ | 초, 0.5 단위, 1.5~5. `hook`은 2 이하 |
 | `image_index` | int | ✅ | `photoUrls` 순번. `menu_board` 사진 사용 불가 |
 | `motion` | enum | ✅ | `ai` (컷마다 첫 장면, 영상당 최대 3개) / `zoom_in` (외관 컷) / `zoom_out` / `static` (컷의 나머지 장면). 아래 [원테이크](#원테이크-2026-11-21) 참고. `transition`은 예전 장면 JSON 호환용으로만 받음 |
 | `video_prompt` | string \| null | 컷 첫 장면 `ai`일 때 | 영어, 60단어 이내. `[이 사진 음식의 질감·특징이 살아나는 움직임] → [다음 컷 사진으로 넘어가는 카메라 이동]`. 예: "the soft mochi gently wobbles and settles, then the camera glides sideways past the counter to the next table, where a strawberry cake sits", 다음이 외관이면 "…then the camera pulls back through the window and out to the street, revealing the storefront". 마지막 컷이면 이동 없이 질감만. 글자·간판·로고 요청 금지, 사람·손·얼굴(`chef`, `hands`, `gloved`…), 도구(`fork`, `knife`, `tongs`…), 손·입이 필요한 동작(`lifting`, `tearing`, `eating`…) 금지 (손·포크로 찢는 장면이 먹는 장면처럼 보여 어색했음). 붓기·뿌리기는 됨 |
@@ -78,11 +78,11 @@
 장면마다 따로 만든 클립을 잇지 않고, 카메라 한 대가 15초 동안 끊김 없이 움직인 것처럼 한 편의 배경 영상을 만든 뒤 장면 길이대로 잘라 쓴다 (`StoryboardRenderer.buildOneTake`).
 
 - **컷** = 같은 사진(`image_index`)을 쓰는 이어진 장면들. 같은 사진을 떨어진 장면에 다시 쓰면 검증 오류 (카메라는 다음 사진으로만 움직임)
-- 컷 *i*(마지막 제외): Runway Kling 2.5 Turbo Pro에 **첫 화면 = 이 컷 사진, 끝 화면 = 다음 컷 사진**을 주고 그 컷 `video_prompt`로 클립을 만든다. 앞 클립이 끝나는 화면이 다음 클립이 시작하는 화면이라 이어 붙이면 한 번에 찍은 영상이 됨
+- 컷 *i*(마지막 제외): Runway Gemini Omni 1.2 Flash에 **첫 화면 = 이 컷 사진, 끝 화면 = 다음 컷 사진**을 주고 세로 720p 전환 클립을 만든다. 기본 3초, 마지막 컷으로 이동할 때는 현재 컷이 3초보다 길면 4초를 요청한다.
 - 마지막 컷: `video_prompt`가 있으면 그 사진에서 시작하는 Gen-4 Turbo 클립, 없으면(가게 외관) 그 사진에서 시작하는 줌
-- 클립은 컷 길이에 정확히 맞춰 빠르게·느리게 재생 (컷이 7.5초보다 길면 10초 클립 요청). 모든 클립을 동시에 요청하고, 실패하거나 Runway가 꺼져 있으면 그 컷만 줌
+- 컷 길이는 FFmpeg로 맞춘다. 긴 전환 컷은 처음 사진을 조금 더 보여 준 뒤 움직인다. 클립은 동시에 요청하며, 실패하거나 Runway가 꺼진 컷은 줌으로 대체한다.
 - 장면 경계는 같은 화면끼리 겹치는 페이드라 보이지 않음. 사진 칸이 화면 일부인 템플릿(띠형·카드형)은 예전처럼 장면별 클립
-- 비용: Kling 5초 60 credits(10초 120) × 컷 전환 수 + 마지막 컷 Gen-4 25. 음식 3장 + 외관이면 약 180 credits, 한 편에 7~10분
+- 비용: Gemini 720p 전환 3초는 23크레딧, 4초는 30크레딧(첫·끝 사진 포함). 음식 3장과 외관을 3초·3초·4초로 이으면 총 76크레딧. 마지막 컷을 Gen-4로 만들면 별도 과금.
 | `menu_ref` | string \| null | 가격 자막 있을 때 | 메뉴 데이터 `menus[].name`과 정확히 일치. 장면 사진도 같은 메뉴여야 함 |
 | `narration` | string | ✅ | 한국어 TTS이자 그 장면 자막 (대사 한 조각). 모든 장면에 쓰고, 공백 포함 40자 이내 (화면에서는 18자 안팎 조각 최대 3개로 나뉘어 차례로 뜸 — `caption.text` 참고). 긴 문장은 쉼표·이어 주는 말에서 나눠 다음 장면으로. 공백·문장부호 제외 글자 수 ≤ `duration` × 7 (가격은 "만 이천 원"처럼 읽는 형태로 셈). 숫자는 `menu_ref` 메뉴 가격(`12,000원`)만, 이모지 금지. 장면끼리 마지막 세 글자가 같으면 안 됨 |
 | `caption.text` | string | ✅ | 그 장면 `narration`과 같은 글 (띄어쓰기·문장부호까지, 여러 칸 띄어쓰기만 허용). 마지막 장면만 가게 이름. 공백 포함 40자 이내. 렌더러(`CaptionSplitter`)가 띄어쓰기에서 18자 이내 조각 최대 3개로 나누고, 조각마다 읽는 글자 수 비율로 나레이션 구간을 나눠 말하는 속도에 맞춰 바꿔 띄움 (예: "딸기 복숭아 샤인머스켓 / 골라 먹는 재미예요."). 가격은 앞 단어와 같은 조각. 띄어쓰기 없이 18자가 넘으면 나눌 수 없어 오류. 가격 조각은 "메뉴 + 가격"으로 끝내면 가격이 따로 크게 나옴. 가격은 `12,000원` 형식. 이모지 금지 (폰트가 못 그림) |
@@ -178,7 +178,7 @@
 | 바뀐 필드 | B 파트 작업 | 비용 |
 | --- | --- | --- |
 | `ai` 장면의 `video_prompt` · `image_index` · `motion` | 해당 장면 Runway 재생성 + 재합성 | 크레딧 |
-| 원테이크 컷의 `video_prompt` · 컷 순서·사진 | 그 컷 클립(과 사진이 바뀌면 앞 컷 클립) Runway 재생성 + 재합성 | 크레딧 (컷당 60) |
+| 원테이크 컷의 `video_prompt` · 컷 순서·사진 | 그 컷 클립(과 사진이 바뀌면 앞 컷 클립) Runway 재생성 + 재합성 | 전환당 23~30크레딧 |
 | 그 외 장면의 `image_index` · `motion` | 해당 장면 FFmpeg 클립 재생성 + 재합성 | 무료 |
 | `narration` | 해당 장면 TTS 재합성 + 재합성 | 거의 무료 |
 | `caption` · `style` · `bgm` · `order` · `duration` · `title` | 재합성만 | 무료 |

@@ -40,4 +40,14 @@ class OneTakePlanTest {
         assertThat(StoryboardRenderer.planShots(scenes))
                 .containsExactly(new StoryboardRenderer.Shot(0, 0, 0, 5, "stew bubbling vigorously"));
     }
+
+    @Test
+    void 원테이크는_컷이_길어도_짧게_요청하고_마지막으로_이동할_때만_1초_더_쓴다() {
+        var longShot = new StoryboardRenderer.Shot(0, 0, 0, 8, "glide to the next picture");
+        var shortShot = new StoryboardRenderer.Shot(0, 0, 0, 2, "glide to the next picture");
+
+        assertThat(StoryboardRenderer.oneTakeTransitionSeconds(longShot, false)).isEqualTo(3);
+        assertThat(StoryboardRenderer.oneTakeTransitionSeconds(longShot, true)).isEqualTo(4);
+        assertThat(StoryboardRenderer.oneTakeTransitionSeconds(shortShot, true)).isEqualTo(3);
+    }
 }
