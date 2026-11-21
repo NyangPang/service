@@ -16,7 +16,7 @@ import { mockFor } from '@/mocks/db'
 import { useAuthStore, useMe } from '@/stores/authStore'
 import { toast } from '@/stores/toastStore'
 import { storeEditOf, updateMyStore } from '../api'
-import { useMyStore, useMyStoreId } from '../hooks'
+import { useMyStore, useMyStoreId, useMyStoreQuery } from '../hooks'
 import { StoreReviewSection } from '@/features/review/components/StoreReviews'
 
 /** 사장님 프로필 (Figma 11:1746·11:1889) — 가게 정보(사진·가게명·주소) 편집 + 내 영상 + 손님 리뷰 */
@@ -25,6 +25,7 @@ export function OwnerProfile() {
   const queryClient = useQueryClient()
   const storeId = useMyStoreId()
   const store = useMyStore()
+  const storeDetail = useMyStoreQuery().data
   const me = useMe()
   const setMember = useAuthStore((s) => s.setMember)
   const { data: videos } = useStoreShortforms(storeId)
@@ -92,6 +93,8 @@ export function OwnerProfile() {
         ) : (
           <Row label="주소" value={store.address} onEdit={() => setEditing('address')} />
         )}
+        <InfoRow label="전화" value={storeDetail?.phone} />
+        <InfoRow label="운영시간" value={storeDetail?.businessHours} />
         {error && <p role="alert" className="mt-2 text-13 text-fg-red">{error}</p>}
 
         <Link
@@ -151,6 +154,15 @@ export function OwnerProfile() {
           }}
         />
       )}
+    </div>
+  )
+}
+
+function InfoRow({ label, value }: { label: string; value: string | null | undefined }) {
+  return (
+    <div className="flex items-start gap-4 border-b-2 border-green-4 px-1 py-3.5">
+      <span className="w-14 shrink-0 pt-0.5 text-15 text-green-4">{label}</span>
+      <span className="min-w-0 flex-1 text-15 text-ink">{value || '정보 없음'}</span>
     </div>
   )
 }
