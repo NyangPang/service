@@ -7,6 +7,7 @@ import com.commicom.itda.domain.generation.dto.GenerationStatusResponse;
 import com.commicom.itda.domain.generation.entity.Generation;
 import com.commicom.itda.domain.generation.entity.GenerationStatus;
 import com.commicom.itda.domain.generation.repository.GenerationRepository;
+import com.commicom.itda.domain.generation.storyboard.VideoOptions;
 import com.commicom.itda.domain.member.entity.Member;
 import com.commicom.itda.domain.member.repository.MemberRepository;
 import com.commicom.itda.domain.pro.repository.ProSubscriptionRepository;
@@ -77,10 +78,11 @@ public class GenerationService {
         List<String> photoUrls = ownUploads(request.photoUrls(), store);
         // 메뉴판 사진: 영상 만들 때 메뉴 읽기에만 씀 (같은 폴더 검사)
         List<String> menuBoardUrls = ownUploads(request.menuBoardUrls(), store);
+        VideoOptions options = VideoOptions.of(request.videoStyle(), request.emphases());
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
-                pipelineService.execute(generationId, menuInfo, appeal, menus, photoUrls, menuBoardUrls);
+                pipelineService.execute(generationId, menuInfo, appeal, menus, photoUrls, menuBoardUrls, options);
             }
         });
 

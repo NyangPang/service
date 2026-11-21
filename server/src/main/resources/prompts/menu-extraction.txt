@@ -84,7 +84,7 @@
     - 사람과 신체 (person, chef, hand, hands, face 등)
     - 손이 있어야 하는 동작 (holding, lifting, stirring 등)
     - 가게 이름·브랜드 이름
-
+{styleImages}
 [출력 형식 예시] (형식만 참고하고, 내용은 첨부 이미지로 새로 쓰세요)
 {
   "menus": [
@@ -107,5 +107,5 @@ JSON 객체 하나만 출력하세요. 코드블록(```), 설명, 주석은 붙�
 - photos 개수가 index 있는 사진 개수와 같고(메뉴판 제외) index가 0부터 빠짐없이 이어지는가
 - 모든 price가 price_text를 원 단위로 바르게 바꾼 값인가
 - menu_ref가 모두 menus[].name과 똑같은가
-- image_requests 개수가 (3 − 쓸 수 있는 사진 수)이고 (0보다 작으면 0), 가게 외관을 그리지 않았는가
+- image_requests 개수가 (3 − 쓸 수 있는 사진 수)이고 (0보다 작으면 0, [영상 스타일 이미지]가 있으면 그 규칙만큼 더), 가게 외관을 그리지 않았는가
 - 모든 image_requests prompt가 40단어 이내이고, 움직일 거리와 "vertical composition"이 들어 있는가

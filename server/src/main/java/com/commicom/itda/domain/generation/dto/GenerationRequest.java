@@ -1,5 +1,7 @@
 package com.commicom.itda.domain.generation.dto;
 
+import com.commicom.itda.domain.generation.storyboard.Emphasis;
+import com.commicom.itda.domain.generation.storyboard.VideoStyle;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -25,5 +27,9 @@ public record GenerationRequest(
          */
         @Valid @Size(max = 30, message = "메뉴는 30개까지 넣을 수 있어요") List<MenuItemDto> menus,
         /** 고쳐 만들 게시물 ID (수정 요청일 때만). 무료는 게시물마다 3번까지, PRO는 무제한 */
-        Long revisionOf
+        Long revisionOf,
+        /** 생성 느낌: 영상 스타일 (MENU_FOCUS / PERSON_INTRO / NEWS_PROMO, 선택). 없으면 기본 프롬프트·기본 목소리 */
+        VideoStyle videoStyle,
+        /** 생성 느낌: 강조 포인트 (FAST_CUTS / MENU_CLOSEUP / BIG_CAPTION / FAST_TEMPO / SLOW_TEMPO 여러 개, 선택) */
+        @Size(max = 5, message = "강조 포인트는 5개까지 고를 수 있어요") List<Emphasis> emphases
 ) {}

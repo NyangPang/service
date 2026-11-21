@@ -18,7 +18,7 @@ import java.util.List;
 
 /**
  * 장면 내레이션 → 음성 파일(wav, 44.1kHz 스테레오).
- * - polly: AWS Polly 한국어 Seoyeon (실제 서비스용, AWS 키 필요)
+ * - polly: AWS Polly 한국어 Seoyeon(여, neural) / Hyunduk(남, generative) (실제 서비스용, AWS 키 필요)
  * - say:   macOS 내장 음성 Yuna (키 없이 로컬 테스트용)
  */
 interface Narrator {
@@ -32,19 +32,29 @@ interface Narrator {
     void synthesize(String text, Path outWav, Ffmpeg ff) throws Exception;
 
     static Narrator polly(String accessKey, String secretKey, String region, String voice) {
+        return polly(accessKey, secretKey, region, voice, "neural");
+    }
+
+    /** @param engine Polly 엔진 이름 (neural / generative). Hyunduk(남)는 generative 전용 */
+    static Narrator polly(String accessKey, String secretKey, String region, String voice, String engine) {
         PollyClient client = PollyClient.builder()
                 .region(Region.of(region))
                 .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey)))
                 .build();
+        Engine pollyEngine = Engine.fromValue(engine);
+        if (pollyEngine == Engine.UNKNOWN_TO_SDK_VERSION) {
+            throw new IllegalArgumentException("Polly 엔진은 neural | generative | standard | long-form 중 하나예요: " + engine);
+        }
         return new Narrator() {
             public String id() {
-                return "polly:" + voice + ":r" + SPEED;
+                // 기존 neural 목소리는 캐시 키가 그대로 (같은 문장 음성을 다시 만들지 않게)
+                return "polly:" + voice + (pollyEngine == Engine.NEURAL ? "" : ":" + engine) + ":r" + SPEED;
             }
 
             public void synthesize(String text, Path outWav, Ffmpeg ff) throws Exception {
                 SynthesizeSpeechRequest req = SynthesizeSpeechRequest.builder()
                         .text(ssml(text)).textType(TextType.SSML).voiceId(voice).languageCode("ko-KR")
-                        .engine(Engine.NEURAL).outputFormat(OutputFormat.MP3).build();
+                        .engine(pollyEngine).outputFormat(OutputFormat.MP3).build();
                 Path mp3 = outWav.resolveSibling(outWav.getFileName() + ".mp3");
                 try (ResponseInputStream<SynthesizeSpeechResponse> res = client.synthesizeSpeech(req)) {
                     Files.write(mp3, res.readAllBytes());
@@ -98,7 +108,34 @@ interface Narrator {
         };
     }
 
-    /** Polly SSML — 말 속도만 올린다 */
+    /**
+     * primary로 읽다가 실패하면(목소리·엔진이 그 리전에 없는 등) 그 영상의 나머지는 fallback으로 읽는다.
+     * 남자 목소리 하나 때문에 영상 전체가 실패하지 않게. 한 번 실패하면 장면마다 목소리가 섞이지 않도록 계속 fallback
+     */
+    static Narrator withFallback(Narrator primary, Narrator fallback, java.util.function.Consumer<String> warn) {
+        return new Narrator() {
+            private volatile boolean failed;
+
+            public String id() {
+                return failed ? fallback.id() : primary.id();
+            }
+
+            public void synthesize(String text, Path outWav, Ffmpeg ff) throws Exception {
+                if (!failed) {
+                    try {
+                        primary.synthesize(text, outWav, ff);
+                        return;
+                    } catch (Exception e) {
+                        failed = true;
+                        warn.accept("나레이션 " + primary.id() + " 실패 → " + fallback.id() + " 로 대신 읽음: " + e.getMessage());
+                    }
+                }
+                fallback.synthesize(text, outWav, ff);
+            }
+        };
+    }
+
+    /** Polly SSML — 말 속도만 올린다 (generative 엔진도 문장 전체를 감싼 prosody rate는 받는다) */
     private static String ssml(String text) {
         String escaped = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
                 .replace("\"", "&quot;").replace("'", "&apos;");

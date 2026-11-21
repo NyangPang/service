@@ -43,7 +43,7 @@ export interface PlaceInfo {
   address: string | null
 }
 
-/* ── 생성 느낌 (Figma 숏폼 생성 느낌) — AI 영상 프롬프트는 서버에서 만드는 중이라 값만 보냄 ── */
+/* ── 생성 느낌 (Figma 숏폼 생성 느낌) — 서버 VideoStyle·Emphasis 와 같은 값 ── */
 
 export const VIDEO_STYLES = [
   { id: 'MENU_FOCUS', label: '메뉴가 잘 보이는 영상', desc: '음식 클로즈업, 짧은 자막' },
