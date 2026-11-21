@@ -19,21 +19,35 @@ export function CoachMarks({ marks, onClose }: { marks: CoachMark[]; onClose: ()
   const [vp, setVp] = useState({ w: window.innerWidth, h: window.innerHeight })
   const closeRef = useRef<HTMLButtonElement>(null)
 
+  // 안내가 떠 있는 동안 계속 다시 잰다: 데이터가 늦게 와서 배너·사진이 뒤늦게 생기면
+  // 아래 버튼들이 밀리는데, 한 번만 재면 구멍과 설명이 원래 자리에 남아 어긋남 (배포 서버처럼 응답이 느릴 때)
   useLayoutEffect(() => {
+    let last = ''
     const measure = () => {
+      const next = marks
+        .map((mark) => ({ mark, el: mark.find() }))
+        .filter((p): p is { mark: CoachMark; el: Element } => !!p.el)
+        .map((p) => ({ ...p, r: p.el.getBoundingClientRect() }))
+        // 화면 밖(스크롤해야 보이는 곳)이면 설명하지 않음
+        .filter(({ r }) => r.width > 0 && r.bottom > 0 && r.top < window.innerHeight)
+      const key = `${window.innerWidth}x${window.innerHeight}|` + next.map(({ r }) => `${Math.round(r.left)},${Math.round(r.top)},${Math.round(r.width)},${Math.round(r.height)}`).join('|')
+      if (key === last) return
+      last = key
       setVp({ w: window.innerWidth, h: window.innerHeight })
-      setPlaced(
-        marks
-          .map((mark) => ({ mark, el: mark.find() }))
-          .filter((p): p is { mark: CoachMark; el: Element } => !!p.el)
-          .map((p) => ({ ...p, r: p.el.getBoundingClientRect() }))
-          // 화면 밖(스크롤해야 보이는 곳)이면 설명하지 않음
-          .filter(({ r }) => r.width > 0 && r.bottom > 0 && r.top < window.innerHeight),
-      )
+      setPlaced(next)
     }
     measure()
+    const timer = setInterval(measure, 250)
+    const observer = new ResizeObserver(measure)
+    observer.observe(document.body)
     window.addEventListener('resize', measure)
-    return () => window.removeEventListener('resize', measure)
+    window.addEventListener('scroll', measure, true)
+    return () => {
+      clearInterval(timer)
+      observer.disconnect()
+      window.removeEventListener('resize', measure)
+      window.removeEventListener('scroll', measure, true)
+    }
   }, [marks])
 
   useEffect(() => {
