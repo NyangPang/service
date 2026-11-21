@@ -20,7 +20,22 @@ import {
   postGeneration,
   publishShortform,
 } from '../api'
-import { EDIT_TARGETS, editPlaceholder, isMapUrl, type EditTarget, type GenerationRequest, type MenuItem, videoFileName, revisionsLeft, revisionNote, REVISION_LIMIT_DIALOG } from '../schema'
+import {
+  EDIT_TARGETS,
+  editPlaceholder,
+  EMPHASES,
+  isMapUrl,
+  REVISION_LIMIT_DIALOG,
+  revisionNote,
+  revisionsLeft,
+  VIDEO_STYLES,
+  videoFileName,
+  type EditTarget,
+  type Emphasis,
+  type GenerationRequest,
+  type MenuItem,
+  type VideoStyle,
+} from '../schema'
 import { Dialog } from './Dialog'
 import { ErrorText, Hero, Screen, StepWaiting } from './FlowUi'
 import { DraftPreview } from './DraftPreview'
@@ -50,6 +65,9 @@ export function CreateShortformFlow() {
   // 마지막으로 가게 정보를 읽은 지도 링크 (링크를 바꿔야 다시 읽음 — 고친 값을 덮어쓰지 않게)
   const placeFor = useRef<string | null>(null)
   const [appeal, setAppeal] = useState('')
+  // 생성 느낌: 영상 스타일 1개 (기본 = 메뉴가 잘 보이는 영상) + 강조 포인트 여러 개
+  const [videoStyle, setVideoStyle] = useState<VideoStyle>('MENU_FOCUS')
+  const [emphases, setEmphases] = useState<Emphasis[]>([])
   const [generationId, setGenerationId] = useState<number | null>(null)
   const [startedAt, setStartedAt] = useState(0)
   const [editTarget, setEditTarget] = useState<EditTarget>('VIDEO')
@@ -116,13 +134,16 @@ export function CreateShortformFlow() {
     const p = { name: name && name !== store?.name ? name : null, address: address && address !== store?.address ? address : null }
     return p.name || p.address ? p : undefined
   }
-  const startGenerate = () =>
+  /** @param skip "그냥 넘어가셔도 돼요": 스타일·강조·어필 없이 생성 */
+  const startGenerate = (skip = false) =>
     generate.mutate({
       storeId,
       mapUrl: mapUrl.trim() || undefined,
       place: placeChanged(),
       menus: menus.filter((m) => m.name.trim()),
-      appeal: appeal.trim() || undefined,
+      appeal: skip ? undefined : appeal.trim() || undefined,
+      videoStyle: skip ? undefined : videoStyle,
+      emphases: skip ? undefined : emphases,
       // 음식·가게 사진은 영상 장면에, 메뉴판은 메뉴 읽기에 (게시물 사진은 둘을 이어 4장까지)
       photos: photos.slice(0, MAX_POST_PHOTOS),
       menuBoards: files,
@@ -203,22 +224,19 @@ export function CreateShortformFlow() {
 
       {step === 'appeal' && (
         <Screen
-          hero={<Hero sub={'손님에게 자랑하고 싶은 점을 적어 주세요\nAI가 게시물 글로 다듬어 드려요'} />}
           prev={{ onClick: () => setStep('menus') }}
-          next={{ label: generate.isPending ? '요청 중...' : '생성', onClick: startGenerate, disabled: generate.isPending || !appeal.trim() }}
+          next={{ label: generate.isPending ? '요청 중...' : '생성', onClick: () => startGenerate(), disabled: generate.isPending }}
         >
-          <textarea
-            value={appeal}
-            onChange={(e) => setAppeal(e.target.value)}
-            maxLength={200}
-            rows={5}
-            placeholder="예) 가게가 넓고 고기가 맛있어요"
-            className="w-full resize-none border-b-2 border-green-4 py-2 text-15 leading-relaxed text-ink outline-none placeholder:text-gray-2"
+          <StepFeel
+            videoStyle={videoStyle}
+            setVideoStyle={setVideoStyle}
+            emphases={emphases}
+            setEmphases={setEmphases}
+            appeal={appeal}
+            setAppeal={setAppeal}
+            onSkip={() => startGenerate(true)}
+            disabled={generate.isPending}
           />
-          <p className="mt-1 text-right text-xs text-gray-2">{appeal.length} / 200</p>
-          <p className="mt-4 rounded-xl bg-q-panel px-4 py-3 text-xs leading-relaxed break-keep text-q-muted">
-            적어 주신 한마디와 가게 정보(소개·메뉴·주소)로 손님 피드에 보일 본문을 만들어요. 없는 내용은 지어내지 않아요.
-          </p>
           {generate.isError && <ErrorText>{errorMessage(generate.error)}</ErrorText>}
         </Screen>
       )}
@@ -455,6 +473,97 @@ function PhotoPicker({ label, files, setFiles, className = '' }: { label: string
         ))}
       </ul>
     </div>
+  )
+}
+
+/* ── 3단계: 생성 느낌 — 영상 스타일 1개 + 강조 포인트 여러 개 + 가게 어필 (모두 선택) ── */
+function StepFeel({
+  videoStyle,
+  setVideoStyle,
+  emphases,
+  setEmphases,
+  appeal,
+  setAppeal,
+  onSkip,
+  disabled,
+}: {
+  videoStyle: VideoStyle
+  setVideoStyle: (s: VideoStyle) => void
+  emphases: Emphasis[]
+  setEmphases: (e: Emphasis[]) => void
+  appeal: string
+  setAppeal: (v: string) => void
+  onSkip: () => void
+  disabled: boolean
+}) {
+  const toggle = (id: Emphasis) => setEmphases(emphases.includes(id) ? emphases.filter((e) => e !== id) : [...emphases, id])
+  return (
+    <>
+      <h1 className="text-22 font-bold tracking-tight text-ink">어떤 느낌으로 만들까요?</h1>
+      <p className="mt-1 text-15 text-q-sub">원하는 스타일이 있다면 골라주세요.</p>
+
+      <div role="radiogroup" aria-label="영상 스타일" className="mt-6 flex flex-col gap-3">
+        {VIDEO_STYLES.map((s) => {
+          const selected = s.id === videoStyle
+          return (
+            <button
+              key={s.id}
+              type="button"
+              role="radio"
+              aria-checked={selected}
+              onClick={() => setVideoStyle(s.id)}
+              className={`flex items-center gap-3 rounded-xl border px-4 py-4 text-left transition-colors ${
+                selected ? 'border-green-6 bg-green-1' : 'border-green-6/60 bg-surface'
+              }`}
+            >
+              <span className="min-w-0 flex-1">
+                <span className="block text-18 font-bold text-ink">{s.label}</span>
+                <span className="mt-0.5 block text-xs text-q-sub">{s.desc}</span>
+              </span>
+              <span aria-hidden className="flex size-5 shrink-0 items-center justify-center rounded-full border-2 border-green-6">
+                {selected && <span className="size-2.5 rounded-full bg-green-6" />}
+              </span>
+            </button>
+          )
+        })}
+      </div>
+
+      <p className="mt-6 text-13 text-q-sub">강조하고 싶은 포인트가 있다면 골라주세요(복수선택 가능)</p>
+      <ul className="mt-2 flex flex-wrap gap-2" aria-label="강조 포인트">
+        {EMPHASES.map((e) => {
+          const on = emphases.includes(e.id)
+          return (
+            <li key={e.id}>
+              <button
+                type="button"
+                aria-pressed={on}
+                onClick={() => toggle(e.id)}
+                className={`h-9 rounded-full border px-5 text-13 font-medium transition-colors ${
+                  on ? 'border-green-4 bg-green-4 text-white' : 'border-q-line bg-surface text-ink'
+                }`}
+              >
+                {e.label}
+              </button>
+            </li>
+          )
+        })}
+      </ul>
+
+      <textarea
+        value={appeal}
+        onChange={(e) => setAppeal(e.target.value)}
+        maxLength={200}
+        rows={3}
+        aria-label="내 가게 어필"
+        placeholder="내 가게 어필을 적어주세요 (선택)"
+        className="mt-8 w-full resize-none border-b-2 border-green-4 py-2 text-15 leading-relaxed text-ink outline-none placeholder:text-gray-2"
+      />
+      <p className="mt-1 text-right text-xs text-gray-2">{appeal.length} / 200</p>
+
+      <button type="button" onClick={onSkip} disabled={disabled} className="mx-auto mt-4 block text-xs text-q-sub underline disabled:opacity-40">
+        그냥 넘어가셔도 돼요
+      </button>
+    </>
   )
 }
 

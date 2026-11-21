@@ -31,6 +31,10 @@ export interface GenerationRequest {
   photoUrls?: string[]
   /** 재수정(PRO): 무엇을 어떻게 고칠지 */
   revision?: { shortformId: number; target: 'VIDEO' | 'SCRIPT'; request: string }
+  /** 생성 느낌: 영상 스타일 (3개 중 1개) */
+  videoStyle?: VideoStyle
+  /** 생성 느낌: 강조 포인트 (여러 개) */
+  emphases?: Emphasis[]
 }
 
 /** GET /api/generation/place — 지도 링크에서 읽은 가게명·주소 (못 읽으면 null) */
@@ -38,6 +42,24 @@ export interface PlaceInfo {
   name: string | null
   address: string | null
 }
+
+/* ── 생성 느낌 (Figma 숏폼 생성 느낌) — AI 영상 프롬프트는 서버에서 만드는 중이라 값만 보냄 ── */
+
+export const VIDEO_STYLES = [
+  { id: 'MENU_FOCUS', label: '메뉴가 잘 보이는 영상', desc: '음식 클로즈업, 짧은 자막' },
+  { id: 'PERSON_INTRO', label: '인물이 소개하는 영상', desc: '친근한 말투, 차분한 전환' },
+  { id: 'NEWS_PROMO', label: '신메뉴 및 할인 알림 영상', desc: '첫 장면에 핵심 소식, 빠른 전환' },
+] as const
+export type VideoStyle = (typeof VIDEO_STYLES)[number]['id']
+
+export const EMPHASES = [
+  { id: 'FAST_CUTS', label: '빠른 장면 전환' },
+  { id: 'MENU_CLOSEUP', label: '메뉴 클로즈업' },
+  { id: 'BIG_CAPTION', label: '큰 자막' },
+  { id: 'FAST_TEMPO', label: '빠른 템포' },
+  { id: 'SLOW_TEMPO', label: '느린 템포' },
+] as const
+export type Emphasis = (typeof EMPHASES)[number]['id']
 
 export interface GenerationCreated {
   generationId: number
