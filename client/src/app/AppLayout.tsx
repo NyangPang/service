@@ -1,8 +1,9 @@
+import { Link, useLocation } from 'react-router-dom'
 import pigeonCouponBox from '@/assets/user/pigeon-coupon-box.png'
 import itdulgiReview from '@/assets/user/itdulgi-review.svg'
 import pigeonQuest from '@/assets/user/pigeon-quest.png'
 import { OWNER_ILLUST } from '@/features/owner/illustrations'
-import { FlagNavIcon, MapNavIcon, PhotoNavIcon, SearchNavIcon } from '@/shared/ui/icons'
+import { ActivityIcon, FlagNavIcon, MapNavIcon, PhotoNavIcon, SearchNavIcon } from '@/shared/ui/icons'
 import { AppShell, type TabItem } from './AppShell'
 import type { MenuItem } from './SettingsDrawer'
 
@@ -26,5 +27,20 @@ const MENU: MenuItem[] = [
 
 /** 손님 모드: 숏폼 / 지도 / 퀘스트 */
 export function AppLayout() {
-  return <AppShell tabs={TABS} menuItems={MENU} />
+  const { pathname } = useLocation()
+  return (
+    <AppShell
+      tabs={TABS}
+      menuItems={MENU}
+      headerAction={
+        pathname === '/my-activity'
+          ? undefined
+          : (cls) => (
+              <Link to="/my-activity" aria-label="내 활동" className={cls}>
+                <ActivityIcon />
+              </Link>
+            )
+      }
+    />
+  )
 }

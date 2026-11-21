@@ -1,6 +1,7 @@
 import { Navigate, useLocation, useParams, useSearchParams } from 'react-router-dom'
 import { NotificationList } from '@/features/notification/components/NotificationList'
 import { useMyStoreId } from '@/features/owner/hooks'
+import { MyActivityTabs } from '@/features/review/components/MyActivityTabs'
 import { MyReviews } from '@/features/review/components/MyReviews'
 import { ReviewDraw } from '@/features/review/components/ReviewDraw'
 import { ReviewForm, ReviewNotAllowed } from '@/features/review/components/ReviewForm'
@@ -9,6 +10,9 @@ import { useMyReviews, useWritableVisits } from '@/features/review/hooks'
 import { useMe } from '@/stores/authStore'
 
 const Loading = () => <div className="mx-5 mt-6 h-40 animate-pulse rounded-2xl bg-q-panel" />
+
+/** 손님 내 활동 (내 방문 / 내 리뷰 탭) */
+export const MyActivityPage = () => <MyActivityTabs />
 
 /** 손님 마이페이지 > 내 리뷰 */
 export const MyReviewsPage = () => <MyReviews />

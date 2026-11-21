@@ -20,7 +20,7 @@ import {
   ProPage,
   QuestStorePage,
 } from '@/pages/OwnerPage'
-import { MyReviewsPage, OwnerNotificationsPage, OwnerReviewsPage, ReviewDrawPage, ReviewEditPage, ReviewWritePage } from '@/pages/ReviewPage'
+import { MyActivityPage, MyReviewsPage, OwnerNotificationsPage, OwnerReviewsPage, ReviewDrawPage, ReviewEditPage, ReviewWritePage } from '@/pages/ReviewPage'
 import { PigeonAlbumPage, PigeonHistoryPage, QuestPage, QuestQrPage, QuestScanPage, QuestVisitPage } from '@/pages/QuestPage'
 import { SearchPage } from '@/pages/SearchPage'
 
@@ -55,6 +55,7 @@ export const router = createBrowserRouter([
       { path: '/quest/scan', element: <QuestScanPage />, handle: { title: '방문 인증' } },
       { path: '/quest/qr', element: <QuestQrPage />, handle: { title: 'QR 인식하기' } },
       { path: '/quest/:questId/visit', element: <QuestVisitPage />, handle: { title: '방문 인증' } },
+      { path: '/my-activity', element: <MyActivityPage />, handle: { title: '내 활동', action: null } },
       { path: '/coupons', element: <CouponPage />, handle: { title: '내 쿠폰함' } },
       { path: '/scraps', element: <ScrapPage />, handle: { title: '스크랩' } },
       { path: '/profile', element: <MyProfilePage />, handle: { title: '프로필' } },
