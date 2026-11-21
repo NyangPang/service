@@ -71,8 +71,18 @@
 | `type` | enum | ✅ | `hook` / `menu` / `detail` / `review` / `cta`. 처음은 `hook`, 마지막은 `cta` |
 | `duration` | number | ✅ | 초, 0.5 단위, 1.5~5 (Runway 클립 5초). `hook`은 2 이하 |
 | `image_index` | int | ✅ | `photoUrls` 순번. `menu_board` 사진 사용 불가 |
-| `motion` | enum | ✅ | `ai` (Runway Gen-4 Turbo, 영상당 최대 3개, `ai` 장면끼리 같은 사진 금지) / `transition` (앞 장면 사진 → 이 장면 가게 외관 사진을 AI가 이어 줌. Runway Kling 2.5 Turbo Pro 첫·끝 화면, 5초 60 credits. 영상당 1개, 외관 사진으로 넘어가는 장면만, 첫 장면 불가. Runway가 꺼져 있거나 실패하면 `zoom_out`으로 대체) / `zoom_in` / `zoom_out` / `static` (FFmpeg, 무료) |
-| `video_prompt` | string \| null | `ai`·`transition`일 때 | 영어, 60단어 이내. `ai`: `[음식] + [음식을 다루는 동작 1개] + [음식 묘사] + [카메라] + [조명] + [분위기]` — 카메라 무빙만으로는 정적이라 집기·옮기기("a gloved hand uses tongs to pick up the bread and place it on a tray")·찢기·자르기·단면("a fork and knife tear the bread apart, revealing the cream inside")·붓기 중 하나를 넣음. `transition`: 앞 장면 음식에서 외관으로 이어지는 카메라 이동. 글자·간판·로고 요청 금지, 사람 전체·얼굴·손가락(`chef`, `fingers`, `face`…)과 입이 필요한 동작(`eating`, `biting`, `sipping`…) 금지. 손은 장갑 낀 손(`a gloved hand`)과 도구로만 |
+| `motion` | enum | ✅ | `ai` (컷마다 첫 장면, 영상당 최대 3개) / `zoom_in` (외관 컷) / `zoom_out` / `static` (컷의 나머지 장면). 아래 [원테이크](#원테이크-2026-11-21) 참고. `transition`은 예전 장면 JSON 호환용으로만 받음 |
+| `video_prompt` | string \| null | 컷 첫 장면 `ai`일 때 | 영어, 60단어 이내. `[이 사진 음식의 질감·특징이 살아나는 움직임] → [다음 컷 사진으로 넘어가는 카메라 이동]`. 예: "the soft mochi gently wobbles and settles, then the camera glides sideways past the counter to the next table, where a strawberry cake sits", 다음이 외관이면 "…then the camera pulls back through the window and out to the street, revealing the storefront". 마지막 컷이면 이동 없이 질감만. 글자·간판·로고 요청 금지, 사람·손·얼굴(`chef`, `hands`, `gloved`…), 도구(`fork`, `knife`, `tongs`…), 손·입이 필요한 동작(`lifting`, `tearing`, `eating`…) 금지 (손·포크로 찢는 장면이 먹는 장면처럼 보여 어색했음). 붓기·뿌리기는 됨 |
+
+### 원테이크 (2026-11-21)
+장면마다 따로 만든 클립을 잇지 않고, 카메라 한 대가 15초 동안 끊김 없이 움직인 것처럼 한 편의 배경 영상을 만든 뒤 장면 길이대로 잘라 쓴다 (`StoryboardRenderer.buildOneTake`).
+
+- **컷** = 같은 사진(`image_index`)을 쓰는 이어진 장면들. 같은 사진을 떨어진 장면에 다시 쓰면 검증 오류 (카메라는 다음 사진으로만 움직임)
+- 컷 *i*(마지막 제외): Runway Kling 2.5 Turbo Pro에 **첫 화면 = 이 컷 사진, 끝 화면 = 다음 컷 사진**을 주고 그 컷 `video_prompt`로 클립을 만든다. 앞 클립이 끝나는 화면이 다음 클립이 시작하는 화면이라 이어 붙이면 한 번에 찍은 영상이 됨
+- 마지막 컷: `video_prompt`가 있으면 그 사진에서 시작하는 Gen-4 Turbo 클립, 없으면(가게 외관) 그 사진에서 시작하는 줌
+- 클립은 컷 길이에 정확히 맞춰 빠르게·느리게 재생 (컷이 7.5초보다 길면 10초 클립 요청). 모든 클립을 동시에 요청하고, 실패하거나 Runway가 꺼져 있으면 그 컷만 줌
+- 장면 경계는 같은 화면끼리 겹치는 페이드라 보이지 않음. 사진 칸이 화면 일부인 템플릿(띠형·카드형)은 예전처럼 장면별 클립
+- 비용: Kling 5초 60 credits(10초 120) × 컷 전환 수 + 마지막 컷 Gen-4 25. 음식 3장 + 외관이면 약 180 credits, 한 편에 7~10분
 | `menu_ref` | string \| null | 가격 자막 있을 때 | 메뉴 데이터 `menus[].name`과 정확히 일치. 장면 사진도 같은 메뉴여야 함 |
 | `narration` | string | ✅ | 한국어 TTS이자 그 장면 자막 (대사 한 조각). 모든 장면에 쓰고, 공백 포함 40자 이내 (화면에서는 18자 안팎 조각 최대 3개로 나뉘어 차례로 뜸 — `caption.text` 참고). 긴 문장은 쉼표·이어 주는 말에서 나눠 다음 장면으로. 공백·문장부호 제외 글자 수 ≤ `duration` × 7 (가격은 "만 이천 원"처럼 읽는 형태로 셈). 숫자는 `menu_ref` 메뉴 가격(`12,000원`)만, 이모지 금지. 장면끼리 마지막 세 글자가 같으면 안 됨 |
 | `caption.text` | string | ✅ | 그 장면 `narration`과 같은 글 (띄어쓰기·문장부호까지, 여러 칸 띄어쓰기만 허용). 마지막 장면만 가게 이름. 공백 포함 40자 이내. 렌더러(`CaptionSplitter`)가 띄어쓰기에서 18자 이내 조각 최대 3개로 나누고, 조각마다 읽는 글자 수 비율로 나레이션 구간을 나눠 말하는 속도에 맞춰 바꿔 띄움 (예: "딸기 복숭아 샤인머스켓 / 골라 먹는 재미예요."). 가격은 앞 단어와 같은 조각. 띄어쓰기 없이 18자가 넘으면 나눌 수 없어 오류. 가격 조각은 "메뉴 + 가격"으로 끝내면 가격이 따로 크게 나옴. 가격은 `12,000원` 형식. 이모지 금지 (폰트가 못 그림) |
@@ -155,7 +165,7 @@
 | 4 | 자막 | 40자 이내이고 18자 조각 3개 안에 나뉨, 이모지·그림 기호 없음, 마지막 장면을 빼고 `narration`과 같은 글. 마지막 장면 나레이션에 가게 이름 |
 | 5 | 가격 | 자막 속 가격 = `menu_ref` 메뉴의 `price` |
 | 6 | 나레이션 | 모든 장면에 있음, 글자 수 ≤ `duration` × 7, 숫자는 `menu_ref` 메뉴 가격만, 이모지 없음 |
-| 7 | 영상 프롬프트 | `ai` 장면 3개 이하, `ai` 장면끼리 다른 사진, 쓰는 사진마다(외관 제외) `ai` 하나, 영어, 60단어 이내, 글자 관련 단어 없음, 사람 전체·얼굴·손가락 단어와 입이 필요한 동작 없음 (Runway가 얼굴·손가락을 뭉개 그림. 장갑 낀 손과 도구는 허용) |
+| 7 | 영상 프롬프트 | `ai` 장면 3개 이하, `ai` 장면끼리 다른 사진, 쓰는 사진마다(외관 제외) `ai` 하나, 영어, 60단어 이내, 글자 관련 단어 없음, 사람·손·얼굴 단어와 도구·손·입이 필요한 동작 없음 (Runway가 손·얼굴을 뭉개 그림), 같은 사진은 붙은 장면에만 (원테이크) |
 | 8 | 사진 | `menu_board` 사진 금지, `menu_ref`와 사진 메뉴 일치 |
 | 9 | 사진 종류 | [사진 종류별 사용 규칙](#사진-종류별-사용-규칙)의 장면 · `motion: ai` 제한 |
 
@@ -168,7 +178,7 @@
 | 바뀐 필드 | B 파트 작업 | 비용 |
 | --- | --- | --- |
 | `ai` 장면의 `video_prompt` · `image_index` · `motion` | 해당 장면 Runway 재생성 + 재합성 | 크레딧 |
-| `transition` 장면의 `video_prompt` · 앞 장면이나 이 장면의 `image_index` | 화면 전환 클립 Runway 재생성 + 재합성 | 크레딧 (60) |
+| 원테이크 컷의 `video_prompt` · 컷 순서·사진 | 그 컷 클립(과 사진이 바뀌면 앞 컷 클립) Runway 재생성 + 재합성 | 크레딧 (컷당 60) |
 | 그 외 장면의 `image_index` · `motion` | 해당 장면 FFmpeg 클립 재생성 + 재합성 | 무료 |
 | `narration` | 해당 장면 TTS 재합성 + 재합성 | 거의 무료 |
 | `caption` · `style` · `bgm` · `order` · `duration` · `title` | 재합성만 | 무료 |

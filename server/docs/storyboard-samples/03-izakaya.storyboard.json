@@ -40,7 +40,7 @@
     },
     {
       "id": 5, "order": 5, "type": "cta", "duration": 3.5,
-      "image_index": 0, "motion": "zoom_out",
+      "image_index": 1, "motion": "static",
       "video_prompt": null,
       "menu_ref": null,
       "narration": "골목이자카야, 오늘 한 잔 하고 가요!",

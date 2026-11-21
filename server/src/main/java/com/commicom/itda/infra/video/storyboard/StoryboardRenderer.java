@@ -30,7 +30,9 @@ import java.util.function.Consumer;
  * B 파트: 장면 JSON + 사진 → 세로 mp4 (1080x1920, 30fps).
  *
  * <pre>
- * 장면마다  ① 배경 클립  사진마다 ai 장면의 video_prompt로 Runway 5초 클립을 한 번 만들고 (사진들 것을 동시에 요청),
+ * 원테이크  (사진 칸이 화면 전체인 템플릿) 같은 사진이 이어지는 장면을 한 컷으로 묶고, 컷마다 그 사진 → 다음 컷 사진으로
+ *           카메라가 넘어가는 AI 클립을 만들어 이어 붙인 한 편의 배경 영상에서 장면 구간을 잘라 씀 ({@link #buildOneTake})
+ * 장면마다  ① 배경 클립  (원테이크가 아닐 때) 사진마다 ai 장면의 video_prompt로 Runway 5초 클립을 한 번 만들고 (사진들 것을 동시에 요청),
  *                        그 사진을 쓰는 장면은 모두 그 클립을 이어서 씀 (앞뒤로 왕복 재생해 길이를 늘림)
  *                        → 저해상도 사진을 그대로 키운 정지 화면이 영상에 섞이지 않음
  *                        Runway가 없거나 그 사진에 ai 장면이 없으면 FFmpeg 줌 (zoom_in·zoom_out·static)
@@ -75,6 +77,154 @@ public final class StoryboardRenderer {
     /** 화면 전환은 이 배속까지 빠르게 돌려 장면 안에서 외관 화면에 도착하게 한다 */
     private static final double TRANSITION_MAX_SPEED = 1.4;
 
+    /**
+     * 원테이크의 한 컷: 같은 사진을 쓰는 이어진 장면들.
+     * @param firstScene 이 컷의 첫 장면 순번 (orderedScenes 기준)
+     * @param start      영상에서 이 컷이 시작하는 초
+     * @param span       이 컷의 길이 (장면 duration 합)
+     * @param prompt     이 컷 장면들 중 처음 나오는 video_prompt (없으면 null)
+     */
+    record Shot(int imageIndex, int firstScene, double start, double span, String prompt) {}
+
+    /** 한 편으로 이어 붙인 배경 영상과, 장면 순번별 클립 상태·메모 */
+    private record OneTake(Path track, Map<Integer, State> states, Map<Integer, String> notes) {}
+
+    /** 컷이 이보다 길면 Runway에 10초 클립을 요청한다 (5초 클립을 너무 느리게 늘리지 않게) */
+    private static final double LONG_SHOT_SEC = 7.5;
+
+    /** 장면 순서대로 같은 사진이 이어지는 구간을 컷으로 묶는다 */
+    static List<Shot> planShots(List<Scene> ordered) {
+        List<Shot> shots = new ArrayList<>();
+        double t = 0;
+        for (int i = 0; i < ordered.size(); i++) {
+            Scene s = ordered.get(i);
+            String prompt = s.videoPrompt() == null || s.videoPrompt().isBlank() ? null : s.videoPrompt().strip();
+            if (shots.isEmpty() || shots.getLast().imageIndex() != s.imageIndex()) {
+                shots.add(new Shot(s.imageIndex(), i, t, s.duration(), prompt));
+            } else {
+                Shot cur = shots.getLast();
+                shots.set(shots.size() - 1, new Shot(cur.imageIndex(), cur.firstScene(), cur.start(), cur.span() + s.duration(),
+                        cur.prompt() != null ? cur.prompt() : prompt));
+            }
+            t += s.duration();
+        }
+        return shots;
+    }
+
+    /**
+     * 원테이크 배경 영상: 컷마다 그 사진을 첫 화면, 다음 컷 사진을 끝 화면으로 하는 AI 클립(Kling)을 만들어 이어 붙인다.
+     * 앞 클립이 끝나는 화면 = 다음 클립이 시작하는 화면(같은 사진)이라 한 번에 찍은 영상처럼 이어진다.
+     * 마지막 컷은 프롬프트가 있으면 그 사진에서 시작하는 클립(Gen-4 Turbo), 없으면(가게 외관 등) 그 사진에서 시작하는 줌.
+     * 클립은 모두 동시에 요청하고, 실패하거나 Runway가 꺼져 있으면 그 컷만 줌으로 대신한다.
+     */
+    private OneTake buildOneTake(List<Scene> ordered, List<Path> photos, boolean runwayOn) throws Exception {
+        List<Shot> shots = planShots(ordered);
+        for (Shot shot : shots) {
+            if (shot.imageIndex() < 0 || shot.imageIndex() >= photos.size()) {
+                throw new IllegalArgumentException("장면 " + ordered.get(shot.firstScene()).id() + ": image_index " + shot.imageIndex()
+                        + " 에 해당하는 사진이 없음 (사진 " + photos.size() + "장)");
+            }
+        }
+        Map<Integer, Path> raws = new HashMap<>();
+        Map<Integer, State> shotStates = new HashMap<>();
+        ExecutorService pool = Executors.newCachedThreadPool();
+        try {
+            Map<Integer, Future<State>> jobs = new LinkedHashMap<>();
+            int transitionsRequested = 0;
+            for (int i = 0; i < shots.size() && runwayOn; i++) {
+                Shot shot = shots.get(i);
+                if (shot.prompt() == null) continue;
+                int seconds = shot.span() > LONG_SHOT_SEC ? RunwayClipClient.LONG_CLIP_SECONDS : RunwayClipClient.CLIP_SECONDS;
+                Path photo = photos.get(shot.imageIndex());
+                Path raw;
+                if (i < shots.size() - 1) {
+                    Path next = photos.get(shots.get(i + 1).imageIndex());
+                    raw = cacheDir.resolve("onetake-" + hash("kling", fileHash(photo), fileHash(next), shot.prompt(), String.valueOf(seconds)) + ".mp4");
+                    Path rawF = raw;
+                    jobs.put(i, pool.submit(() -> cached(rawF, tmp -> runway.generateTransition(photo, next, shot.prompt(), seconds, tmp, ff))));
+                    transitionsRequested++;
+                } else {
+                    raw = cacheDir.resolve("onetake-" + hash("gen4", fileHash(photo), shot.prompt(), String.valueOf(seconds)) + ".mp4");
+                    Path rawF = raw;
+                    jobs.put(i, pool.submit(() -> cached(rawF, tmp -> runway.generate(photo, shot.prompt(), seconds, tmp, ff))));
+                }
+                raws.put(i, raw);
+            }
+            log.accept(String.format("  원테이크: 컷 %d개 → AI 이어 찍기 %d개 (다음 사진으로 넘어가기 %d개, %s)%s",
+                    shots.size(), jobs.size(), transitionsRequested, RunwayClipClient.TRANSITION_MODEL,
+                    runwayOn ? "" : " · Runway 꺼짐 → 컷마다 줌"));
+            for (Map.Entry<Integer, Future<State>> e : jobs.entrySet()) {
+                try {
+                    shotStates.put(e.getKey(), e.getValue().get());
+                } catch (ExecutionException ex) {
+                    log.accept("  ⚠ 컷 " + (e.getKey() + 1) + " AI 클립 실패 → 줌으로 대체: " + ex.getCause().getMessage());
+                    shotStates.put(e.getKey(), State.FALLBACK);
+                }
+            }
+        } finally {
+            pool.shutdownNow();   // 생성 취소(인터럽트)면 기다리던 요청도 멈춤
+        }
+
+        List<Path> parts = new ArrayList<>();
+        Map<Integer, State> states = new HashMap<>();
+        Map<Integer, String> notes = new HashMap<>();
+        for (int i = 0; i < shots.size(); i++) {
+            Shot shot = shots.get(i);
+            Path photo = photos.get(shot.imageIndex());
+            Path raw = raws.get(i);
+            Path part;
+            State state;
+            String note;
+            if (raw != null && Files.exists(raw)) {
+                part = cacheDir.resolve("shot-" + hash(VERSION, raw.getFileName().toString(), fmt(shot.span())) + ".mp4");
+                cached(part, tmp -> fitShot(raw, shot.span(), tmp));
+                state = shotStates.getOrDefault(i, State.CACHED);
+                note = i < shots.size() - 1
+                        ? String.format(Locale.ROOT, "%d번 사진 → %d번 사진 AI로 이어 찍음", shot.imageIndex(), shots.get(i + 1).imageIndex())
+                        : String.format(Locale.ROOT, "%d번 사진 AI 클립", shot.imageIndex());
+            } else {
+                part = cacheDir.resolve("shot-" + hash(VERSION, "zoom", fileHash(photo), fmt(shot.span())) + ".mp4");
+                cached(part, tmp -> zoomClip(photo, "zoom_in", shot.span(), 1080, 1920, tmp));
+                boolean wanted = runwayOn && shot.prompt() != null;
+                state = wanted ? State.FALLBACK : State.CACHED;
+                note = wanted ? "AI 클립 실패 → 줌으로 대체" : shot.prompt() == null ? "줌" : "Runway 꺼짐 → 줌";
+            }
+            parts.add(part);
+            states.put(shot.firstScene(), state);
+            notes.put(shot.firstScene(), "원테이크 " + note);
+        }
+        for (int s = 0; s < ordered.size(); s++) notes.putIfAbsent(s, "원테이크 이어짐");
+        Path track = cacheDir.resolve("onetake-track-" + hash(parts.stream().map(p -> p.getFileName().toString()).toArray(String[]::new)) + ".mp4");
+        cached(track, tmp -> concatClips(parts, tmp));
+        return new OneTake(track, states, notes);
+    }
+
+    /** AI 클립 하나를 컷 길이에 정확히 맞춘다 (빠르게·느리게 재생, 모자라면 마지막 화면 유지), 1080x1920 30fps로 */
+    private void fitShot(Path raw, double span, Path out) throws Exception {
+        double rawSec = ff.duration(raw);
+        double factor = span / rawSec;
+        ff.run(List.of("-i", raw.toString(),
+                "-vf", "scale=1080:1920:force_original_aspect_ratio=increase:flags=lanczos,crop=1080:1920,setsar=1,"
+                        + "setpts=" + fmt(factor) + "*PTS,fps=" + FPS + ",tpad=stop_mode=clone:stop_duration=1,format=yuv420p",
+                "-t", fmt(span),
+                "-an", "-c:v", "libx264", "-preset", "veryfast", "-crf", "18", out.toString()));
+    }
+
+    /** 컷 영상들을 그대로 이어 붙인다 (모두 1080x1920 30fps) */
+    private void concatClips(List<Path> parts, Path out) throws Exception {
+        List<String> args = new ArrayList<>();
+        StringBuilder f = new StringBuilder();
+        for (int i = 0; i < parts.size(); i++) {
+            args.addAll(List.of("-i", parts.get(i).toString()));
+            f.append("[").append(i).append(":v]fps=").append(FPS).append(",format=yuv420p,setsar=1[v").append(i).append("];");
+        }
+        for (int i = 0; i < parts.size(); i++) f.append("[v").append(i).append("]");
+        f.append("concat=n=").append(parts.size()).append(":v=1:a=0[v]");
+        args.addAll(List.of("-filter_complex", f.toString(), "-map", "[v]",
+                "-an", "-c:v", "libx264", "-preset", "veryfast", "-crf", "18", "-pix_fmt", "yuv420p", out.toString()));
+        ff.run(args);
+    }
+
     private final Ffmpeg ff;
     private final Path cacheDir;
     private final Narrator narrator;          // null이면 무음
@@ -117,10 +267,13 @@ public final class StoryboardRenderer {
         int clipW = template.photoBox == null ? 1080 : template.photoBox.w();
         int clipH = template.photoBox == null ? 1920 : template.photoBox.h();
 
-        // 사진 번호 → 그 사진의 Runway 프롬프트 (그 사진을 쓰는 첫 ai 장면 것). 이 사진을 쓰는 장면은 모두 같은 클립을 이어 씀
         boolean runwayOn = runway != null && runway.enabled();
+        // 원테이크: 사진 칸이 화면 전체인 템플릿이면, 장면마다 따로 만든 클립을 잇지 않고
+        // 사진이 바뀌는 곳마다 AI가 카메라를 다음 사진으로 옮기는 한 편의 영상을 만든 뒤 장면 길이대로 잘라 쓴다
+        OneTake oneTake = template.photoBox == null ? buildOneTake(ordered, photos, runwayOn) : null;
+        // 사진 번호 → 그 사진의 Runway 프롬프트 (그 사진을 쓰는 첫 ai 장면 것). 이 사진을 쓰는 장면은 모두 같은 클립을 이어 씀
         Map<Integer, String> clipPrompts = new HashMap<>();
-        if (runwayOn) {
+        if (runwayOn && oneTake == null) {
             for (Scene s : ordered) {
                 if ("ai".equals(s.motion()) && s.videoPrompt() != null && !s.videoPrompt().isBlank()) {
                     clipPrompts.putIfAbsent(s.imageIndex(), s.videoPrompt());
@@ -129,7 +282,7 @@ public final class StoryboardRenderer {
         }
         // 화면 전환(transition) 장면: 앞 장면 사진 → 이 장면 사진(가게 외관)을 잇는 클립. 사진 클립과 동시에 요청한다
         Map<Integer, TransitionJob> transitions = new HashMap<>();
-        if (runwayOn) {
+        if (runwayOn && oneTake == null) {
             for (int idx = 1; idx < ordered.size(); idx++) {
                 Scene s = ordered.get(idx);
                 Scene prev = ordered.get(idx - 1);
@@ -198,7 +351,17 @@ public final class StoryboardRenderer {
             State clipState;
             String clipPrompt = clipPrompts.get(scene.imageIndex());
             TransitionJob transition = transitions.get(idx);
-            if ("transition".equals(motion) && transition != null && Files.exists(transition.raw())) {
+            if (oneTake != null) {
+                // 한 편의 영상에서 이 장면 구간을 잘라 씀. 장면 경계는 같은 화면끼리 겹치는 페이드라 끊김 없이 이어진다
+                double at = sceneStart;
+                Path track = oneTake.track();
+                clipKey = hash("onetake-part", track.getFileName().toString(), fmt(at), fmt(length));
+                clip = cacheDir.resolve("clip-" + clipKey + ".mp4");
+                cached(clip, tmp -> subClip(track, at, length, tmp));
+                clipState = oneTake.states().getOrDefault(idx, State.CACHED);
+                note = oneTake.notes().getOrDefault(idx, "");
+                if (idx > 0) dissolveInto.add(idx);
+            } else if ("transition".equals(motion) && transition != null && Files.exists(transition.raw())) {
                 // 전환 클립을 장면 안에 담는다: 조금 빠르게(최대 1.4배) 재생하고 남는 시간은 외관 화면에서 멈춰 보여 줌
                 Path raw = transition.raw();
                 clipKey = hash("transition-fit", VERSION, raw.getFileName().toString(), fmt(length));

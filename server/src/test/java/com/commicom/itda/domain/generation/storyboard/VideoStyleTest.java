@@ -39,7 +39,7 @@ class VideoStyleTest {
         assertThat(text).isEqualTo(prompt.build(menu, "한마디", "서울 성동구", VideoOptions.NONE))
                 .doesNotContain("{style", "[영상 스타일", "[강조 포인트]")
                 .contains("써 주세요.\n\n[가게 정보]")
-                .contains("다른 사진으로.\n\n[출력 형식 예시]");
+                .contains("detail 장면에 쓰지 않습니다.\n\n[출력 형식 예시]");
     }
 
     @Test

@@ -34,10 +34,15 @@ final class RunwayClipClient {
     private static final String MODEL = "gen4_turbo";
     /** 처음·끝 화면(promptImage position first/last)을 둘 다 받는 모델. ratio는 받지 않고 입력 사진 비율을 따른다 */
     static final String TRANSITION_MODEL = "kling2.5_turbo_pro";
-    private static final int CLIP_SECONDS = 5;
+    /** 두 모델 모두 5초 또는 10초만 받는다 */
+    static final int CLIP_SECONDS = 5;
+    static final int LONG_CLIP_SECONDS = 10;
     private static final Duration POLL = Duration.ofSeconds(5);
-    /** 여러 클립을 동시에 보내면 Runway가 동시 실행 한도만큼만 돌리고 나머지는 대기(THROTTLED)시키므로 넉넉히 */
-    private static final Duration MAX_WAIT = Duration.ofMinutes(10);
+    /**
+     * 여러 클립을 동시에 보내면 Runway가 동시 실행 한도만큼만 돌리고 나머지는 대기(THROTTLED)시키므로 넉넉히.
+     * Kling 클립은 하나에 4~5분 걸려, 원테이크 영상(전환 3개)은 한도 대기까지 10분을 넘길 수 있다
+     */
+    private static final Duration MAX_WAIT = Duration.ofMinutes(20);
 
     private final String apiKey;
     private final Consumer<String> log;
@@ -54,26 +59,43 @@ final class RunwayClipClient {
     }
 
     void generate(Path photo, String prompt, Path outMp4, Ffmpeg ff) throws Exception {
+        generate(photo, prompt, CLIP_SECONDS, outMp4, ff);
+    }
+
+    /** @param seconds {@link #CLIP_SECONDS} 또는 {@link #LONG_CLIP_SECONDS} */
+    void generate(Path photo, String prompt, int seconds, Path outMp4, Ffmpeg ff) throws Exception {
         ObjectNode body = json.createObjectNode()
                 .put("model", MODEL)
                 .put("promptImage", dataUri(photo, outMp4, ff))
                 .put("promptText", prompt == null ? "" : prompt)
                 .put("ratio", "720:1280")
-                .put("duration", CLIP_SECONDS);
+                .put("duration", seconds);
         run(body, "Runway 클립", photo.getFileName().toString(), outMp4);
     }
 
     /** first 사진에서 시작해 last 사진으로 끝나는 5초 클립 (예: 빵 → 가게 외관) */
     void generateTransition(Path first, Path last, String prompt, Path outMp4, Ffmpeg ff) throws Exception {
-        ObjectNode body = transitionBody(json, dataUri(first, outMp4, ff), dataUri(last, outMp4, ff), prompt);
+        generateTransition(first, last, prompt, CLIP_SECONDS, outMp4, ff);
+    }
+
+    /** @param seconds {@link #CLIP_SECONDS} 또는 {@link #LONG_CLIP_SECONDS} */
+    void generateTransition(Path first, Path last, String prompt, int seconds, Path outMp4, Ffmpeg ff) throws Exception {
+        ObjectNode body = transitionBody(json, dataUri(first, outMp4, ff), dataUri(last, outMp4, ff), prompt, seconds);
         run(body, "Runway 화면 전환", first.getFileName() + " → " + last.getFileName(), outMp4);
     }
 
     static ObjectNode transitionBody(ObjectMapper json, String firstUri, String lastUri, String prompt) {
+        return transitionBody(json, firstUri, lastUri, prompt, CLIP_SECONDS);
+    }
+
+    static ObjectNode transitionBody(ObjectMapper json, String firstUri, String lastUri, String prompt, int seconds) {
+        if (seconds != CLIP_SECONDS && seconds != LONG_CLIP_SECONDS) {
+            throw new IllegalArgumentException("Runway 클립은 5초 또는 10초만 됩니다: " + seconds);
+        }
         ObjectNode body = json.createObjectNode()
                 .put("model", TRANSITION_MODEL)
                 .put("promptText", prompt == null || prompt.isBlank() ? "smooth continuous camera move" : prompt)
-                .put("duration", CLIP_SECONDS);
+                .put("duration", seconds);
         var images = body.putArray("promptImage");
         images.addObject().put("uri", firstUri).put("position", "first");
         images.addObject().put("uri", lastUri).put("position", "last");
