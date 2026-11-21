@@ -2,7 +2,7 @@
 
 > [2026 서울AI디지털배움터 청년 AI 해커톤] **14팀 냥팡맨**
 
-![잇츠 서비스 소개](main.png)
+![잇츠 서비스 소개](docs/service-intro.jpg)
 
 ## 프로젝트 소개
 
@@ -73,12 +73,26 @@
 ## 기술 스택
 
 | 구분 | 기술 |
-|---|---|
-| Frontend | React |
-| Backend | Spring Boot, Swagger |
-| Infra | AWS (EC2, S3) |
-| AI 영상 생성 | Claude, Runway API |
+|------|------|
+| Frontend | React 19, TypeScript, Vite, Tailwind CSS |
+| 상태관리 | Zustand, TanStack Query |
+| Backend | Spring Boot 4, Java 21, Spring Security, JPA |
+| Database | MySQL, H2 (로컬) |
+| Infra | AWS EC2, S3, CloudFront |
+| CI/CD | GitHub Actions, Docker, GHCR |
+| 인증 | JWT, 이메일 인증 (SMTP) |
+| 메뉴판 인식 (OCR) | Claude (AWS Bedrock) |
+| AI 영상 프롬프트·나레이션 대본 작성 | Claude (AWS Bedrock) |
+| 게시물 소개 글 작성 | Claude (AWS Bedrock) |
+| AI 영상 클립 생성 | Runway API (Gen-4 Turbo) |
+| AI 메뉴 이미지 생성 | Runway API (Gen-4 Image) |
+| 나레이션 음성 (TTS) | AWS Polly |
 | 영상 편집·자막·타이틀 합성 | FFmpeg |
+| 지도 | Kakao Maps |
+| QR 생성·인증 | qrcode.react, HMAC |
+| 가게 정보 불러오기 | Jsoup (네이버·카카오 지도 링크) |
+| 웹 스크래핑 | Jsoup, Playwright |
+| API 문서 | Swagger (SpringDoc OpenAPI) |
 
 ## 기대 효과
 
@@ -93,10 +107,14 @@
 서버·화면을 내 컴퓨터에서 띄우는 방법은 [SETUP.md](SETUP.md)를, 신규 기능을 어디에 만들지는 [docs/new-features.md](docs/new-features.md)를, 외부 API·키·오픈소스는 [docs/public-apis.md](docs/public-apis.md)를 참고하세요.
 
 ## 팀원 소개
+## 팀원 소개
+
 > **14팀 냥팡맨**
->- 한양대학교 컴퓨터소프트웨어학부 [성현주](https://github.com/LEELMIO), [이채원](https://github.com/CW-YI), [임지오](https://github.com/imzioim)
->- 광운대학교 컴퓨터정보공학부 [장서현](https://github.com/jangsh7)
->- 광운대학교 미디어커뮤니케이션학부 임아연
+
+| <img src="https://github.com/LEELMIO.png" width="120"> | <img src="https://github.com/CW-YI.png" width="120"> | <img src="https://github.com/imzioim.png" width="120"> | <img src="https://github.com/jangsh7.png" width="120"> | <img src="./docs/ayeon.png" width="120"> |
+|:------------------------------------------------------:|:---:|:---:|:---:|:----------------------------------------:|
+|           [성현주](https://github.com/LEELMIO)            | [이채원](https://github.com/CW-YI) | [임지오](https://github.com/imzioim) | [장서현](https://github.com/jangsh7) |                   임아연                    |
+|                리뷰, QR 인증·보상,<br>알림, 서버                 | AI 영상<br>프롬프팅·제작 | AI 영상 제작,<br>성과 조회 리포트 | 지도, 사용자 편의<br> 모드,CI/CD 배포 |             기획,<br>UI/UX 디자인             |
 
 ## 참고 자료
 
