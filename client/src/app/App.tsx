@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { RouterProvider } from 'react-router-dom'
 import { useSessionCheck } from '@/features/auth/hooks'
+import { CoachMarkHost } from '@/features/tutorial/components/CoachMarkHost'
 import { Toaster } from '@/shared/ui/Toaster'
 import { router } from './router'
 import { Splash } from './Splash'
@@ -14,6 +15,8 @@ export function App() {
     <QueryClientProvider client={queryClient}>
       <SessionCheck />
       <RouterProvider router={router} />
+      {/* 사장님 홈·영상 만들기 첫 화면: 처음 한 번 버튼별 사용법 */}
+      <CoachMarkHost />
       {/* 앱 위에 덮어 두고 그 사이 첫 화면이 뒤에서 미리 불러와짐 */}
       <Toaster />
       <Splash />
