@@ -58,18 +58,18 @@ export function WelcomePage() {
               role="radio"
               aria-checked={active}
               onClick={() => setPicked(o.mode)}
-              className={`relative flex items-center gap-4 overflow-hidden rounded-3xl border-2 px-5 py-5 text-left transition-colors ${
+              className={`relative flex items-center gap-3 overflow-hidden rounded-3xl border-2 px-5 py-4 text-left transition-colors ${
                 active ? 'border-fg-green-6 bg-q-mint' : 'border-q-line bg-surface'
               }`}
             >
               <span className="min-w-0 flex-1">
                 <span className="block text-19 font-bold text-ink">{o.title}</span>
                 <span className="mt-0.5 block text-13 text-q-muted">{o.desc}</span>
-                <span className="mt-3 flex flex-wrap gap-1.5">
+                <span className="mt-2.5 flex flex-wrap gap-1.5">
                   {o.points.map((p) => (
                     <span
                       key={p}
-                      className={`rounded-full px-2.5 py-1 text-11 font-bold ${
+                      className={`rounded-full px-2.5 py-0.5 text-11 font-bold ${
                         active ? 'bg-surface text-fg-green-6' : 'bg-q-panel text-q-sub'
                       }`}
                     >
@@ -78,7 +78,7 @@ export function WelcomePage() {
                   ))}
                 </span>
               </span>
-              <img src={o.image} alt="" className="size-[84px] shrink-0 object-contain" />
+              <img src={o.image} alt="" className="size-[72px] shrink-0 object-contain" />
               <span
                 aria-hidden
                 className={`absolute top-4 right-4 flex size-6 items-center justify-center rounded-full border-2 text-xs font-bold ${
@@ -92,20 +92,23 @@ export function WelcomePage() {
         })}
       </div>
 
-      <button
-        type="button"
-        disabled={!picked}
-        onClick={start}
-        className="mt-auto h-[54px] w-full rounded-full bg-green-6 text-base font-bold text-white transition-opacity disabled:opacity-30"
-      >
-        {picked === 'OWNER' ? '사장님으로 시작하기' : picked === 'USER' ? '손님으로 시작하기' : '하나를 골라 주세요'}
-      </button>
-      <p className="mt-4 text-center text-13 text-q-muted">
-        이미 계정이 있나요?{' '}
-        <Link to="/login" className="font-bold text-fg-green-6 underline">
-          로그인
-        </Link>
-      </p>
+      {/* 카드와 버튼 사이는 화면이 짧아도 최소 24px 띄움 */}
+      <div className="mt-auto pt-6">
+        <button
+          type="button"
+          disabled={!picked}
+          onClick={start}
+          className="h-[54px] w-full rounded-full bg-green-6 text-base font-bold text-white transition-opacity disabled:opacity-30"
+        >
+          {picked === 'OWNER' ? '사장님으로 시작하기' : picked === 'USER' ? '손님으로 시작하기' : '하나를 골라 주세요'}
+        </button>
+        <p className="mt-4 text-center text-13 text-q-muted">
+          이미 계정이 있나요?{' '}
+          <Link to="/login" className="font-bold text-fg-green-6 underline">
+            로그인
+          </Link>
+        </p>
+      </div>
     </div>
   )
 }
