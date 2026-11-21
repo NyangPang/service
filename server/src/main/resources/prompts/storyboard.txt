@@ -62,7 +62,8 @@ title은 영상 내내 화면 위쪽에 떠 있는 고정 제목이자, 쇼츠 �
 
 15초 나레이션 전체는 끊기지 않고 이어지는 한 문장입니다.
 장면마다 "~예요." "~이에요." "~있어요."로 끝나는 짧은 문장을 늘어놓지 않습니다. 말이 뚝뚝 끊겨 광고 문구처럼 들립니다.
-장면 조각들이 "~는데", "~하고", "~고", "~을", "~까지"처럼 이어 주는 말로 꼬리를 물다가, 마지막 장면에서만 "~예요", "~입니다"로 문장을 끝냅니다.
+장면 조각들이 "~고", "~해서", "~나오고", "~좋고", "~한데", "~되는데", "~까지"처럼 이어 주는 말로 꼬리를 물다가, 마지막 장면에서만 "~예요", "~입니다"로 문장을 끝냅니다.
+가운데 장면을 "다른", "튀긴", "곁들인", "찾는", "하이볼은", "12,000원"처럼 ㄴ 받침으로 끝내지 않습니다. 말이 다음 장면 단어에 걸린 채 멈춰 어색하게 들립니다.
 
 대사는 아래 다섯 단계 순서로 만듭니다. 1~3단계는 속으로만 하고, 결과(4~5단계)만 JSON에 씁니다.
 메뉴판 분석 → 가장 강한 매력 선정 → 후킹 유형 결정 → 유형에 맞는 이야기 작성 → 15초 분량 조정
@@ -111,8 +112,8 @@ title은 영상 내내 화면 위쪽에 떠 있는 고정 제목이자, 쇼츠 �
    | 전개 | 3~11초  | 가운데 장면들                          | 사장님 말·손님 말·메뉴 구성으로 매력을 뒷받침. 새 정보가 나올수록 매력이 커지게 배치 |
    | 결말 | 11~15초 | 마지막 장면(cta)                       | 앞의 매력에 대한 자연스러운 감상. 상황에 맞는 방문 이유나 추천 대상을 드러내도 좋음 |
    - 도입: 가장 강한 매력을 담은 말로 바로 시작합니다. 한 문장의 앞머리라 끝맺지 않고 다음 장면으로 넘깁니다.
-     예: "딸기 복숭아 망고 샤인머스켓까지", "매일 아침 직접 두드린 등심을", "아니 여기 하이볼은"
-   - 전개: 가격 반전, 예상 밖의 구성, 독특한 조합을 활용합니다. 조각마다 "~는데", "~하고", "~고", "~을", "~에" 같은 이어 주는 말로 끝나 다음 장면으로 넘어갑니다.
+     예: "딸기 복숭아 망고 샤인머스켓까지", "매일 아침 등심을 직접 두드려서", "아니 여기 하이볼이 진한데"
+   - 전개: 가격 반전, 예상 밖의 구성, 독특한 조합을 활용합니다. 조각마다 "~고", "~해서", "~나오고", "~좋고", "~한데", "~되는데", "~까지" 같은 이어 주는 말로 끝나 다음 장면으로 넘어갑니다.
      "다양한", "무려", "그 안에", "게다가", "거기에", "심지어", "~마다", "~까지"처럼 이야기를 키우는 표현을 골고루 섞어 리듬을 살립니다. 같은 표현을 두 번 쓰지 않고, 입력에 없는 사실을 만들어 내는 데 쓰지 않습니다.
      각 조각이 따로 놀지 않고 하나의 이야기로 이어져야 합니다.
    - 결말: 15초 문장이 여기서 처음이자 마지막으로 끝납니다. 마지막 장면 나레이션에 가게 이름 "{storeName}"을 자연스럽게 넣고, 가게 이름으로 끝내지 말고 "~예요", "~입니다"로 끝맺습니다.
@@ -128,9 +129,11 @@ title은 영상 내내 화면 위쪽에 떠 있는 고정 제목이자, 쇼츠 �
    - "햇살 드는 창가", "감성 가득", "분위기 좋은"처럼 막연한 분위기 말 대신, 무엇이 나오고 무엇을 할 수 있는지 구체적으로 씁니다.
    - 쉼표는 되도록 쓰지 않습니다. 쉼표 자리는 띄어쓰기나 이어 주는 말로 바꿉니다. 가격 "12,000원"의 쉼표는 예외입니다.
    - 조각마다 끝맺음을 바꿉니다. 마지막 세 글자가 같은 조각이 둘이면 안 됩니다.
-   - 마지막 장면만 문장을 끝맺습니다. 가운데 장면은 이어 주는 말("~인데", "~하고", "~이랑", "~을", "~까지")로 끝내고 마침표·물음표·느낌표를 찍지 않으며, "~요", "~니다"로 끝내지 않습니다.
+   - 마지막 장면만 문장을 끝맺습니다. 가운데 장면은 이어 주는 말("~고", "~해서", "~나오고", "~좋고", "~한데", "~되는데", "~까지")로 끝내고 마침표·물음표·느낌표를 찍지 않으며, "~요", "~니다"로 끝내지 않습니다.
+     - 가운데 장면을 ㄴ 받침으로 끝내지 않습니다. "다른", "튀긴", "곁들인", "찾는"처럼 뒤 단어를 꾸미는 말, "하이볼은", "치즈카츠는" 같은 은·는, "12,000원"처럼 ㄴ 받침 글자로 끝나면 영상이 만들어지지 않습니다.
+     - 바꾸는 법: "맛이 다른" → "맛이 다르고", "바삭하게 튀긴" → "바삭하게 튀겨서", "샐러드까지 곁들인" → "샐러드까지 나오고", "다시 찾는" → "다시 찾아오는데", "하이볼은" → "하이볼이 진한데", "12,000원" → "12,000원이라"
      - 나쁜 예 (장면마다 끝남): "이 두께 좀 보세요." → "등심을 매일 두드려요." → "손님들도 다시 와요."
-     - 좋은 예 (한 문장): "매일 아침 직접 두드린 등심을" → "무려 이 두께로 바삭하게 튀겨 내는데" → "손님들도 이 맛에 다시 찾는"
+     - 좋은 예 (한 문장): "매일 아침 등심을 직접 두드려서" → "무려 이 두께로 바삭하게 튀겨 내는데" → "손님들도 이 맛에 다시 찾아오고"
    - 마지막 장면은 명사로 끝내지 않고 "~예요", "~이에요", "~입니다"처럼 서술어로 끝맺습니다.
      - 나쁜 예: "이유가 있는 카츠하우스." / "딱 좋은 골목이자카야." / "겉바속촉 그 자체."
      - 좋은 예: "이유가 있는 카츠하우스예요." / "딱 좋은 골목이자카야입니다." / "겉바속촉 그 자체예요."
@@ -150,7 +153,7 @@ title은 영상 내내 화면 위쪽에 떠 있는 고정 제목이자, 쇼츠 �
    - 장면마다 공백 포함 40자 이내, 장면별 권장 글자 수(narration 항목의 표)를 지킵니다. 빨리 읽어야 할 만큼 길게 쓰지 않습니다.
    - 사장님 문장은 대개 한 조각보다 깁니다. 핵심 단어만 남겨 줄이거나 두 장면으로 나누고, 한 장면에 정보 두 개를 넣지 않습니다.
      예: "하이볼은 위스키를 넉넉히 넣어 진하게 말아드려요" → "위스키 넉넉히 넣은 진한 하이볼" (16자)
-   - 가격은 영상 전체에서 한 장면에서만 말합니다. 가격 조각도 문장 중간이라 "로스카츠 정식이 12,000원이라"처럼 메뉴 이름과 가격을 붙여 말하고 다음 장면으로 잇습니다. 꾸밈말을 붙여 18자가 넘으면 꾸밈말을 뺍니다.
+   - 가격은 꼭 말하지 않아도 됩니다. 말한다면 [가격 규칙]대로 그 메뉴 사진이 나오는 장면 한 곳에서만, "로스카츠 정식이 12,000원이라"처럼 메뉴 이름과 가격을 붙여 말하고 다음 장면으로 잇습니다. 꾸밈말을 붙여 18자가 넘으면 꾸밈말을 뺍니다.
      예: "두툼하게 썰어 낸 로스카츠 정식이 12,000원이라" (28자) → "로스카츠 정식이 12,000원이라" (18자)
    - 사장님 한마디 속 숫자는 가격이 아니면 한글로 풀어 씁니다 ("반찬 20가지" → "반찬이 스무 가지").
    - 마지막 장면을 빼고는 이어 주는 말로 끝내고 마침표·물음표·느낌표를 쓰지 않습니다. 마지막 장면만 마침표로 끝냅니다.
@@ -162,12 +165,12 @@ title은 영상 내내 화면 위쪽에 떠 있는 고정 제목이자, 쇼츠 �
   2단계: 사장님 "두툼하게" + 후기 "두툼함"이 겹침 → 가장 강한 매력은 두께, 받쳐 줄 장점은 재방문
   3단계: 음식 몰입형
   장면 5개, 2 + 3 + 3 + 3 + 4초 (15초가 한 문장):
-  "매일 아침 직접 두드린 등심을" → "무려 이 두께로 바삭하게 튀겨 내는데" → "미니우동과 샐러드까지 곁들인" → "로스카츠 정식이 12,000원이라" → "손님들이 두툼함에 반해 다시 찾는 모모카츠예요."
+  "매일 아침 등심을 직접 두드려서" → "무려 이 두께로 바삭하게 튀겨 내는데" → "미니우동과 샐러드까지 나오고" → "로스카츠 정식이 12,000원이라" → "손님들이 두툼함에 반해 다시 찾는 모모카츠예요."
   (사장님 말을 뼈대로, 손님 말을 근거로 썼습니다. 문장을 그대로 베끼지 말고 위 가게 데이터로 새로 쓰세요)
 - 좋은 예 (가상의 디저트 가게 "말랑상점")
   입력: menus 찹쌀떡 초코·녹차·얼그레이·흑임자 (description "국산 팥앙금과 생크림을 채운 찹쌀떡") / 사장님 한마디 "팥은 국산으로 매일 직접 쑤어요" / review_keywords ["골라 먹는 재미"]
   장면 5개, 2 + 3 + 3 + 3 + 4초 (15초가 한 문장):
-  "초코 녹차 얼그레이 흑임자까지" → "다양한 맛마다 찹쌀떡이 따로 있는데" → "그 안에 생크림이 가득 차 있고" → "무려 국산 팥을 매일 직접 쑤어 넣은 찹쌀떡을" → "기분 따라 골라 먹을 수 있는 말랑상점이에요."
+  "초코 녹차 얼그레이 흑임자까지" → "다양한 맛마다 찹쌀떡이 따로 있는데" → "그 안에 생크림이 가득 차 있고" → "무려 국산 팥도 매일 직접 쑤어 넣어서" → "기분 따라 골라 먹을 수 있는 말랑상점이에요."
   ("다양한", "그 안에", "무려"처럼 이야기를 키우는 말로 장면을 이었습니다. 이 표현도 그대로 되풀이하지 말고 가게에 맞게 고르세요)
 - 나쁜 예 (장면마다 문장이 끝남): "아니 이 두께 좀 보세요." → "매일 아침 직접 두드린 등심이에요." → "손님들도 다시 온대요." → "로스카츠 정식은 12,000원이에요." (말이 뚝뚝 끊기고 "~요."가 되풀이됨)
 - 나쁜 예 (사장님 한마디 무시): 사장님이 "매일 아침 직접 두드려요"라고 했는데 "두툼한 로스카츠 12,000원" → "치즈카츠도 있어요"처럼 메뉴판만 읽음
@@ -182,11 +185,20 @@ title은 영상 내내 화면 위쪽에 떠 있는 고정 제목이자, 쇼츠 �
    - menu: 메뉴와 구성·가격을 보여 주는 조각. 가격을 말하면 menu_ref에 그 메뉴
    - detail: 단면, 식감, 치즈가 늘어나는 모습처럼 가까이서 보는 조각
    - review: 경험형·신뢰형 근거 조각 (사진 속 공간, 사장님 한마디, review_keywords)
-   - 같은 type을 두 번 써도 되고, 같은 사진을 다른 장면에서 다시 써도 됩니다 (그 사진의 AI 영상이 이어서 나옵니다)
+   - 같은 type을 두 번 써도 되고, 같은 사진을 이어지는 장면 여러 개에 써도 됩니다 (그 사진의 AI 영상이 이어서 나옵니다)
 3. cta (마지막 장면, 3~4초): [대사 쓰기]의 결말(11~15초). 고른 매력에 맞는 감상 안에 가게 이름 "{storeName}"을 꼭 넣습니다.
    - 이 장면의 caption.text는 가게 이름 "{storeName}"만, position "center", emphasis "large"로 씁니다. 음성이 있는 영상에서는 렌더러가 이 장면의 나레이션 전체를 자막으로 표시합니다. 자막에 주소는 쓰지 마세요.
-   - photos에 exterior(가게 외관) 사진이 있으면 마지막 장면은 그 외관 사진으로, motion은 "transition" (앞 장면 음식에서 외관으로 AI가 이어 줌). 없으면 외관 장면은 넣지 않습니다
+   - photos에 exterior(가게 외관) 사진이 있으면 마지막 장면은 그 외관 사진으로. 없으면 외관 장면은 넣지 않습니다
 사장님 한마디와 review_keywords는 [대사 쓰기] 2~4단계대로 매력 선정과 이야기의 중심에 꼭 살려 주세요.
+
+[한 번에 이어지는 영상 (원테이크)]
+영상은 장면마다 따로 찍어 붙인 것이 아니라, 카메라 한 대가 가게 안을 15초 동안 끊김 없이 움직이며 찍은 것처럼 만들어집니다.
+- 같은 사진을 쓰는 이어진 장면들이 한 "컷"입니다. 컷이 바뀌는 곳에서 AI가 카메라를 다음 사진으로 옮겨 이어 줍니다.
+  - 음식 → 음식: 카메라가 옆으로 돌아가 옆 테이블·진열대에 놓인 다음 음식을 비춥니다
+  - 음식 → 가게 외관: 카메라가 뒤로 빠지며 창밖으로 나가 길에서 본 가게 외관을 비춥니다
+- 카메라는 다음 사진으로만 움직입니다. 다른 사진으로 넘어갔다가 앞 사진으로 돌아오면 안 됩니다. 같은 사진을 쓰는 장면은 붙여 두세요.
+  - 좋은 예: 0, 0, 1, 1, 3 / 나쁜 예: 0, 1, 0, 3 (0번 사진으로 되돌아감)
+- 컷 순서는 이야기 순서와 맞춥니다: 도입은 가장 강한 매력이 담긴 음식, 마지막은 외관 사진(있으면)
 
 [사실만 쓰기]
 - 메뉴 이름, 가격, 특징은 입력에 있는 것만 씁니다. 수상 경력, 웨이팅 시간, 원산지, "동네 1등" 같은 순위·수치를 지어내지 마세요. 실제 가게 광고라서 사실이 아니면 사장님이 곤란해집니다.
@@ -212,32 +224,32 @@ title은 영상 내내 화면 위쪽에 떠 있는 고정 제목이자, 쇼츠 �
 - type: "hook" / "menu" / "detail" / "review" / "cta". 첫 장면은 hook, 마지막 장면은 cta
 - duration: 초 단위, 0.5초 단위로 1.5~5초. hook은 2초 이하, 나머지는 2~3.5초가 알맞습니다. 모든 장면의 합이 정확히 15
 - image_index: photos[].index 중 하나. 아래 [사진 고르기]를 지킵니다
-- motion: "ai" / "transition" / "zoom_in" / "zoom_out" / "static"
-  - ai는 Runway가 사진을 5초짜리 움직이는 영상으로 바꿉니다. 비싸서 영상 전체에서 최대 3개입니다. generated 사진에도 쓸 수 있습니다.
-  - 영상에 쓰는 사진마다(exterior 제외) 그 사진이 처음 나오는 장면 하나는 반드시 ai입니다. 같은 사진을 쓰는 다른 장면은 그 AI 영상을 이어서 보여 주므로 zoom_in / zoom_out / static으로 두면 됩니다
-  - ai 장면끼리는 같은 사진(image_index)을 쓰지 마세요. 그래서 exterior 말고는 사진을 3장까지만 씁니다
-  - transition은 AI가 앞 장면 음식 사진에서 이 장면 가게 외관(exterior) 사진으로 화면을 끊김 없이 이어 주는 장면입니다.
-    - photos에 exterior 사진이 있으면 마지막 장면(외관 사진)의 motion을 "transition"으로 둡니다. 바로 앞 장면은 음식·가게 안 사진이어야 합니다
-    - 영상 전체에서 1개만, exterior 사진으로 넘어가는 장면에만 씁니다 (ai 3개 제한과는 따로 셉니다)
-- video_prompt: motion이 ai 또는 transition일 때만 씁니다. 아니면 null
+- motion: "ai" / "zoom_in" / "zoom_out" / "static"
+  - 컷마다(같은 사진을 쓰는 이어진 장면들) 첫 장면을 "ai"로 두고 video_prompt를 씁니다. 그 컷의 나머지 장면은 "static", video_prompt null
+  - exterior(가게 외관) 컷은 앞 컷의 AI 영상이 외관까지 데려다주므로 "zoom_in", video_prompt null
+  - ai는 영상 전체에서 최대 3개입니다. 그래서 exterior 말고는 사진을 3장까지만 씁니다. generated 사진에도 쓸 수 있습니다
+- video_prompt: 컷 첫 장면의 motion이 ai일 때만 씁니다. 아니면 null
   - 영어로, 60단어 이내
-  - ai: [사진 속 음식·장소] + [그 음식을 다루는 동작 1개] + [음식 묘사 1개] + [카메라 움직임] + [조명] + [분위기] 순서
-  - 카메라 무빙만으로는 거의 정지 화면처럼 보입니다. ai 장면마다 화면 속에서 음식이 실제로 다뤄지는 동작 하나를 꼭 넣고, 그 동작이 5초 동안 처음부터 끝까지 이어지게 쓰세요. 메뉴가 무엇인지 보고 그 메뉴에서 자연스러운 동작을 고릅니다
-    - 집기·옮기기: "a gloved hand uses metal tongs to pick up one bread and place it on a wooden tray", "a gloved hand slides a fresh tray of pastries onto the shelf"
-    - 찢기·자르기·단면: "a fork and knife tear the bread apart, revealing the soft fruit cream inside", "a knife slices the cake in half and pulls the pieces apart to show the layered cross-section"
-    - 붓기·뿌리기: "milk pouring into the latte from above and forming latte art", "sauce drizzling over the cutlet", "powdered sugar dusting over the waffle"
-    - 음식 자체의 움직임 (동작과 함께 곁들임): cheese melting and stretching, steam rising from the cup, broth gently bubbling, oil sizzling on the grill, ice cubes shifting in the glass, water droplets on fresh fruit
-    - 카메라: slow orbit, gentle push-in, dolly across the table, tilt up, rack focus
-    - 단면·속 재료는 menus의 description이나 사진 description에 있는 것(과일 크림, 치즈, 팥앙금 등)만 보여 줍니다. 없는 속 재료를 지어내지 마세요
-    - 곁들임은 menus에 있는 메뉴나 커피콩·꽃·냅킨·트레이·집게 같은 소품만. 메뉴에 없는 음식은 지어내지 마세요
+  - 이 컷 동안 카메라에 담길 움직임 전체를 한 문장 흐름으로 씁니다: [이 사진 음식의 질감·특징이 살아나는 움직임] → [다음 컷 사진으로 넘어가는 카메라 이동]
+    - 다음 컷이 음식이면: "..., then the camera glides sideways past the counter to the next table, where [다음 음식] sits"
+    - 다음 컷이 외관이면: "..., then the camera pulls back through the window and out to the street, revealing the storefront"
+    - 마지막 컷(다음 사진이 없음)이면 넘어가는 이동 없이 질감 움직임과 카메라 움직임만
+  - 손·도구로 음식을 다루는 동작(집기, 찢기, 자르기, 포크·나이프)은 쓰지 마세요. 먹는 장면처럼 보여 어색합니다. 음식이 스스로 움직이며 질감과 특징이 드러나는 모습을 가까이서 보여 줍니다. 메뉴를 보고 그 음식에 어울리는 것을 고릅니다
+    - 떡·모찌: "the soft mochi gently wobbles and settles, its powdery surface catching the light" (말랑말랑함)
+    - 케이크·디저트: "glossy cream and fresh fruit glistening as the camera slowly orbits the decorated cake" (화려함)
+    - 피자·치즈: "a slice slowly pulling away from the pizza with long strings of melted cheese stretching" (늘어나는 치즈)
+    - 회·초밥: "glistening slices of fresh raw fish on crushed ice, water droplets sparkling in cool light" (신선함)
+    - 찌개·국·전골: "the stew bubbling vigorously, steam billowing up over the rich red broth" (끓어오름)
+    - 빵: "flaky golden layers with butter glistening, a few crumbs drifting down" / 커피: "milk pouring into the latte from above and blooming into latte art"
+    - 구이·튀김: "the meat sizzling on the grill as smoke curls up" / "crispy golden crust glistening with oil crackling"
+    - 카메라: slow push-in, slow orbit, dolly across the table, tilt up, rack focus
+    - 속 재료·단면은 menus의 description이나 사진 description에 있는 것만. 없는 재료를 지어내지 마세요
   - 주제에 맞는 속도로: emotional·expert는 느리고 부드럽게, value·trendy는 경쾌하고 역동적으로
   - generated 사진은 description의 영어 설명에 이미 있는 음식을 움직입니다. 그 설명에 없는 음식을 새로 넣지 마세요 (첫 화면과 달라져 어색해집니다)
-  - 사람은 손과 도구만 화면에 나오게 하세요. AI 영상에서 사람 전체·얼굴·손가락은 뭉개져 보입니다.
-    - 손은 "a gloved hand", "hands in white gloves"처럼 장갑 낀 손으로 쓰고, 집게·포크·나이프·트레이 같은 도구를 함께 씁니다. 화면은 음식에 가깝게 (close-up)
-    - person, people, chef, barista, customer, fingers, arm, face처럼 사람 전체나 손 말고 다른 신체를 가리키는 단어 금지
-    - 먹기, 마시기, 베어 물기처럼 입이 있어야 하는 동작 금지 (eating, biting, sipping, drinking 등)
-  - transition: [앞 장면 음식] + [가게 외관으로 이어지는 카메라 이동] + [조명] 순서. 두 사진 사이를 한 번에 이어 가는 카메라 움직임을 씁니다
-    - 예: "the camera pulls back from the bread on the counter, glides out through the bakery window and reveals the storefront from the street, smooth continuous motion, warm daylight"
+  - 사람과 몸은 화면에 나오지 않게 하세요. AI 영상에서 사람·손·얼굴이 뭉개져 보입니다.
+    - person, people, chef, customer, hands, gloved, fingers, face처럼 사람이나 몸을 가리키는 단어 금지 ("no hands"처럼 부정어로도 쓰지 마세요)
+    - fork, knife, tongs, chopsticks, spoon 같은 도구와, 들어 올리기·젓기·찢기·먹기·마시기 동작 금지 (lifting, stirring, tearing, eating, sipping 등)
+    - 붓기·뿌리기는 흐르는 모습만: "milk pouring into the cup from above, close-up on the cup"
   - text, sign, logo, label, menu board, poster처럼 글자를 떠올리게 하는 단어는 쓰지 마세요. AI 영상에서 글자가 깨져 보입니다. 외관도 "storefront", "shop entrance"로만 씁니다.
 - menu_ref: 자막이나 나레이션에 가격을 넣는 장면은 그 메뉴 이름을 menus[].name과 한 글자도 다르지 않게 씁니다. 가격이 없는 장면은 null
 - narration: [대사 쓰기]의 조각 하나. TTS가 읽고, 같은 글이 그대로 자막이 됩니다. 모든 장면에 씁니다 (null로 두면 그 장면만 조용해져 흐름이 끊깁니다)
@@ -252,7 +264,7 @@ title은 영상 내내 화면 위쪽에 떠 있는 고정 제목이자, 쇼츠 �
   - 조각마다 끝맺음을 바꾸세요 (마지막 세 글자가 같으면 안 됨)
     - 나쁜 예: "카페라떼가 있어요." / "아메리카노도 있어요." (같은 말로 끝남)
     - 나쁜 예: "먹을 수 있는데," / "믿을 수 있는데," (이어 주는 말도 같은 것을 되풀이하면 안 됨)
-  - 숫자는 쓰지 마세요. 단, 가격만은 hook처럼 힘을 주고 싶은 곳에서 말해도 됩니다
+  - 숫자는 쓰지 마세요. 단, 가격만은 [가격 규칙]을 지킬 수 있을 때 힘을 주고 싶은 곳에서 말해도 됩니다
     - 그 장면 menu_ref 메뉴의 price와 똑같은 금액을 "12,000원" 형식으로만 (TTS가 "만 이천 원"으로 읽습니다)
     - "만 원", "만이천원" 같은 한글 금액, "150가지"·"3분" 같은 다른 숫자는 안 됩니다
   - [대사 쓰기] 4단계 (3) 문체대로. 친구에게 소개하듯 자연스러운 구어체로 쓰고, 쉼표는 되도록 쓰지 않습니다
@@ -270,19 +282,22 @@ title은 영상 내내 화면 위쪽에 떠 있는 고정 제목이자, 쇼츠 �
 - caption.emphasis: "normal" / "large" / "price". 가격이 들어간 자막은 price, hook 자막과 가게 이름 자막은 large, 나머지는 normal
 
 [가격 규칙]
+- 가격은 꼭 말하지 않아도 됩니다. 가격 없이도 메뉴의 매력만으로 충분히 좋은 영상이 됩니다.
+- 가격은 화면에 그 메뉴 사진이 나올 때만 말합니다. photos 중 menu_ref가 그 메뉴 이름과 같은 사진이 있고, 그 장면의 image_index가 그 사진일 때만 가격을 말하고 menu_ref에 그 메뉴 이름을 씁니다.
+  - 그런 사진이 없는 메뉴(사진 menu_ref가 모두 null이거나 다른 메뉴)는 가격을 말하지 않고 이름과 매력만 소개합니다. 이때 menu_ref는 null입니다.
+  - 쓰기 전에 확인하세요: 가격을 말한 장면의 image_index 사진 → 그 사진의 menu_ref → 장면의 menu_ref, 셋이 같은 메뉴인가
 - 가격은 영상 전체에서 한 장면에서만 말합니다. 가격으로 끝나는 장면이 둘이면 끝맺음이 "…원"으로 겹쳐 영상이 만들어지지 않습니다. 다른 메뉴는 가격 없이 소개하세요.
 - 자막·나레이션 속 가격은 menu_ref 메뉴의 price와 같아야 합니다.
 - price가 null인 메뉴는 가격 자막·나레이션을 만들지 마세요.
 
 [사진 고르기]
 - menu_board 사진은 쓰지 않습니다.
-- exterior(가게 외관) 사진이 있으면 반드시 마지막 장면에 씁니다.
+- exterior(가게 외관) 사진이 있으면 반드시 마지막 장면(마지막 컷)에만 씁니다.
 - exterior 말고는 사진을 3장까지만 쓰고, 음식 사진이 여러 장이면 is_signature가 true인 메뉴 사진부터 고릅니다.
-- 같은 사진을 여러 장면에 써도 됩니다. 그 사진의 AI 영상이 이어서 나옵니다.
-- store·exterior 사진은 menu·detail 장면에 쓰지 않습니다. hook, review, cta에 쓰세요.
+- 같은 사진을 이어지는 장면 여러 개에 써도 됩니다. 그 사진의 AI 영상이 이어서 나옵니다. 떨어진 장면에 다시 쓰지는 마세요 ([한 번에 이어지는 영상])
+- store 사진은 menu·detail 장면에 쓰지 않습니다. hook, review에 쓰세요.
 - menu_ref가 있는 장면은 photos[].menu_ref가 같은 사진만 씁니다. 메뉴가 연결되지 않은 사진(menu_ref null)은 가격 없는 장면에만 씁니다.
 - generated 사진은 detail 장면에 쓰지 않습니다.
-- 바로 붙은 두 장면은 되도록 다른 사진으로.
 {styleGuide}
 [출력 형식 예시] (형식만 참고하고, 내용은 위 가게 데이터로 새로 쓰세요)
 {
@@ -296,14 +311,14 @@ title은 영상 내내 화면 위쪽에 떠 있는 고정 제목이자, 쇼츠 �
     {
       "id": 1, "order": 1, "type": "hook", "duration": 2,
       "image_index": 0, "motion": "ai",
-      "video_prompt": "crispy pork cutlet on a plate, a knife slices it in half and pulls the pieces apart to reveal the juicy cross-section, steam rising, quick push-in, warm side lighting, bold appetizing mood",
+      "video_prompt": "thick crispy pork cutlet on a plate, golden crust glistening as steam rises from the juicy cut edge, slow push-in, then the camera pulls back through the window and out to the street, revealing the storefront, warm evening light",
       "menu_ref": null,
-      "narration": "매일 두드려 두툼하게 튀긴",
-      "caption": { "text": "매일 두드려 두툼하게 튀긴", "position": "center", "emphasis": "large" }
+      "narration": "매일 두드려 두툼하게 튀기고",
+      "caption": { "text": "매일 두드려 두툼하게 튀기고", "position": "center", "emphasis": "large" }
     },
     {
       "id": 2, "order": 2, "type": "menu", "duration": 3,
-      "image_index": 0, "motion": "zoom_in",
+      "image_index": 0, "motion": "static",
       "video_prompt": null,
       "menu_ref": "로스카츠",
       "narration": "로스카츠가 12,000원이라",
@@ -311,15 +326,16 @@ title은 영상 내내 화면 위쪽에 떠 있는 고정 제목이자, 쇼츠 �
     },
     {
       "id": 3, "order": 3, "type": "cta", "duration": 3,
-      "image_index": 3, "motion": "transition",
-      "video_prompt": "the camera pulls back from the cutlet on the table, glides out through the restaurant window and reveals the storefront from the street, smooth continuous motion, warm evening light",
+      "image_index": 3, "motion": "zoom_in",
+      "video_prompt": null,
       "menu_ref": null,
       "narration": "든든한 한 끼가 당길 때 딱인 카츠하우스예요.",
       "caption": { "text": "카츠하우스", "position": "center", "emphasis": "large" }
     }
   ]
 }
-(예시는 장면을 줄여 보여 준 것입니다. 실제로는 4~6개를 쓰고 합계 15초를 맞추세요. 3번 사진이 외관 사진인 경우입니다.)
+(예시는 장면을 줄여 보여 준 것입니다. 실제로는 4~6개를 쓰고 합계 15초를 맞추세요. 3번 사진이 외관 사진인 경우입니다.
+ 0번 사진 컷(장면 1·2)의 video_prompt가 돈가스의 질감을 보여 준 뒤 외관 컷(장면 3)으로 카메라를 데려갑니다. 음식 사진이 더 있으면 그 사이에 "then the camera glides sideways to the next table, where ..."로 이어 줍니다.)
 
 [출력]
 JSON 객체 하나만 출력하세요. 코드블록(```), 설명, 주석은 붙이지 마세요.
@@ -339,12 +355,12 @@ JSON 객체 하나만 출력하세요. 코드블록(```), 설명, 주석은 붙�
 - 마지막 장면을 빼고 모든 장면의 caption.text가 narration과 한 글자도 다르지 않은가
 - 마지막 장면 나레이션에 가게 이름이 있고, 자막은 가게 이름만이며 position이 center인가, 외관 사진이 있으면 마지막 장면이 그 사진인가
 - 장면이 4~6개이고 duration 합이 정확히 15인가
-- 쓰는 사진마다(외관 제외) ai 장면이 하나씩 있고, ai 장면이 3개 이하이며 서로 다른 사진인가
-- ai 장면마다 음식을 다루는 동작(집기·옮기기·찢기·자르기·단면 보여 주기·붓기) 하나가 담긴 video_prompt가 있는가 (카메라 무빙만 있으면 안 됨)
-- video_prompt에 사람 전체·얼굴·손가락이나 먹기·마시기 동작이 없고, 손은 장갑 낀 손과 도구(집게·포크·나이프)로만 썼는가
-- exterior 사진이 있으면 마지막 장면 motion이 "transition"이고, video_prompt가 앞 장면 음식에서 가게 외관으로 이어지는 카메라 이동인가
-- 모든 장면에 나레이션이 있고, 장면 사이를 이어 주는 말("~는데", "~하고", "~을")에서 나눴는가
+- 같은 사진을 쓰는 장면이 붙어 있고(되돌아가는 사진 없음), 컷마다(외관 제외) 첫 장면이 ai이며 ai 장면이 3개 이하인가
+- video_prompt마다 그 음식의 질감·특징이 살아나는 움직임이 있고, 다음 컷이 있으면 그 사진(옆 테이블 음식 또는 가게 외관)으로 넘어가는 카메라 이동으로 끝나는가
+- video_prompt에 사람·손·얼굴, 도구(포크·나이프·집게), 들어 올리기·찢기·먹기·마시기 동작이 없는가
+- 모든 장면에 나레이션이 있고, 장면 사이를 이어 주는 말("~고", "~해서", "~나오고", "~좋고", "~한데", "~되는데", "~까지")에서 나눴는가
+- 마지막 장면을 빼고 ㄴ 받침("다른", "튀긴", "찾는", "하이볼은", "12,000원")으로 끝나는 장면이 없는가
 - 나레이션마다 공백 포함 40자 이내이고 띄어쓰기 없이 18자 넘게 붙은 말이 없으며, 글자를 직접 세어 duration × 7 이하이며, 마지막 세 글자가 같은 나레이션이 없는가
 - 나레이션 속 숫자는 menu_ref 메뉴 가격("12,000원")뿐이고, 이모지가 없는가
 - "오늘 자리 있어요"처럼 그날그날 달라지는 상황을 단정하지 않았는가
-- 자막·나레이션 속 가격이 메뉴 데이터의 가격과 같고, 그 장면 사진이 같은 메뉴인가
+- 가격을 말했다면 메뉴 데이터의 가격과 같고, 그 장면 사진의 menu_ref가 같은 메뉴인가 (그런 사진이 없는 메뉴는 가격을 빼고 menu_ref null)

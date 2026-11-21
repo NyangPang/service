@@ -274,22 +274,43 @@ class StoryboardValidatorTest {
     }
 
     @Test
-    void 장갑_낀_손과_도구로_하는_동작은_허용() throws IOException {
-        // 카메라 무빙만으로는 정적이라, 집게로 집기·포크와 나이프로 찢기·단면 보여 주기 같은 동작을 쓰게 한다
+    void 손과_도구로_음식을_다루는_동작은_막는다() throws IOException {
+        // 장갑 낀 손·포크로 찢는 동작을 허용해 봤더니 먹는 장면처럼 보여 어색했다 → 음식 자체의 질감으로 보여 준다
         List<String> errors = errorsOf("01-donkatsu", sb -> {
             scene(sb, 0).put("video_prompt", "a gloved hand uses metal tongs to pick up the pork cutlet and place it on a tray, slow push-in, warm light");
             scene(sb, 2).put("video_prompt", "a fork and knife tear the cheese cutlet apart, revealing the melting cheese inside, close-up, warm light");
         });
-        assertThat(errors).isEmpty();
+        assertThat(errors).anyMatch(e -> e.startsWith("[장면 id=1]") && e.contains("사람·신체") && e.contains("\"gloved\", \"hand\""))
+                .anyMatch(e -> e.startsWith("[장면 id=1]") && e.contains("손·도구") && e.contains("\"pick\"") && e.contains("\"tongs\""))
+                .anyMatch(e -> e.startsWith("[장면 id=3]") && e.contains("손·도구") && e.contains("\"tear\"")
+                        && e.contains("\"fork\"") && e.contains("\"knife\""));
     }
 
     @Test
-    void 영상_프롬프트에_입이_필요한_동작이_있으면_오류() throws IOException {
+    void 영상_프롬프트에_먹는_동작이_있으면_오류() throws IOException {
         // 먹는 동작을 쓰면 Runway가 얼굴을 그려 넣는다
         List<String> errors = errorsOf("01-donkatsu", sb ->
                 scene(sb, 2).put("video_prompt", "close-up of biting into the cheese cutlet, sauce pouring, slow motion"));
-        assertThat(errors).anyMatch(e -> e.contains("[장면 id=3]") && e.contains("입이 있어야 하는 동작")
-                && e.contains("동작(\"biting\")"));
+        assertThat(errors).anyMatch(e -> e.contains("[장면 id=3]") && e.contains("손·도구가 있어야 하는 동작")
+                && e.contains("(\"biting\")"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "the soft mochi gently wobbles and settles, its powdery surface catching the light, slow push-in",
+            "a slice slowly pulling away from the pizza with long strings of melted cheese stretching, warm light",
+            "glistening slices of fresh raw fish on crushed ice, water droplets sparkling in cool light",
+            "the stew bubbling vigorously, steam billowing up over the rich red broth, slow push-in"
+    })
+    void 음식_스스로의_질감_움직임은_통과(String videoPrompt) throws IOException {
+        assertThat(errorsOf("01-donkatsu", sb -> scene(sb, 2).put("video_prompt", videoPrompt))).isEmpty();
+    }
+
+    @Test
+    void 같은_사진은_붙은_장면에만_원테이크라_되돌아가면_오류() throws IOException {
+        // 01-donkatsu 사진 순서 0, 0, 2, 1, 3 → 4번째 장면을 0번 사진으로 바꾸면 0 → 2 → 0으로 되돌아감
+        List<String> errors = errorsOf("01-donkatsu", sb -> scene(sb, 3).put("image_index", 0).put("motion", "static").putNull("video_prompt"));
+        assertThat(errors).anyMatch(e -> e.startsWith("[장면 id=4] 0번 사진은 [장면 id=2]까지 쓰고 다른 사진으로 넘어갔습니다"));
     }
 
     @Test
@@ -337,7 +358,7 @@ class StoryboardValidatorTest {
     void 사람을_떠올리게_하는_표현은_막는다(String videoPrompt) throws IOException {
         List<String> errors = errorsOf("01-donkatsu", sb -> scene(sb, 0).put("video_prompt", videoPrompt));
         assertThat(errors).anyMatch(e -> e.startsWith("[장면 id=1] video_prompt에")
-                && (e.contains("사람·신체") || e.contains("입이 있어야 하는 동작")));
+                && (e.contains("사람·신체") || e.contains("손·도구가 있어야 하는 동작")));
     }
 
     @Test
@@ -351,11 +372,11 @@ class StoryboardValidatorTest {
     }
 
     @Test
-    void 동작을_담은_45단어_프롬프트는_통과() throws IOException {
-        // 동작 + 음식 묘사 + 카메라 + 조명 + 분위기를 쓰면 40단어를 쉽게 넘어서, 40단어 제한에 걸려 생성이 실패했었다
-        String prompt = "golden cheese cutlet on a wooden board, a gloved hand uses a knife to slice it in half and pulls the pieces apart "
-                + "so the molten cheese stretches between them, steam rising from the crust, slow push-in, warm side lighting, "
-                + "cozy appetizing mood";
+    void 질감과_다음_컷_이동을_담은_45단어_프롬프트는_통과() throws IOException {
+        // 질감 움직임 + 다음 사진으로 넘어가는 카메라 이동을 쓰면 40단어를 쉽게 넘어서, 40단어 제한에 걸려 생성이 실패했었다
+        String prompt = "golden cheese cutlet on a wooden board, molten cheese slowly stretching and dripping from the crispy cut edge "
+                + "while steam rises, slow push-in, then the camera glides sideways past the counter to the next table, "
+                + "where a plate of tenderloin cutlet sits, warm side lighting";
         assertThat(prompt.split("\\s+").length).isBetween(41, 60);
         assertThat(errorsOf("01-donkatsu", sb -> scene(sb, 2).put("video_prompt", prompt))).isEmpty();
     }

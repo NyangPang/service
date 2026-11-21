@@ -26,6 +26,13 @@ class RunwayClipClientTest {
     }
 
     @Test
+    void 긴_컷은_10초_클립으로_요청하고_다른_길이는_막는다() {
+        assertThat(RunwayClipClient.transitionBody(new ObjectMapper(), "a", "b", "p", 10).path("duration").asInt()).isEqualTo(10);
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> RunwayClipClient.transitionBody(new ObjectMapper(), "a", "b", "p", 7))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
     void 프롬프트가_비면_기본_카메라_이동으로() {
         // Kling은 promptText가 필수
         JsonNode body = RunwayClipClient.transitionBody(new ObjectMapper(), "a", "b", " ");

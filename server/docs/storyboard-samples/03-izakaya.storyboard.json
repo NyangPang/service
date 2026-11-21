@@ -19,8 +19,8 @@
       "image_index": 0, "motion": "zoom_in",
       "video_prompt": null,
       "menu_ref": "모둠꼬치",
-      "narration": "숯불 향 밴 모둠꼬치 18,000원",
-      "caption": { "text": "숯불 향 밴 모둠꼬치 18,000원", "position": "bottom", "emphasis": "price" }
+      "narration": "숯불 향 밴 모둠꼬치가 18,000원이고",
+      "caption": { "text": "숯불 향 밴 모둠꼬치가 18,000원이고", "position": "bottom", "emphasis": "price" }
     },
     {
       "id": 3, "order": 3, "type": "menu", "duration": 3.5,
@@ -40,7 +40,7 @@
     },
     {
       "id": 5, "order": 5, "type": "cta", "duration": 3.5,
-      "image_index": 0, "motion": "zoom_out",
+      "image_index": 1, "motion": "static",
       "video_prompt": null,
       "menu_ref": null,
       "narration": "골목이자카야, 오늘 한 잔 하고 가요!",
