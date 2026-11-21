@@ -1,0 +1,51 @@
+{
+  "schema_version": "0.1",
+  "title": "퇴근길 한 잔은 진한 하이볼 맛집",
+  "total_duration": 15,
+  "theme": "trendy",
+  "style": { "mood": "cozy", "font": "gothic_bold", "main_color": "#E4572E" },
+  "bgm": { "mood": "bright_pop" },
+  "scenes": [
+    {
+      "id": 1, "order": 1, "type": "hook", "duration": 1.5,
+      "image_index": 0, "motion": "ai",
+      "video_prompt": "assorted skewers on a charcoal grill with smoke curling up and fat sizzling, fast push-in, warm amber glow, lively night mood",
+      "menu_ref": null,
+      "narration": "퇴근길 한 잔 생각나죠?",
+      "caption": { "text": "퇴근길 한 잔 생각나죠?", "position": "center", "emphasis": "large" }
+    },
+    {
+      "id": 2, "order": 2, "type": "menu", "duration": 3.5,
+      "image_index": 0, "motion": "zoom_in",
+      "video_prompt": null,
+      "menu_ref": "모둠꼬치",
+      "narration": "숯불 향 밴 모둠꼬치 18,000원",
+      "caption": { "text": "숯불 향 밴 모둠꼬치 18,000원", "position": "bottom", "emphasis": "price" }
+    },
+    {
+      "id": 3, "order": 3, "type": "menu", "duration": 3.5,
+      "image_index": 1, "motion": "ai",
+      "video_prompt": "highball glass with bubbles rising and ice cubes shifting, condensation on the cold glass, a small plate of snacks beside it, quick push-in, warm amber light, lively mood",
+      "menu_ref": "하이볼",
+      "narration": "진한 하이볼은 7,000원이에요.",
+      "caption": { "text": "진한 하이볼은 7,000원이에요.", "position": "bottom", "emphasis": "price" }
+    },
+    {
+      "id": 4, "order": 4, "type": "review", "duration": 3,
+      "image_index": 1, "motion": "zoom_out",
+      "video_prompt": null,
+      "menu_ref": null,
+      "narration": "손님들 후기도 사장님이 친절하대요.",
+      "caption": { "text": "손님들 후기도 사장님이 친절하대요.", "position": "bottom", "emphasis": "normal" }
+    },
+    {
+      "id": 5, "order": 5, "type": "cta", "duration": 3.5,
+      "image_index": 0, "motion": "zoom_out",
+      "video_prompt": null,
+      "menu_ref": null,
+      "narration": "골목이자카야, 오늘 한 잔 하고 가요!",
+      "caption": { "text": "골목이자카야", "position": "center", "emphasis": "large" }
+    }
+  ],
+  "meta": { "category": "CAFE_BAKERY_PUB", "prompt_version": "dummy" }
+}

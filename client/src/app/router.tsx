@@ -32,7 +32,7 @@ export const router = createBrowserRouter([
   // 로그인·회원가입 (Figma 4:189, 3:319~)
   { path: '/login', element: <LoginPage /> },
   { path: '/signup', element: <SignupPage /> },
-  // 내 영상 → 올린 영상 재수정 (PRO). 숏폼 만들기처럼 화면 전체를 쓰는 흐름
+  // 내 영상 → 올린 영상 수정 (무료 3번, PRO 무제한). 숏폼 만들기처럼 화면 전체를 쓰는 흐름
   { path: '/owner/videos/:shortformId/edit', element: <RevisePage /> },
   {
     // 손님 모드

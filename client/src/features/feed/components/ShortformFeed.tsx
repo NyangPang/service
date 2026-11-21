@@ -87,7 +87,6 @@ export function ShortformFeed({ storeId, startId }: { storeId?: number; startId?
           <div key={item.shortformId} data-index={i} className="h-full snap-start snap-always">
             <ShortformItem
               item={item}
-              active={i === activeIndex}
               couponCount={couponCount(item.storeId)}
               onOpenCoupons={() => setCouponFor(item)}
             />

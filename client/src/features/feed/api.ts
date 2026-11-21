@@ -24,18 +24,20 @@ interface ServerShortform {
   shortformId: number
   storeId: number
   storeName: string
-  /** AI 생성 게시물 사진 (첫 장) */
+  /** AI 생성 게시물 사진 (첫 장). 영상 게시물이면 영상 썸네일 */
   imageUrl: string | null
+  /** AI 홍보 영상 (세로 mp4). 사진만 있는 게시물은 null */
+  videoUrl?: string | null
   /** 옆으로 넘겨 볼 사진 전체 */
   imageUrls?: string[]
-  /** 홍보 영상 (영상 게시물만). 있으면 imageUrl 은 포스터 */
-  videoUrl?: string | null
   title: string
-  /** 게시물 소개 글 (사장님 어필을 AI가 다듬은 문장, 없으면 null) */
+  /** 게시물 본문 (가게 정보·메뉴·사장님 한마디로 AI가 쓴 3~5문장, 줄바꿈 있음. 없으면 null) */
   caption?: string | null
   createdAt: string
   /** PRO 가게 영상 (서버가 피드 앞쪽에 둠) */
   promoted?: boolean
+  /** 처음 게시물에서 고쳐 만든 횟수 */
+  revisionCount?: number
 }
 type ServerPage = Omit<ShortformListResult, 'shortforms'> & { shortforms: ServerShortform[] }
 
@@ -60,6 +62,7 @@ function toShortform(s: ServerShortform, stores: StoreSummary[]): Shortform {
     images: s.imageUrls,
     createdAt: s.createdAt,
     promoted: s.promoted,
+    revisionCount: s.revisionCount,
   }
 }
 

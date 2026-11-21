@@ -1,7 +1,8 @@
 import { allMockShortforms, publishMockShortform, replaceMockShortform } from '@/features/feed/mock'
 import { MOCK_STORES } from '@/features/map/mock'
+import { useProStore } from '@/features/pro/store'
 import { ApiError } from '@/shared/api/client'
-import type { GenerationCreated, GenerationRequest, GenerationState, MenuItem, ShortformDetail } from './schema'
+import { FREE_REVISIONS, type GenerationCreated, type GenerationRequest, type GenerationState, type MenuItem, type ShortformDetail } from './schema'
 
 /**
  * 숏폼 생성 목업 (VITE_USE_MOCK=true). 새로고침하면 초기화되는 메모리 저장.
@@ -9,6 +10,8 @@ import type { GenerationCreated, GenerationRequest, GenerationState, MenuItem, S
  */
 const SAMPLE = {
   imageUrl: '/samples/shortform-sample-poster.jpg',
+  /** public/samples 에 없으면 미리보기는 사진으로 대신 보임 */
+  videoUrl: '/samples/shortform-sample.mp4',
   frame: { top: 656 / 1920, height: 607 / 1920 },
 }
 
@@ -35,6 +38,14 @@ export const mockGenerationApi = {
       (j) => j.request.storeId === body.storeId && !canceled.has(j.state.generationId) && ['PENDING', 'PROCESSING'].includes(status(j)),
     )
     if (running) throw new ApiError('GENERATION409', '이미 생성 중인 요청이 있어요')
+    // 수정 횟수: 무료는 게시물마다 3번, PRO는 무제한 (서버 GenerationService.nextRevisionCount 와 같음)
+    if (body.revision) {
+      const { expiresAt } = useProStore.getState()
+      const pro = !!expiresAt && Date.parse(expiresAt) > Date.now()
+      if (!pro && revisionCountOf(body.revision.shortformId) >= FREE_REVISIONS) {
+        throw new ApiError('GENERATION403_2', `무료 수정 ${FREE_REVISIONS}번을 다 썼어요. PRO를 구독하면 계속 고칠 수 있어요`)
+      }
+    }
     const generationId = ++seq
     const state: GenerationState = {
       generationId,
@@ -64,6 +75,11 @@ export const mockGenerationApi = {
   },
 }
 
+/** 고칠 게시물의 수정 횟수 (방금 만든 초안이면 drafts, 올린 게시물이면 피드 목록) */
+function revisionCountOf(shortformId: number) {
+  return drafts.get(shortformId)?.revisionCount ?? allMockShortforms().find((s) => s.shortformId === shortformId)?.revisionCount ?? 0
+}
+
 function status(job: Job): GenerationState['status'] {
   const elapsed = Date.now() - job.startedAt
   if (elapsed < 2000) return 'PENDING'
@@ -90,6 +106,7 @@ function makeDraft(job: Job) {
       imageUrls: [SAMPLE.imageUrl, ...(job.request.photoUrls ?? [])],
       title: `${title} (수정 요청 반영: ${revision.request})`,
       createdAt: now(),
+      revisionCount: revisionCountOf(revision.shortformId) + 1,
     })
     return shortformId
   }
@@ -105,6 +122,7 @@ function makeDraft(job: Job) {
     imageUrls: [SAMPLE.imageUrl, ...(job.request.photoUrls ?? [])],
     title: `${appeal || `동네 사람들이 사랑하는 ${store.name}`}${menuText ? ` · 대표 메뉴 ${menuText}` : ''}`,
     createdAt: now(),
+    revisionCount: 0,
   })
   return shortformId
 }
