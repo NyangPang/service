@@ -14,6 +14,7 @@ import {
   deleteShortform,
   extractMenus,
   fetchGeneration,
+  fetchMapPlace,
   fetchShortformDetail,
   MAX_POST_PHOTOS,
   postGeneration,
@@ -43,6 +44,11 @@ export function CreateShortformFlow() {
   // 게시물에 같이 넣을 음식·가게 사진 (메뉴 읽기엔 안 씀)
   const [photos, setPhotos] = useState<File[]>([])
   const [menus, setMenus] = useState<MenuItem[]>([])
+  // 메뉴 확인 화면의 가게명·주소: 지도 링크에서 읽은 값, 없으면 등록된 가게 정보 (사장님이 고칠 수 있음)
+  const [placeName, setPlaceName] = useState('')
+  const [placeAddress, setPlaceAddress] = useState('')
+  // 마지막으로 가게 정보를 읽은 지도 링크 (링크를 바꿔야 다시 읽음 — 고친 값을 덮어쓰지 않게)
+  const placeFor = useRef<string | null>(null)
   const [appeal, setAppeal] = useState('')
   const [generationId, setGenerationId] = useState<number | null>(null)
   const [startedAt, setStartedAt] = useState(0)
@@ -51,6 +57,11 @@ export function CreateShortformFlow() {
   const [modal, setModal] = useState<'cancel' | 'upload' | 'delete' | 'pro' | null>(null)
 
   const extract = useMutation({ mutationFn: () => extractMenus(storeId, files, mapUrl), onSuccess: (m) => setMenus(m) })
+  const fillPlace = (p: { name: string | null; address: string | null } | null) => {
+    setPlaceName(p?.name ?? store?.name ?? '')
+    setPlaceAddress(p?.address ?? store?.address ?? '')
+  }
+  const lookupPlace = useMutation({ mutationFn: fetchMapPlace, onSuccess: fillPlace, onError: () => fillPlace(null) })
   const generate = useMutation({
     mutationFn: (body: GenerationRequest) => postGeneration(body),
     onSuccess: (g) => {
@@ -91,11 +102,25 @@ export function CreateShortformFlow() {
   const goMenus = () => {
     setStep('menus')
     if (menus.length === 0) extract.mutate()
+    const link = isMapUrl(mapUrl) ? mapUrl.trim() : ''
+    if (placeFor.current !== link) {
+      placeFor.current = link
+      if (link) lookupPlace.mutate(link)
+      else fillPlace(null)
+    }
+  }
+  // 등록된 가게 정보와 다를 때만 생성 요청에 실어 보냄
+  const placeChanged = () => {
+    const name = placeName.trim()
+    const address = placeAddress.trim()
+    const p = { name: name && name !== store?.name ? name : null, address: address && address !== store?.address ? address : null }
+    return p.name || p.address ? p : undefined
   }
   const startGenerate = () =>
     generate.mutate({
       storeId,
       mapUrl: mapUrl.trim() || undefined,
+      place: placeChanged(),
       menus: menus.filter((m) => m.name.trim()),
       appeal: appeal.trim() || undefined,
       // 음식·가게 사진은 영상 장면에, 메뉴판은 메뉴 읽기에 (게시물 사진은 둘을 이어 4장까지)
@@ -154,15 +179,24 @@ export function CreateShortformFlow() {
         <Screen
           hero={<Hero sub={'내 메뉴가 맞는지 확인해요\n아니라면 수정할 수 있어요'} />}
           prev={{ onClick: () => setStep('source') }}
-          next={{ onClick: () => setStep('appeal'), disabled: extract.isPending }}
+          next={{ onClick: () => setStep('appeal'), disabled: extract.isPending || lookupPlace.isPending }}
         >
-          {extract.isPending ? (
+          {extract.isPending || lookupPlace.isPending ? (
             <div className="flex flex-col items-center py-6 text-center">
               <img src={working2} alt="" className="size-40 rounded-3xl object-cover" />
-              <p className="mt-3 animate-pulse text-sm font-bold text-green-4">메뉴판을 읽고 있어요...</p>
+              <p className="mt-3 animate-pulse text-sm font-bold text-green-4">
+                {lookupPlace.isPending ? '지도에서 가게 정보를 읽고 있어요...' : '메뉴판을 읽고 있어요...'}
+              </p>
             </div>
           ) : (
-            <StepMenus storeName={store?.name ?? ''} address={store?.address ?? ''} menus={menus} setMenus={setMenus} />
+            <StepMenus
+              storeName={placeName}
+              setStoreName={setPlaceName}
+              address={placeAddress}
+              setAddress={setPlaceAddress}
+              menus={menus}
+              setMenus={setMenus}
+            />
           )}
         </Screen>
       )}
@@ -427,12 +461,16 @@ function PhotoPicker({ label, files, setFiles, className = '' }: { label: string
 /* ── 2단계: 가게 정보·메뉴 확인 (Figma 9:645·697·1014) ── */
 function StepMenus({
   storeName,
+  setStoreName,
   address,
+  setAddress,
   menus,
   setMenus,
 }: {
   storeName: string
+  setStoreName: (v: string) => void
   address: string
+  setAddress: (v: string) => void
   menus: MenuItem[]
   setMenus: (m: MenuItem[]) => void
 }) {
@@ -441,10 +479,24 @@ function StepMenus({
     <>
       <p className="text-xs font-bold text-q-muted">가게 정보</p>
       <dl className="mt-2">
-        {[['가게명', storeName], ['주소', address]].map(([k, v]) => (
+        {(
+          [
+            ['가게명', storeName, setStoreName, 40],
+            ['주소', address, setAddress, 100],
+          ] as const
+        ).map(([k, v, set, max]) => (
           <div key={k} className="flex h-12 items-center gap-4 border-b-2 border-green-4">
             <dt className="w-12 shrink-0 text-15 text-green-4">{k}</dt>
-            <dd className="truncate text-15 text-ink">{v}</dd>
+            <dd className="min-w-0 flex-1">
+              <input
+                value={v}
+                onChange={(e) => set(e.target.value)}
+                maxLength={max}
+                aria-label={k}
+                placeholder={`${k} 입력`}
+                className="w-full truncate bg-transparent text-15 text-ink outline-none placeholder:text-gray-2"
+              />
+            </dd>
           </div>
         ))}
       </dl>

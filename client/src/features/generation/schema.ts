@@ -19,6 +19,8 @@ export interface MenuItem {
 export interface GenerationRequest {
   storeId: number
   mapUrl?: string
+  /** 메뉴 확인 화면의 가게명·주소가 등록된 가게 정보와 다를 때만 (지도 링크에서 읽었거나 사장님이 고침) */
+  place?: PlaceInfo
   menus?: MenuItem[]
   appeal?: string
   /** 게시물에 같이 넣을 음식·가게 사진 (최대 4장) — 보내기 전에 서버에 올림 */
@@ -29,6 +31,12 @@ export interface GenerationRequest {
   photoUrls?: string[]
   /** 재수정(PRO): 무엇을 어떻게 고칠지 */
   revision?: { shortformId: number; target: 'VIDEO' | 'SCRIPT'; request: string }
+}
+
+/** GET /api/generation/place — 지도 링크에서 읽은 가게명·주소 (못 읽으면 null) */
+export interface PlaceInfo {
+  name: string | null
+  address: string | null
 }
 
 export interface GenerationCreated {

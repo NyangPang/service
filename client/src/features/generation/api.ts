@@ -1,7 +1,7 @@
 import { USE_MOCK } from '@/mocks/db'
 import { api, request } from '@/shared/api/client'
 import { mockExtractMenus, mockGenerationApi, mockShortformApi } from './mock'
-import type { GenerationCreated, GenerationRequest, GenerationState, MenuItem, ShortformDetail } from './schema'
+import type { GenerationCreated, GenerationRequest, GenerationState, MenuItem, PlaceInfo, ShortformDetail } from './schema'
 
 /**
  * 화면에서 고른 메뉴·수정 요청 → 서버 menuInfo 한 덩어리 (가게 어필은 appeal 로 따로 보냄 → 게시물 소개 글)
@@ -12,6 +12,8 @@ function toMenuInfo(body: GenerationRequest) {
   const menus = (body.menus ?? []).filter((m) => m.name.trim())
   if (menus.length) lines.push(`메뉴: ${menus.map((m) => (m.price ? `${m.name} ${m.price.toLocaleString()}원` : m.name)).join(', ')}`)
   if (body.mapUrl?.trim()) lines.push(`지도 링크: ${body.mapUrl.trim()}`)
+  if (body.place?.name) lines.push(`가게명: ${body.place.name}`)
+  if (body.place?.address) lines.push(`주소: ${body.place.address}`)
   if (body.revision) lines.push(`수정 요청(${body.revision.target === 'VIDEO' ? '영상' : '대본 및 자막'}): ${body.revision.request}`)
   return lines.join('\n') || undefined
 }
@@ -126,6 +128,15 @@ export async function extractMenus(storeId: number, files: File[], _mapUrl: stri
   } catch {
     return extractMenusByOcr(boards)
   }
+}
+
+/**
+ * 지도 링크에서 가게명·주소 읽기 — GET /api/generation/place?url= (네이버·카카오 장소 페이지를 서버가 읽음).
+ * 못 읽으면 둘 다 null → 화면은 등록된 가게 정보로 채움. 목업엔 읽을 곳이 없어 null
+ */
+export async function fetchMapPlace(mapUrl: string): Promise<PlaceInfo> {
+  if (USE_MOCK) return { name: null, address: null }
+  return request<PlaceInfo>(api.get('/api/generation/place', { params: { url: mapUrl.trim() }, timeout: 20_000 }))
 }
 
 /** 예전 방식: 사진마다 POST /api/ocr (multipart image) → { menuText } 를 줄 단위로 메뉴·가격으로 나눔 */

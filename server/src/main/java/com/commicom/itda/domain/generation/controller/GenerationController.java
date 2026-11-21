@@ -7,6 +7,7 @@ import com.commicom.itda.domain.generation.dto.MenuItemDto;
 import com.commicom.itda.domain.generation.service.GenerationService;
 import com.commicom.itda.domain.generation.service.MenuReadService;
 import com.commicom.itda.global.response.ApiResponse;
+import com.commicom.itda.infra.scraping.MapPlaceReader;
 import com.commicom.itda.global.response.SuccessStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -37,6 +38,7 @@ public class GenerationController {
 
     private final GenerationService generationService;
     private final MenuReadService menuReadService;
+    private final MapPlaceReader mapPlaceReader;
 
     @Operation(summary = "메뉴판 사진에서 메뉴 읽기 (메뉴 확인 화면)",
             description = "메뉴판 사진(1~3장)을 AI로 읽어 메뉴 목록을 돌려준다. 영상 만들 때와 같은 메뉴 추출기를 쓴다. "
@@ -48,6 +50,15 @@ public class GenerationController {
             @RequestParam Long storeId,
             @RequestPart("menuBoards") List<MultipartFile> menuBoards) {
         return ApiResponse.onSuccess(menuReadService.read(memberId, storeId, menuBoards));
+    }
+
+    @Operation(summary = "지도 링크에서 가게명·주소 읽기 (메뉴 확인 화면)",
+            description = "네이버 지도·카카오맵 공유 링크(단축 링크 포함)의 장소 페이지에서 가게명과 주소를 읽는다. "
+                    + "못 읽으면 name·address가 null — 화면은 등록된 가게 정보로 채운다")
+    @GetMapping("/place")
+    public ApiResponse<MapPlaceReader.Place> readPlace(@RequestParam String url) {
+        MapPlaceReader.Place place = mapPlaceReader.read(url);
+        return ApiResponse.onSuccess(place != null ? place : new MapPlaceReader.Place(null, null));
     }
 
     @Operation(summary = "AI 게시물 생성 요청",
