@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import pigeonWalk from '@/assets/map/pigeon-walk.png'
+import pigeonAlarm from '@/assets/owner/pigeon-alarm.png'
 import { useLogout } from '@/features/auth/hooks'
 import { canUseOwnerMode } from '@/features/auth/schema'
 import { NotificationBell } from '@/features/notification/components/NotificationBell'
@@ -25,7 +26,7 @@ const TABS: TabItem[] = [
 
 const MENU: MenuItem[] = [
   { to: '/owner/profile', label: '가게 프로필·리뷰', icon: '🏪', image: pigeonWalk },
-  { to: '/owner/notifications', label: '알림', icon: '🔔' },
+  { to: '/owner/notifications', label: '알림', icon: '🔔', image: pigeonAlarm },
   { to: '/owner/create', label: '게시물 제작', icon: '📸', image: OWNER_ILLUST.videoEdit },
   { to: '/owner/quest-store', label: '퀘스트·QR', icon: '📍', image: OWNER_ILLUST.qr },
   {
