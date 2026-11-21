@@ -4,22 +4,23 @@ import { useNavigate } from 'react-router-dom'
 import pigeonCrying from '@/assets/generation/pigeon-crying.jpg'
 import pigeonUpload from '@/assets/generation/pigeon-upload.jpg'
 import pigeonUploaded from '@/assets/generation/pigeon-uploaded.png'
-import { PostCarousel } from '@/features/feed/components/PostCarousel'
 import { ShortformThumb } from '@/features/feed/components/ShortformThumb'
 import { useStoreShortforms } from '@/features/feed/hooks'
 import type { Shortform } from '@/features/feed/schema'
 import { useMyStoreId } from '@/features/owner/hooks'
+import { useIsPro } from '@/features/pro/hooks'
 import { errorMessage } from '@/shared/lib/error'
 import { CloseIcon } from '@/shared/ui/icons'
 import { cancelGeneration, deleteShortform, fetchGeneration, fetchShortformDetail, postGeneration, replaceShortform } from '../api'
-import { EDIT_TARGETS, editPlaceholder, type EditTarget } from '../schema'
+import { EDIT_TARGETS, editPlaceholder, REVISION_LIMIT_DIALOG, revisionNote, revisionsLeft, type EditTarget, videoFileName } from '../schema'
 import { Dialog } from './Dialog'
 import { ErrorText, Hero, Screen, StepWaiting } from './FlowUi'
+import { DraftPreview } from './DraftPreview'
 
 type Step = 'pick' | 'input' | 'generate' | 'done'
 
 /**
- * 이미 올린 숏폼 재수정 (PRO).
+ * 이미 올린 숏폼 수정 (무료는 게시물마다 3번, PRO는 무제한).
  * 새 버전을 만드는 동안 기존 영상은 손님 피드에 그대로 → 확인 후 "이걸로 교체"하면 그때 바뀜.
  */
 export function ReviseShortformFlow({ shortformId }: { shortformId: number }) {
@@ -43,9 +44,7 @@ export function ReviseShortformFlow({ shortformId }: { shortformId: number }) {
         >
           <CloseIcon />
         </button>
-        <p className="flex items-center gap-1.5 text-17 font-bold text-ink">
-          게시물 수정 <span className="rounded-full bg-green-6 px-1.5 text-10 leading-4 text-white">PRO</span>
-        </p>
+        <p className="text-17 font-bold text-ink">게시물 수정</p>
         <span className="size-[44px]" />
       </header>
 
@@ -62,12 +61,17 @@ export function ReviseShortformFlow({ shortformId }: { shortformId: number }) {
 
 function Revise({ original, onExit }: { original: Shortform; onExit: () => void }) {
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
+  const isPro = useIsPro()
+  // 고칠 기준: 처음엔 올린 게시물, [다시 수정]하면 방금 만든 새 버전 (그래야 수정 횟수가 이어서 셈)
+  const [base, setBase] = useState({ id: original.shortformId, count: original.revisionCount ?? 0 })
+  const left = revisionsLeft(base.count, isPro)
   const [step, setStep] = useState<Step>('pick')
   const [target, setTarget] = useState<EditTarget>('VIDEO')
   const [text, setText] = useState('')
   const [generationId, setGenerationId] = useState<number | null>(null)
   const [startedAt, setStartedAt] = useState(0)
-  const [modal, setModal] = useState<'cancel' | 'replace' | 'discard' | null>(null)
+  const [modal, setModal] = useState<'cancel' | 'replace' | 'discard' | 'pro' | null>(null)
 
   const generate = useMutation({
     mutationFn: () =>
@@ -76,7 +80,7 @@ function Revise({ original, onExit }: { original: Shortform; onExit: () => void 
         // 원래 소개 글을 바탕으로 다시 다듬음 (글·문구 수정 요청은 menuInfo 로)
         appeal: original.description || undefined,
         photoUrls: original.images?.slice(1),
-        revision: { shortformId: original.shortformId, target, request: text.trim() },
+        revision: { shortformId: base.id, target, request: text.trim() },
       }),
     onSuccess: (g) => {
       setGenerationId(g.generationId)
@@ -107,6 +111,7 @@ function Revise({ original, onExit }: { original: Shortform; onExit: () => void 
   const discard = useMutation({ mutationFn: () => deleteShortform(newId!), onSuccess: onExit })
 
   const restart = () => {
+    if (newId !== null) setBase({ id: newId, count: detail.data?.revisionCount ?? base.count + 1 })
     setGenerationId(null)
     setStep('pick')
   }
@@ -116,12 +121,14 @@ function Revise({ original, onExit }: { original: Shortform; onExit: () => void 
       {step === 'pick' && (
         <Screen hero={<Hero sub="어떤 것을 수정하고 싶으신가요?" plain />} prev={{ label: '취소', onClick: onExit, wide: true }}>
           <OriginalCard video={original} />
-          <div className="mt-6 flex flex-col gap-3">
+          <p className="mt-4 text-center text-13 font-medium text-q-muted">{revisionNote(left)}</p>
+          <div className="mt-4 flex flex-col gap-3">
             {EDIT_TARGETS.map(([t, label]) => (
               <button
                 key={t}
                 type="button"
                 onClick={() => {
+                  if (left <= 0) return setModal('pro')
                   setTarget(t)
                   setText('')
                   setStep('input')
@@ -146,7 +153,7 @@ function Revise({ original, onExit }: { original: Shortform; onExit: () => void 
           prev={{ onClick: () => setStep('pick') }}
           next={{ label: generate.isPending ? '요청 중...' : '수정 요청', onClick: () => generate.mutate(), disabled: !text.trim() || generate.isPending }}
         >
-          <p className="mb-2 text-xs font-bold text-q-muted">{target === 'VIDEO' ? '사진' : '글·문구'} 수정</p>
+          <p className="mb-2 text-xs font-bold text-q-muted">{target === 'VIDEO' ? '영상' : '대본 및 자막'} 수정</p>
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
@@ -176,19 +183,14 @@ function Revise({ original, onExit }: { original: Shortform; onExit: () => void 
         <Screen
           prev={{ label: '다시 수정', onClick: restart }}
           next={{ label: '이걸로 교체', onClick: () => setModal('replace'), disabled: !detail.data }}
+          download={detail.data?.videoUrl ? { url: detail.data.videoUrl, fileName: videoFileName(detail.data.storeName) } : undefined}
         >
           <p className="mb-2 text-center text-13 font-bold text-green-4">새 버전이 완성됐어요</p>
-          <div className="relative mx-auto aspect-[4/5] w-full max-w-[260px] overflow-hidden rounded-3xl bg-green-1 shadow-[0_10px_30px_rgba(8,104,22,0.18)]">
-            {detail.data ? (
-              <PostCarousel images={detail.data.imageUrls ?? (detail.data.imageUrl ? [detail.data.imageUrl] : [])} alt={detail.data.title} frame={detail.data.frame} />
-            ) : (
-              <p className="flex h-full items-center justify-center text-sm text-q-muted">게시물을 불러오는 중...</p>
-            )}
-          </div>
+          <DraftPreview detail={detail.data} maxWidth={260} />
           {detail.data && (
             <div className="mx-auto mt-4 max-w-[300px]">
               <p className="text-16 font-bold text-ink">{detail.data.title}</p>
-              {detail.data.caption && <p className="mt-1 text-14 leading-relaxed text-q-sub">{detail.data.caption}</p>}
+              {detail.data.caption && <p className="mt-1 whitespace-pre-line text-14 leading-relaxed text-q-sub">{detail.data.caption}</p>}
             </div>
           )}
           {replace.isError && <ErrorText>{errorMessage(replace.error)}</ErrorText>}
@@ -232,6 +234,15 @@ function Revise({ original, onExit }: { original: Shortform; onExit: () => void 
           image={pigeonUpload}
           primary={{ label: replace.isPending ? '바꾸는 중...' : '네 바꿀래요', onClick: () => replace.mutate() }}
           secondary={{ label: '아니요', onClick: () => setModal(null) }}
+        />
+      )}
+      {modal === 'pro' && (
+        <Dialog
+          title={REVISION_LIMIT_DIALOG.title}
+          text={REVISION_LIMIT_DIALOG.text}
+          image={pigeonUpload}
+          primary={{ label: 'PRO 알아보기', onClick: () => navigate('/owner/pro') }}
+          secondary={{ label: '닫기', onClick: () => setModal(null) }}
         />
       )}
       {modal === 'discard' && (

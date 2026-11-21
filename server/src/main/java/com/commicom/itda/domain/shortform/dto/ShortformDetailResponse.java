@@ -20,7 +20,10 @@ public record ShortformDetailResponse(
         String title,
         /** 게시물 소개 글 (사장님 어필을 다듬은 문장, 없으면 null) */
         String caption,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        /** 처음 게시물에서 고쳐 만든 횟수 (0 = 처음). 무료는 freeRevisions 번까지 고칠 수 있음, PRO는 무제한 */
+        int revisionCount,
+        int freeRevisions
 ) {
 
     public static ShortformDetailResponse from(Shortform shortform) {
@@ -36,7 +39,9 @@ public record ShortformDetailResponse(
                 shortform.getVideoUrl(),
                 shortform.getTitle(),
                 shortform.getCaption(),
-                shortform.getCreatedAt()
+                shortform.getCreatedAt(),
+                shortform.getRevisionCount(),
+                Shortform.FREE_REVISIONS
         );
     }
 }

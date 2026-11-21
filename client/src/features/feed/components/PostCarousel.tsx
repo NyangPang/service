@@ -1,18 +1,23 @@
 import { useRef, useState, type ReactNode } from 'react'
 import { PostImage } from './PostImage'
+import { PostVideo } from './PostVideo'
 
 /**
  * 게시물 사진 여러 장을 옆으로 넘겨 봄 (AI 사진 1장 + 사장님 사진 최대 4장). 부모가 크기를 정함 (relative + 크기 필요).
  * 손가락으로 밀면 한 장씩 멈추고, PC에서는 좌우 화살표. 한 장이면 넘기기 없이 그대로
+ * video가 있으면 첫 장(images[0] = 영상 썸네일) 자리에 영상을 틂
  */
 export function PostCarousel({
   images,
   alt,
   frame,
   fallback,
+  video,
 }: {
   images: string[]
   alt: string
+  /** AI 홍보 영상 — 첫 장 자리 */
+  video?: { url: string; onError: () => void; autoPlay?: boolean }
   /** 목업 샘플 사진: 첫 장만 해당 (feed/schema 의 frame) */
   frame?: { top: number; height: number }
   fallback?: ReactNode
@@ -20,7 +25,14 @@ export function PostCarousel({
   const listRef = useRef<HTMLDivElement>(null)
   const [index, setIndex] = useState(0)
 
-  if (images.length <= 1) return <PostImage url={images[0]} alt={alt} frame={frame} fallback={fallback} />
+  const first = (url: string | undefined) =>
+    video ? (
+      <PostVideo url={video.url} poster={url} alt={alt} frame={frame} onError={video.onError} autoPlay={video.autoPlay} />
+    ) : (
+      <PostImage url={url} alt={alt} frame={frame} fallback={fallback} />
+    )
+
+  if (images.length <= 1) return first(images[0])
 
   const go = (to: number) => {
     const list = listRef.current
@@ -38,7 +50,7 @@ export function PostCarousel({
       >
         {images.map((url, i) => (
           <div key={`${url}-${i}`} className="relative size-full shrink-0 snap-start snap-always overflow-hidden" aria-label={`${i + 1} / ${images.length}`}>
-            <PostImage url={url} alt={i === 0 ? alt : `${alt} ${i + 1}`} frame={i === 0 ? frame : undefined} fallback={i === 0 ? fallback : undefined} />
+            {i === 0 ? first(url) : <PostImage url={url} alt={`${alt} ${i + 1}`} />}
           </div>
         ))}
       </div>
@@ -64,7 +76,7 @@ function ArrowButton({ side, onClick }: { side: 'left' | 'right'; onClick: () =>
     <button
       type="button"
       onClick={onClick}
-      aria-label={side === 'left' ? '이전 사진' : '다음 사진'}
+      aria-label={side === 'left' ? '이전' : '다음'}
       className={`absolute top-1/2 ${side === 'left' ? 'left-2' : 'right-2'} hidden size-8 -translate-y-1/2 items-center justify-center rounded-full bg-surface/85 text-lg font-bold text-ink shadow group-hover:flex`}
     >
       {side === 'left' ? '‹' : '›'}

@@ -1,0 +1,16 @@
+{
+  "store_name": "오후의디저트",
+  "category": "CAFE_BAKERY_PUB",
+  "menus": [
+    { "name": "크로플", "price_text": "6,500원", "price": 6500, "description": "바닐라 아이스크림을 올린 크로와상 와플", "is_signature": true },
+    { "name": "딸기라떼", "price_text": "6,000원", "price": 6000, "description": "생딸기 청과 우유", "is_signature": false }
+  ],
+  "review_keywords": ["창가 자리", "디저트 맛집"],
+  "photos": [
+    { "index": 0, "source": "upload", "kind": "store", "menu_ref": null, "description": "햇살 드는 창가 자리" }
+  ],
+  "image_requests": [
+    { "menu_ref": "크로플", "prompt": "golden croissant waffle topped with a scoop of vanilla ice cream on a white ceramic plate, light wooden cafe table, soft natural window light, close-up, realistic food photography, vertical composition" },
+    { "menu_ref": "딸기라떼", "prompt": "iced strawberry latte in a tall clear glass with red strawberry syrup layered under milk, marble cafe counter, bright soft daylight, eye-level close-up, realistic food photography, vertical composition" }
+  ]
+}

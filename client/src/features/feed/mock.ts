@@ -57,8 +57,10 @@ interface Draft {
   imageUrl: string | null
   imageUrls?: string[]
   title: string
+  videoUrl?: string | null
   frame?: { top: number; height: number }
   createdAt: string
+  revisionCount?: number
 }
 
 function toShortform(d: Draft): Shortform {
@@ -73,9 +75,11 @@ function toShortform(d: Draft): Shortform {
     address: store?.address ?? '',
     menus: DETAILS[d.storeId]?.menus ?? [],
     description: d.title,
+    videoUrl: d.videoUrl ?? undefined,
     posterUrl: d.imageUrl,
     images: d.imageUrls,
     frame: d.frame,
+    revisionCount: d.revisionCount ?? 0,
   }
 }
 

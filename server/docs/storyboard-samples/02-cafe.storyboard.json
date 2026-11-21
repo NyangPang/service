@@ -1,0 +1,43 @@
+{
+  "schema_version": "0.1",
+  "title": "버터 향 가득한 골목 소금빵 맛집",
+  "total_duration": 15,
+  "theme": "emotional",
+  "style": { "mood": "fresh", "font": "gothic_regular", "main_color": "#5E8C61" },
+  "bgm": { "mood": "calm_lofi" },
+  "scenes": [
+    {
+      "id": 1, "order": 1, "type": "hook", "duration": 2,
+      "image_index": 0, "motion": "ai",
+      "video_prompt": "golden salt bread rolls on a wooden tray with butter glistening and crumbs falling, slow orbit shot, soft morning sunlight through window, calm cozy cafe mood",
+      "menu_ref": null,
+      "narration": "버터 향 맡아보셨어요?",
+      "caption": { "text": "버터 향 맡아보셨어요?", "position": "center", "emphasis": "large" }
+    },
+    {
+      "id": 2, "order": 2, "type": "menu", "duration": 4.5,
+      "image_index": 0, "motion": "zoom_in",
+      "video_prompt": null,
+      "menu_ref": "소금빵",
+      "narration": "매일 굽는 버터 소금빵이 3,500원",
+      "caption": { "text": "매일 굽는 버터 소금빵이 3,500원", "position": "bottom", "emphasis": "price" }
+    },
+    {
+      "id": 3, "order": 3, "type": "detail", "duration": 4,
+      "image_index": 1, "motion": "ai",
+      "video_prompt": "iced vanilla latte with milk poured from a small pitcher swirling into coffee, ice cubes shifting, close-up, soft natural window light, relaxed afternoon mood",
+      "menu_ref": "바닐라라떼",
+      "narration": "바닐라라떼 한 잔 곁들이면 딱이죠.",
+      "caption": { "text": "바닐라라떼 한 잔 곁들이면 딱이죠.", "position": "bottom", "emphasis": "normal" }
+    },
+    {
+      "id": 4, "order": 4, "type": "cta", "duration": 4.5,
+      "image_index": 2, "motion": "ai",
+      "video_prompt": "sunlit window seat in a quiet cafe with soft light drifting across the table and a fresh flower in a small vase, slow push-in, calm cozy mood",
+      "menu_ref": null,
+      "narration": "골목카페 창가에서 쉬어 가세요.",
+      "caption": { "text": "골목카페", "position": "center", "emphasis": "large" }
+    }
+  ],
+  "meta": { "category": "CAFE_BAKERY_PUB", "prompt_version": "dummy" }
+}
