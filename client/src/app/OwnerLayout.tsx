@@ -29,16 +29,7 @@ const MENU: MenuItem[] = [
   { to: '/owner/notifications', label: '알림', icon: '🔔', image: pigeonAlarm },
   { to: '/owner/create', label: '게시물 제작', icon: '📸', image: OWNER_ILLUST.videoEdit },
   { to: '/owner/quest-store', label: '퀘스트·QR', icon: '📍', image: OWNER_ILLUST.qr },
-  {
-    to: '/owner/coupons/new',
-    label: '쿠폰',
-    icon: '🎟',
-    image: OWNER_ILLUST.couponNew,
-    tabs: [
-      { label: '발행', to: '/owner/coupons/new' },
-      { label: '사용 처리', to: '/owner/redeem' },
-    ],
-  },
+  { to: '/owner/coupons', label: '쿠폰', icon: '🎟', image: OWNER_ILLUST.couponNew },
   { to: '/owner/pro', label: '잇츠 PRO', icon: '⭐', image: OWNER_ILLUST.pro },
 ]
 
