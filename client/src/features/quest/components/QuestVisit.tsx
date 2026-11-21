@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import pigeonGps from '@/assets/quest/pigeon-gps.png'
 import pigeonTrophy from '@/assets/quest/pigeon-trophy.png'
@@ -73,6 +73,21 @@ export function QuestVisit({ quest }: { quest: Quest }) {
       setLocating(false)
     }
   }
+
+  // QR을 찍고 들어왔으면 (QR 인식하기·폰 카메라) 코드를 직접 친 것처럼 바로 인증 — 가게 목록을 불러온 뒤 한 번만
+  const fromQr = useRef(Boolean(params.get('storeId') && params.get('qrToken')))
+  const autoVerify = useEffectEvent(() => {
+    fromQr.current = false
+    // 못 찾으면 store 가 가까운 가게로 대신 잡히므로, QR의 가게가 맞을 때만
+    if (store?.storeId !== storeId) {
+      setError('이 퀘스트에 참여한 가게의 QR이 아니에요')
+      return
+    }
+    void handleVerify()
+  })
+  useEffect(() => {
+    if (fromQr.current && stores) autoVerify()
+  }, [stores])
 
   return (
     <div className="h-full overflow-y-auto px-5 pt-4 pb-8">
