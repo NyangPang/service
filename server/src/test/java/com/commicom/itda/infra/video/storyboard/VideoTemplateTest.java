@@ -88,6 +88,23 @@ class VideoTemplateTest {
     }
 
     @Test
+    void 긴_자막은_모든_템플릿에서_띄어쓰기_단위_조각으로_나뉨() {
+        CaptionRenderer renderer = new CaptionRenderer();
+        for (VideoTemplate t : VideoTemplate.values()) {
+            assertThat(renderer.captionLines("딸기 복숭아 샤인머스켓 골라 먹는 재미예요.", t))
+                    .as(t.id()).containsExactly("딸기 복숭아 샤인머스켓", "골라 먹는 재미예요.");
+        }
+    }
+
+    @Test
+    void 꽉_찬_화면형에서_18자_조각은_폭_때문에_다시_나뉘지_않음() {
+        // CaptionSplitter.PART_MAX(18자)가 꽉 찬 화면형 글씨 크기에서 한 줄에 들어가야 조각이 의도대로 보인다
+        String widest = "가나다라마바사아자 차카타파하가나다";
+        assertThat(widest).hasSize(18);
+        assertThat(new CaptionRenderer().captionLines(widest, VideoTemplate.HEADLINE)).containsExactly(widest);
+    }
+
+    @Test
     void 띠형에서_긴_자막도_한_줄이고_제목은_아래_띠에_그리지_않음(@TempDir Path dir) throws Exception {
         CaptionRenderer renderer = new CaptionRenderer();
         Path caption = dir.resolve("caption.png");

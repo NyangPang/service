@@ -1,5 +1,6 @@
 package com.commicom.itda.infra.video.storyboard;
 
+import com.commicom.itda.domain.generation.storyboard.CaptionSplitter;
 import com.commicom.itda.domain.generation.storyboard.SpokenPrice;
 import com.commicom.itda.infra.video.storyboard.Storyboard.Scene;
 
@@ -206,7 +207,9 @@ public final class StoryboardRenderer {
                 double start = voice == null ? 0 : leadIn;
                 double end = voice == null ? scene.duration() : Math.min(scene.duration(), start + speechDuration);
                 List<String> lines = captions.captionLines(caption.text(), template);
-                int totalLength = lines.stream().mapToInt(String::length).sum();
+                // 조각마다 읽는 데 걸리는 시간 비율로 나레이션 구간을 나눠, 말하는 속도에 맞춰 다음 조각으로 바꾼다
+                // (가격은 "만 이천 원"처럼 읽는 글자 수로, 공백·문장부호는 빼고 셈)
+                int totalLength = lines.stream().mapToInt(CaptionSplitter::spokenLength).sum();
                 int shownLength = 0;
                 double cueStart = sceneStart + start;
                 for (String text : lines) {
@@ -214,8 +217,7 @@ public final class StoryboardRenderer {
                     String capKey = hash("cap", CAPTION_VERSION, line.toString(), String.valueOf(sb.style()), template.id());
                     Path cap = cacheDir.resolve("cap-" + capKey + ".png");
                     cached(cap, tmp -> captions.renderCaption(line, sb.style(), template, tmp));
-                    shownLength += text.length();
-                    // 긴 자막은 같은 내레이션 구간 안에서 줄 길이 비율로 나눠 표시한다.
+                    shownLength += CaptionSplitter.spokenLength(text);
                     double cueEnd = sceneStart + start + (end - start) * shownLength / totalLength;
                     cues.add(new CaptionCue(cap, cueStart, cueEnd));
                     cueStart = cueEnd;

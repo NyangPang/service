@@ -1,5 +1,6 @@
 package com.commicom.itda.infra.video.storyboard;
 
+import com.commicom.itda.domain.generation.storyboard.CaptionSplitter;
 import com.commicom.itda.infra.video.storyboard.Storyboard.Caption;
 import com.commicom.itda.infra.video.storyboard.Storyboard.Style;
 
@@ -76,11 +77,21 @@ final class CaptionRenderer {
     private static final int BAND_CAPTION_TOP = 1490;
     private static final int CARD_RADIUS = 56;
 
-    /** A안에서는 글씨 크기가 고정이므로 폭을 넘는 문장을 다음 자막으로 나눈다. */
+    /**
+     * 한 장면 자막을 화면에 차례로 띄울 조각으로 나눈다 (띄어쓰기 단위, 조각마다 18자 안팎, 최대 3조각 — {@link CaptionSplitter}).
+     * 꽉 찬 화면형(A안)은 글씨 크기가 고정이라, 그래도 폭을 넘는 조각(띄어쓰기 없는 긴 말)은 폭에 맞춰 한 번 더 나눈다.
+     */
     List<String> captionLines(String text, VideoTemplate template) {
         String line = text.strip().replaceAll("\\s+", " ");
-        if (template != VideoTemplate.HEADLINE || line.isBlank()) return List.of(line);
+        if (line.isBlank()) return List.of(line);
+        List<String> parts = CaptionSplitter.split(line);
+        if (template != VideoTemplate.HEADLINE) return parts;
+        List<String> lines = new ArrayList<>();
+        for (String part : parts) lines.addAll(fitHeadlineWidth(part));
+        return lines;
+    }
 
+    private List<String> fitHeadlineWidth(String line) {
         AttributedString styled = new AttributedString(line);
         styled.addAttribute(TextAttribute.FONT, extraBold.deriveFont(HEADLINE_CAPTION_SIZE));
         LineBreakMeasurer measure = new LineBreakMeasurer(styled.getIterator(), new FontRenderContext(null, true, true));

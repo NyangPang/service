@@ -121,9 +121,23 @@ class StoryboardValidatorTest {
     // ── 4·5. 자막·가격 ──
 
     @Test
-    void 자막이_20자를_넘으면_오류() throws IOException {
+    void 자막이_40자를_넘으면_오류() throws IOException {
+        List<String> errors = errorsOf("01-donkatsu",
+                sb -> line(sb, 2, "치즈가 쭉쭉 늘어나는 치즈카츠까지 있어서 고르는 재미가 정말 쏠쏠한 집이에요."));
+        assertThat(errors).anyMatch(e -> e.contains("[장면 id=3] caption.text는 공백 포함 40자"));
+    }
+
+    @Test
+    void 자막이_20자를_넘어도_조각으로_나뉘면_자막_오류가_없음() throws IOException {
+        // 예전(20자 제한)에는 장면 구성 3번이 모두 이 길이에서 막혀 생성이 실패했다
         List<String> errors = errorsOf("01-donkatsu", sb -> line(sb, 2, "치즈가 쭉쭉 늘어나는 치즈카츠까지 있어요."));
-        assertThat(errors).anyMatch(e -> e.contains("[장면 id=3] caption.text는 공백 포함 20자"));
+        assertThat(errors).noneMatch(e -> e.contains("caption.text는"));
+    }
+
+    @Test
+    void 띄어쓰기_없이_길게_붙은_자막은_나눌_수_없어_오류() throws IOException {
+        List<String> errors = errorsOf("01-donkatsu", sb -> line(sb, 2, "겉바속촉치즈듬뿍로스카츠정식세트메뉴예요."));
+        assertThat(errors).anyMatch(e -> e.contains("[장면 id=3] caption.text는 화면에 띄어쓰기 단위로 18자 조각 3개까지"));
     }
 
     @Test

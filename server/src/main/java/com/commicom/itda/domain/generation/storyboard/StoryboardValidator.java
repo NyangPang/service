@@ -40,8 +40,11 @@ public class StoryboardValidator {
     static final Set<String> EMPHASES = Set.of("normal", "large", "price");
 
     static final int TITLE_MAX = 20;
-    /** 자막 = 나레이션 한 조각. 렌더러가 길면 두 줄로 나누고 글자를 줄인다 */
-    static final int CAPTION_MAX = 20;
+    /**
+     * 자막 = 그 장면 나레이션 전체. 렌더러가 {@link CaptionSplitter}로 18자 안팎 조각 3개까지 나눠
+     * 말하는 속도에 맞춰 차례로 띄운다. 말 속도는 따로 duration × {@value #NARRATION_CHARS_PER_SEC}자로 막는다
+     */
+    static final int CAPTION_MAX = 40;
     static final int MIN_SCENES = 4;
     static final int MAX_SCENES = 6;
     static final double MIN_SCENE_SEC = 1.5;
@@ -371,6 +374,10 @@ public class StoryboardValidator {
         }
         if (text.length() > CAPTION_MAX) {
             errors.add(at + " caption.text는 공백 포함 " + CAPTION_MAX + "자 이내여야 합니다. (현재 " + text.length() + "자: \"" + text + "\")");
+        } else if (!CaptionSplitter.fits(text)) {
+            errors.add(at + " caption.text는 화면에 띄어쓰기 단위로 " + CaptionSplitter.PART_MAX + "자 조각 "
+                    + CaptionSplitter.MAX_PARTS + "개까지 나눠 띄웁니다. 띄어쓰기 없이 이어진 부분이 너무 길어 나눌 수 없으니 띄어 쓰거나 줄이세요. (현재: \""
+                    + text + "\" → " + String.join(" / ", CaptionSplitter.split(text)) + ")");
         }
         String emoji = findEmoji(text);
         if (emoji != null) {
