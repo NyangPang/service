@@ -13,6 +13,8 @@ public record GenerationStatusResponse(
         @JsonInclude(JsonInclude.Include.ALWAYS) Long shortformId,
         @JsonInclude(JsonInclude.Include.ALWAYS) String errorMessage,
         @JsonInclude(JsonInclude.Include.ALWAYS) String imageUrl,
+        /** AI 홍보 영상 주소 (영상을 못 만들어 이미지 게시물이 됐으면 null) */
+        @JsonInclude(JsonInclude.Include.ALWAYS) String videoUrl,
         LocalDateTime requestedAt
 ) {
 
@@ -25,6 +27,7 @@ public record GenerationStatusResponse(
                 generation.getShortform() != null ? generation.getShortform().getId() : null,
                 generation.getErrorMessage(),
                 generation.getShortform() != null ? generation.getShortform().getImageUrl() : null,
+                generation.getShortform() != null ? generation.getShortform().getVideoUrl() : null,
                 generation.getCreatedAt()
         );
     }

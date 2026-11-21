@@ -1,0 +1,17 @@
+{
+  "store_name": "카츠하우스",
+  "category": "RESTAURANT",
+  "menus": [
+    { "name": "로스카츠", "price_text": "12,000", "price": 12000, "description": "두툼한 등심 돈가스", "is_signature": true },
+    { "name": "히레카츠", "price_text": "13,000", "price": 13000, "description": "부드러운 안심 돈가스", "is_signature": false },
+    { "name": "치즈카츠", "price_text": "14,000", "price": 14000, "description": null, "is_signature": false }
+  ],
+  "review_keywords": ["웨이팅", "겉바속촉", "두툼함"],
+  "photos": [
+    { "index": 0, "source": "upload", "kind": "food", "menu_ref": "로스카츠", "description": "로스카츠 단면 클로즈업" },
+    { "index": 1, "source": "upload", "kind": "food", "menu_ref": "히레카츠", "description": "히레카츠 한 접시" },
+    { "index": 2, "source": "upload", "kind": "food", "menu_ref": "치즈카츠", "description": "치즈카츠" },
+    { "index": 3, "source": "upload", "kind": "exterior", "menu_ref": null, "description": "가게 외관과 대기 줄" }
+  ],
+  "image_requests": []
+}

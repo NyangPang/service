@@ -1,0 +1,16 @@
+{
+  "store_name": "골목카페",
+  "category": "CAFE_BAKERY_PUB",
+  "menus": [
+    { "name": "아메리카노", "price_text": "4.0", "price": 4000, "description": null, "is_signature": false },
+    { "name": "소금빵", "price_text": "3.5", "price": 3500, "description": "매일 굽는 버터 소금빵", "is_signature": true },
+    { "name": "바닐라라떼", "price_text": "5.0", "price": 5000, "description": null, "is_signature": false }
+  ],
+  "review_keywords": ["버터향", "조용함", "창가 햇살"],
+  "photos": [
+    { "index": 0, "source": "upload", "kind": "food", "menu_ref": "소금빵", "description": "나무 트레이 위 소금빵" },
+    { "index": 1, "source": "upload", "kind": "food", "menu_ref": "바닐라라떼", "description": "아이스 바닐라라떼" },
+    { "index": 2, "source": "upload", "kind": "store", "menu_ref": null, "description": "햇살 드는 창가 자리" }
+  ],
+  "image_requests": []
+}

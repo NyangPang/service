@@ -13,9 +13,9 @@ import { PRO_BENEFITS } from '../store'
 const COMPARE = [
   ['AI 홍보 게시물 만들기', true, true],
   ['지도·피드에 게시물 올리기', true, true],
+  ['영상 다운로드', true, true],
+  ['게시물 수정', '3번', '무제한'],
   ['피드 우선 노출', false, true],
-  ['게시물 재수정', false, true],
-  ['원본 사진 다운로드', false, true],
 ] as const
 
 /** 가입 전에 알아 둘 것 */
@@ -114,8 +114,8 @@ export function ProPlan() {
                 {COMPARE.map(([label, free, pro]) => (
                   <tr key={label} className="border-t border-q-line">
                     <td className="py-2.5 text-q-text">{label}</td>
-                    <td className="text-center text-q-muted">{free ? '✓' : '–'}</td>
-                    <td className="text-center font-bold text-fg-q-green">{pro ? '✓' : '–'}</td>
+                    <td className="text-center text-q-muted">{typeof free === 'string' ? free : free ? '✓' : '–'}</td>
+                    <td className="text-center font-bold text-fg-q-green">{typeof pro === 'string' ? pro : pro ? '✓' : '–'}</td>
                   </tr>
                 ))}
               </tbody>

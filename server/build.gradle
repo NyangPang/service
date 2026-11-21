@@ -60,6 +60,8 @@ dependencies {
 
     // AI (Bedrock Converse + Image) / AWS (S3, Polly)
     implementation 'org.springframework.ai:spring-ai-starter-model-bedrock-converse'
+    // AI (Anthropic API 직접 연결) — 둘 중 무엇을 쓸지는 spring.ai.model.chat 으로 고름
+    implementation 'org.springframework.ai:spring-ai-starter-model-anthropic'
     implementation 'software.amazon.awssdk:s3'
     implementation 'software.amazon.awssdk:polly'
     implementation 'software.amazon.awssdk:bedrockruntime'
@@ -78,4 +80,24 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+// 장면 JSON → mp4 (B 파트). 사용법은 StoryboardCli 주석, docs/video-pipeline.md 참고
+// ./gradlew renderStoryboard --args="--storyboard docs/storyboard-samples/02-cafe.storyboard.json --photos a.png,b.png --out build/video/cafe.mp4"
+tasks.register('renderStoryboard', JavaExec) {
+    group = 'video'
+    description = '장면 JSON + 사진 → 세로 mp4'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.commicom.itda.infra.video.storyboard.StoryboardCli'
+    workingDir = projectDir
+    jvmArgs '-Djava.awt.headless=true'
+}
+
+// 메뉴 데이터 image_requests → Runway 이미지 생성 (B 파트). 사용법은 MenuImageCli 주석 참고
+tasks.register('generateMenuImages', JavaExec) {
+    group = 'video'
+    description = '메뉴 데이터의 이미지 요청 → Runway 이미지'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.commicom.itda.infra.video.storyboard.MenuImageCli'
+    workingDir = projectDir
 }

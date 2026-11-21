@@ -5,7 +5,6 @@ import pigeonCrying from '@/assets/generation/pigeon-crying.jpg'
 import pigeonUpload from '@/assets/generation/pigeon-upload.jpg'
 import pigeonUploaded from '@/assets/generation/pigeon-uploaded.png'
 import working2 from '@/assets/generation/pigeon-working-2.jpg'
-import { PostCarousel } from '@/features/feed/components/PostCarousel'
 import { useMyStore, useMyStoreId } from '@/features/owner/hooks'
 import { useIsPro } from '@/features/pro/hooks'
 import { errorMessage } from '@/shared/lib/error'
@@ -20,15 +19,16 @@ import {
   postGeneration,
   publishShortform,
 } from '../api'
-import { EDIT_TARGETS, editPlaceholder, isMapUrl, type EditTarget, type GenerationRequest, type MenuItem } from '../schema'
+import { EDIT_TARGETS, editPlaceholder, isMapUrl, type EditTarget, type GenerationRequest, type MenuItem, videoFileName, revisionsLeft, revisionNote, REVISION_LIMIT_DIALOG } from '../schema'
 import { Dialog } from './Dialog'
 import { ErrorText, Hero, Screen, StepWaiting } from './FlowUi'
+import { DraftPreview } from './DraftPreview'
 
 type Step = 'source' | 'menus' | 'appeal' | 'generate' | 'editPick' | 'editInput' | 'done'
 
 /**
  * 숏폼 만들기 (Figma 9:220 ~ 9:1170, 사장님 전용)
- * 재료 입력 → 메뉴 확인 → 어필 → 생성 대기(폴링) → 확인 → (수정: PRO) → 업로드 → 완료
+ * 재료 입력 → 메뉴 확인 → 어필 → 생성 대기(폴링) → 확인 → (수정: 무료 3번, PRO 무제한) → 업로드 → 완료
  */
 export function CreateShortformFlow() {
   const navigate = useNavigate()
@@ -98,12 +98,21 @@ export function CreateShortformFlow() {
       mapUrl: mapUrl.trim() || undefined,
       menus: menus.filter((m) => m.name.trim()),
       appeal: appeal.trim() || undefined,
-      // 게시물 사진: AI 사진 뒤에 음식·가게 사진 먼저, 그다음 메뉴판 (합쳐 4장까지)
-      photos: [...photos, ...files].slice(0, MAX_POST_PHOTOS),
+      // 음식·가게 사진은 영상 장면에, 메뉴판은 메뉴 읽기에 (게시물 사진은 둘을 이어 4장까지)
+      photos: photos.slice(0, MAX_POST_PHOTOS),
+      menuBoards: files,
     })
   const startRevision = () =>
     shortformId &&
     generate.mutate({ storeId, appeal: appeal.trim() || undefined, photoUrls: detail.data?.imageUrls?.slice(1), revision: { shortformId, target: editTarget, request: editRequest.trim() } })
+
+  // 무료 수정 남은 횟수 (PRO면 무제한). 다 쓰면 [수정]에서 PRO 안내
+  const left = revisionsLeft(detail.data?.revisionCount, isPro)
+  const openEdit = () => {
+    if (left <= 0) return setModal('pro')
+    setModal(null)
+    setStep('editPick')
+  }
 
   const inputStep = step === 'source' ? 1 : step === 'menus' ? 2 : step === 'appeal' ? 3 : 0
 
@@ -174,7 +183,7 @@ export function CreateShortformFlow() {
           />
           <p className="mt-1 text-right text-xs text-gray-2">{appeal.length} / 200</p>
           <p className="mt-4 rounded-xl bg-q-panel px-4 py-3 text-xs leading-relaxed break-keep text-q-muted">
-            적어 주신 내용을 바탕으로 손님 피드에 보일 소개 글을 만들어요. 없는 내용은 지어내지 않아요.
+            적어 주신 한마디와 가게 정보(소개·메뉴·주소)로 손님 피드에 보일 본문을 만들어요. 없는 내용은 지어내지 않아요.
           </p>
           {generate.isError && <ErrorText>{errorMessage(generate.error)}</ErrorText>}
         </Screen>
@@ -191,20 +200,18 @@ export function CreateShortformFlow() {
 
       {step === 'generate' && generation.data?.status === 'COMPLETED' && (
         <Screen
-          prev={{ label: '수정', onClick: () => (isPro ? setStep('editPick') : setModal('pro')) }}
+          hero={detail.data?.videoUrl ? <Hero sub={'업로드 전에\n영상과 소리를 확인해 주세요.'} plain /> : undefined}
+          prev={{ label: '수정', onClick: openEdit }}
           next={{ label: '업로드', onClick: () => setModal('upload'), disabled: !detail.data }}
+          download={detail.data?.videoUrl ? { url: detail.data.videoUrl, fileName: videoFileName(detail.data.storeName) } : undefined}
         >
-          <div className="relative mx-auto mt-2 aspect-[4/5] w-full max-w-[300px] overflow-hidden rounded-3xl bg-green-1 shadow-[0_10px_30px_rgba(8,104,22,0.18)]">
-            {detail.data ? (
-              <PostCarousel images={detail.data.imageUrls ?? (detail.data.imageUrl ? [detail.data.imageUrl] : [])} alt={detail.data.title} frame={detail.data.frame} />
-            ) : (
-              <p className="flex h-full items-center justify-center text-sm text-q-muted">게시물을 불러오는 중...</p>
-            )}
+          <div className="mt-2">
+            <DraftPreview detail={detail.data} />
           </div>
           {detail.data && (
             <div className="mx-auto mt-4 max-w-[300px]">
               <p className="text-16 font-bold text-ink">{detail.data.title}</p>
-              {detail.data.caption && <p className="mt-1 text-14 leading-relaxed text-q-sub">{detail.data.caption}</p>}
+              {detail.data.caption && <p className="mt-1 whitespace-pre-line text-14 leading-relaxed text-q-sub">{detail.data.caption}</p>}
             </div>
           )}
         </Screen>
@@ -212,6 +219,7 @@ export function CreateShortformFlow() {
 
       {step === 'editPick' && (
         <Screen hero={<Hero sub="어떤 것을 수정하고 싶으신가요?" plain />} prev={{ onClick: () => setStep('generate') }}>
+          <p className="text-center text-13 font-medium text-q-muted">{revisionNote(left)}</p>
           <div className="mt-6 flex flex-col gap-3">
             {EDIT_TARGETS.map(([target, label]) => (
               <button
@@ -240,7 +248,7 @@ export function CreateShortformFlow() {
           prev={{ onClick: () => setStep('editPick') }}
           next={{ label: generate.isPending ? '요청 중...' : '확인', onClick: startRevision, disabled: !editRequest.trim() || generate.isPending }}
         >
-          <p className="mb-2 text-xs font-bold text-q-muted">{editTarget === 'VIDEO' ? '사진' : '글·문구'} 수정</p>
+          <p className="mb-2 text-xs font-bold text-q-muted">{editTarget === 'VIDEO' ? '영상' : '대본 및 자막'} 수정</p>
           <textarea
             value={editRequest}
             onChange={(e) => setEditRequest(e.target.value)}
@@ -292,26 +300,22 @@ export function CreateShortformFlow() {
           primary={{ label: publish.isPending ? '올리는 중...' : '네 홍보할래요', onClick: () => publish.mutate() }}
           secondary={{
             label: '더 수정할래요',
-            onClick: () => {
-              if (!isPro) return setModal('pro')
-              setModal(null)
-              setStep('editPick')
-            },
+            onClick: openEdit,
           }}
         />
       )}
       {modal === 'delete' && (
         <Dialog
-          title="이 게시물을 삭제할까요?"
+          title="정말 삭제하실건가요?"
           image={pigeonCrying}
-          primary={{ label: '아니요', onClick: () => setModal(null) }}
+          primary={{ label: '아니요 계속 수정할래요', onClick: () => setModal(null) }}
           secondary={{ label: remove.isPending ? '삭제 중...' : '네 삭제할래요', onClick: () => remove.mutate() }}
         />
       )}
       {modal === 'pro' && (
         <Dialog
-          title="게시물 수정은 PRO 기능이에요"
-          text="PRO를 구독하면 사진·문구를 원하는 대로 다시 만들 수 있어요"
+          title={REVISION_LIMIT_DIALOG.title}
+          text={REVISION_LIMIT_DIALOG.text}
           image={pigeonUpload}
           primary={{ label: 'PRO 알아보기', onClick: () => navigate('/owner/pro') }}
           secondary={{ label: '닫기', onClick: () => setModal(null) }}
@@ -369,7 +373,7 @@ function StepSource({
       <PhotoPicker label="메뉴판 사진" files={files} setFiles={setFiles} className="mt-7" />
       <PhotoPicker label="음식·가게 사진 (선택)" files={photos} setFiles={setPhotos} className="mt-6" />
       <p className="mt-2 text-xs leading-relaxed break-keep text-gray-2">
-        게시물에는 AI가 만든 사진 1장 뒤에 올린 사진이 {MAX_POST_PHOTOS}장까지 붙어 옆으로 넘겨 볼 수 있어요 (음식·가게 사진 먼저)
+        음식·가게 사진으로 AI가 홍보 영상을 만들어요 ({MAX_POST_PHOTOS}장까지). 사진이 모자라면 메뉴 사진을 AI가 그려 채워요
       </p>
       <p className="mt-6 rounded-xl bg-q-panel px-4 py-3 text-xs leading-relaxed break-keep text-q-muted">
         지도 링크나 메뉴판 사진 중 하나만 있어도 돼요. 둘 다 올리면 메뉴를 더 정확하게 읽어요.
