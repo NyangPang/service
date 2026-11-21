@@ -88,6 +88,8 @@ export const MOCK_ONLY = {
   notification: false,
   /** 가게 리뷰 작성·수정·삭제·조회 (방문 인증한 가게만) */
   review: false,
+  /** 사장님 성과지표 (게시물 조회수·스크랩·방문 인증) + 게시물 조회 기록 */
+  metrics: false,
 } as const
 
 /** 이 기능을 목업으로 돌릴지 */

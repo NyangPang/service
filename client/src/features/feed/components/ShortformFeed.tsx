@@ -5,6 +5,7 @@ import guideSwipe from '@/assets/feed/guide-swipe.png'
 import pigeonUploaded from '@/assets/generation/pigeon-uploaded.png'
 import { StoreCouponSheet } from '@/features/coupon/components/StoreCouponSheet'
 import { useStores } from '@/features/map/hooks'
+import { useRecordShortformView } from '@/features/metrics/hooks'
 import { useQuestEvent } from '@/features/quest/hooks'
 import { useShortformFeed } from '../hooks'
 import type { Shortform } from '../schema'
@@ -23,6 +24,8 @@ export function ShortformFeed({ storeId, startId }: { storeId?: number; startId?
   const [couponFor, setCouponFor] = useState<Shortform | null>(null)
   // 퀘스트 "게시물 5개 보기": 넘기다 스친 게시물은 빼고 2초 이상 본 게시물만 셈
   useQuestEvent('SHORTFORM_VIEW', items?.[activeIndex]?.shortformId, 2000)
+  // 사장님 성과지표 조회수: 같은 기준(2초 이상 본 게시물)으로 로그인 여부와 상관없이 기록
+  useRecordShortformView(items?.[activeIndex]?.shortformId, 2000)
 
   // 화면에 60% 이상 보이는 게시물을 "지금 게시물"로
   useEffect(() => {

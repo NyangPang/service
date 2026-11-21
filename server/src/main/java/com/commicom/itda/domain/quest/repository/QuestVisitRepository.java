@@ -13,6 +13,9 @@ public interface QuestVisitRepository extends JpaRepository<QuestVisit, Long> {
 
     List<QuestVisit> findAllByMemberId(Long memberId);
 
+    /** 성과지표: 가게의 기간 안 방문 인증 (KST 날짜, 양 끝 포함) */
+    List<QuestVisit> findAllByStoreIdAndVisitDateBetween(Long storeId, LocalDate from, LocalDate to);
+
     boolean existsByMemberIdAndStoreIdAndVisitDate(Long memberId, Long storeId, LocalDate visitDate);
 
     boolean existsByMemberIdAndQuestIdAndStoreId(Long memberId, Long questId, Long storeId);

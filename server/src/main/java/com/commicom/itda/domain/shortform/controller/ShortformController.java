@@ -4,6 +4,7 @@ import com.commicom.itda.domain.shortform.dto.ShortformDetailResponse;
 import com.commicom.itda.domain.shortform.dto.ShortformFeedResponse;
 import com.commicom.itda.domain.shortform.dto.ShortformReplaceRequest;
 import com.commicom.itda.domain.shortform.service.ShortformService;
+import com.commicom.itda.domain.shortform.service.ShortformViewService;
 import com.commicom.itda.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ShortformController {
 
     private final ShortformService shortformService;
+    private final ShortformViewService viewService;
 
     @Operation(summary = "게시물 피드 조회", description = "최신순 게시물 목록을 페이지네이션하여 반환한다. storeId를 주면 해당 가게의 게시물만 반환한다.")
     @GetMapping
@@ -43,6 +45,17 @@ public class ShortformController {
     @GetMapping("/{shortformId}")
     public ApiResponse<ShortformDetailResponse> getShortform(@PathVariable Long shortformId) {
         return ApiResponse.onSuccess(shortformService.getShortform(shortformId));
+    }
+
+    @Operation(summary = "게시물 조회 기록",
+            description = "피드에서 게시물을 2초 이상 보면 앱이 보낸다 (사장님 성과지표의 조회수). 로그인하지 않아도 된다. "
+                    + "로그인 손님은 같은 게시물을 하루 1번만 세고, 공개 전 게시물·사장님이 자기 가게 게시물을 본 것은 세지 않는다. "
+                    + "result.counted = 이번에 셌는지")
+    @PostMapping("/{shortformId}/views")
+    public ApiResponse<java.util.Map<String, Boolean>> recordView(
+            @Parameter(hidden = true) @AuthenticationPrincipal Long memberId,
+            @PathVariable Long shortformId) {
+        return ApiResponse.onSuccess(java.util.Map.of("counted", viewService.record(shortformId, memberId)));
     }
 
     @Operation(summary = "게시물 공개 (사장님)", description = "AI로 만든 게시물은 비공개로 생기고, 사장님이 [업로드]하면 손님 피드에 보인다. 내 가게만 (SHORTFORM403)")

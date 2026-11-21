@@ -15,7 +15,7 @@ export function OwnerLoginGate({
   description,
   children,
 }: {
-  feature: 'coupon' | 'quest'
+  feature: 'coupon' | 'quest' | 'metrics'
   image: string
   title: string
   description: string
