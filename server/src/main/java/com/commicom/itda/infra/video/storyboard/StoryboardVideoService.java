@@ -31,9 +31,12 @@ public class StoryboardVideoService {
     private final String awsSecretKey;
     private final String awsRegion;
     private final String pollyVoice;
+    private final String pollyMaleVoice;
+    private final String pollyMaleEngine;
     private final String elevenLabsKey;
     private final String elevenLabsVoice;
     private final String elevenLabsModel;
+    private final String elevenLabsMaleVoice;
 
     public StoryboardVideoService(@Value("${video.ffmpeg-path}") String ffmpegPath,
                                   @Value("${video.work-dir}") String workDir,
@@ -44,9 +47,12 @@ public class StoryboardVideoService {
                                   @Value("${AWS_SECRET_ACCESS_KEY:}") String awsSecretKey,
                                   @Value("${aws.region:ap-northeast-2}") String awsRegion,
                                   @Value("${aws.polly.voice-id:Seoyeon}") String pollyVoice,
+                                  @Value("${aws.polly.male-voice-id:Hyunduk}") String pollyMaleVoice,
+                                  @Value("${aws.polly.male-engine:generative}") String pollyMaleEngine,
                                   @Value("${ELEVENLABS_API_KEY:}") String elevenLabsKey,
                                   @Value("${ELEVENLABS_VOICE_ID:uyVNoMrnUku1dZyVEXwD}") String elevenLabsVoice,
-                                  @Value("${ELEVENLABS_MODEL:eleven_v3}") String elevenLabsModel) {
+                                  @Value("${ELEVENLABS_MODEL:eleven_v3}") String elevenLabsModel,
+                                  @Value("${ELEVENLABS_MALE_VOICE_ID:}") String elevenLabsMaleVoice) {
         this.ffmpegPath = ffmpegPath;
         this.workDir = Path.of(workDir);
         this.tts = tts;
@@ -59,9 +65,12 @@ public class StoryboardVideoService {
         this.awsSecretKey = awsSecretKey;
         this.awsRegion = awsRegion;
         this.pollyVoice = pollyVoice;
+        this.pollyMaleVoice = pollyMaleVoice;
+        this.pollyMaleEngine = pollyMaleEngine;
         this.elevenLabsKey = elevenLabsKey;
         this.elevenLabsVoice = elevenLabsVoice;
         this.elevenLabsModel = elevenLabsModel;
+        this.elevenLabsMaleVoice = elevenLabsMaleVoice;
     }
 
     /**
@@ -70,11 +79,16 @@ public class StoryboardVideoService {
      * @param useRunway      false면 키가 있어도 Runway를 부르지 않음 (motion=ai 장면도 zoom_in) — 크레딧 아끼기용
      */
     public Result render(String storyboardJson, List<Path> photos, boolean useRunway) throws Exception {
+        return render(storyboardJson, photos, useRunway, NarrationVoice.DEFAULT);
+    }
+
+    /** @param voice 나레이션 목소리 (영상 스타일에 따라 남자 목소리) */
+    public Result render(String storyboardJson, List<Path> photos, boolean useRunway, NarrationVoice voice) throws Exception {
         Storyboard sb = json.readValue(storyboardJson, Storyboard.class);
         String id = UUID.randomUUID().toString();
         Path out = workDir.resolve("storyboard").resolve(id).resolve("video.mp4");
 
-        Narrator narrator = narrator();
+        Narrator narrator = narrator(voice == null ? NarrationVoice.DEFAULT : voice);
         RunwayClipClient runway = useRunway ? new RunwayClipClient(runwayKey, log::info) : null;
         log.info("[영상] 「{}」 장면 {}개 · 사진 {}장 · 음성 {} · Runway {}", sb.title(), sb.scenes().size(), photos.size(),
                 narrator == null ? "없음" : narrator.id(), runway != null && runway.enabled() ? "사용" : "안 씀(zoom_in 대체)");
@@ -97,7 +111,8 @@ public class StoryboardVideoService {
      * video.tts: auto / elevenlabs / polly / say / none.
      * auto는 StoryboardCli와 같은 순서 — ElevenLabs 키 → AWS 키(Polly) → macOS say → 무음
      */
-    private Narrator narrator() {
+    private Narrator narrator(NarrationVoice voice) {
+        boolean male = voice == NarrationVoice.MALE;
         boolean hasEleven = !elevenLabsKey.isBlank();
         boolean hasAws = !awsAccessKey.isBlank() && !awsSecretKey.isBlank() && !awsAccessKey.startsWith("local-dummy");
         String mode = !"auto".equals(tts) ? tts
@@ -105,11 +120,15 @@ public class StoryboardVideoService {
         return switch (mode) {
             case "elevenlabs" -> {
                 if (!hasEleven) throw new IllegalStateException("video.tts=elevenlabs 는 ELEVENLABS_API_KEY 가 필요해요");
-                yield Narrator.elevenLabs(elevenLabsKey, elevenLabsVoice, elevenLabsModel);
+                if (male && elevenLabsMaleVoice.isBlank()) log.warn("[영상] ELEVENLABS_MALE_VOICE_ID 가 없어 남자 목소리 대신 기본 목소리로 읽어요");
+                yield Narrator.elevenLabs(elevenLabsKey, male && !elevenLabsMaleVoice.isBlank() ? elevenLabsMaleVoice : elevenLabsVoice,
+                        elevenLabsModel);
             }
             case "polly" -> {
                 if (!hasAws) throw new IllegalStateException("video.tts=polly 는 AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY 가 필요해요");
-                yield Narrator.polly(awsAccessKey, awsSecretKey, awsRegion, pollyVoice);
+                Narrator base = Narrator.polly(awsAccessKey, awsSecretKey, awsRegion, pollyVoice);
+                yield male ? Narrator.withFallback(Narrator.polly(awsAccessKey, awsSecretKey, awsRegion, pollyMaleVoice, pollyMaleEngine),
+                        base, msg -> log.warn("[영상] {}", msg)) : base;
             }
             case "say" -> Narrator.macSay("Yuna");
             case "none" -> null;
