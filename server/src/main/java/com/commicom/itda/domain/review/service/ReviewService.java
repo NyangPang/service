@@ -36,6 +36,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -46,8 +47,8 @@ import java.util.stream.Collectors;
 /**
  * 가게 리뷰: 손님 마이페이지 > 내 리뷰 (작성·수정·삭제·보상 뽑기), 사장님 가게 프로필 > 리뷰 (조회·숨기기).
  * <p>
- * 기준은 QR 방문 인증 1건: 리뷰는 같은 인증으로 여러 개 쓸 수 있고, 보상 뽑기 3회는 그 인증으로 쓴 첫 리뷰에만
- * (인증 1건당 평생 한 번). 보상 받은 리뷰를 지우면 남은 뽑기는 사라지고, 그 인증으로 다시 써도 보상은 없음.
+ * 기준은 QR 방문 인증 1건: 인증 1건당 리뷰는 평생 1개, 쓰면 보상 뽑기 3회.
+ * 리뷰를 지우면 남은 뽑기는 사라지고, 그 인증으로는 다시 쓸 수 없음 (뽑기권이 남아 있어서).
  */
 @Service
 @RequiredArgsConstructor
@@ -80,6 +81,10 @@ public class ReviewService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_VISIT_NOT_FOUND));
         Store store = storeRepository.findById(visit.getStoreId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
+        // 인증 1건당 리뷰 1개. 지운 리뷰도 포함 (뽑기권은 지워도 남음). 예전 데이터엔 뽑기권 없는 리뷰도 있어서 둘 다 봄
+        if (ticketRepository.existsByVisitId(visit.getId()) || reviewRepository.existsByVisitId(visit.getId())) {
+            throw new BusinessException(ErrorCode.REVIEW_ALREADY_WRITTEN);
+        }
 
         List<MultipartFile> photoFiles = nonEmpty(photos);
         MultipartFile videoFile = isPresent(video) ? video : null;
@@ -96,12 +101,9 @@ public class ReviewService {
                 .videoUrl(videoFile == null ? null : storageService.upload(videoFile, "reviews/" + store.getId()))
                 .build());
 
-        // 이 인증으로 처음 쓰는 리뷰일 때만 뽑기 3회 (두 번째 리뷰부터, 또는 보상 받은 리뷰를 지운 뒤엔 없음)
-        int granted = 0;
-        if (!ticketRepository.existsByVisitId(visit.getId())) {
-            ticketRepository.save(new ReviewDrawTicket(memberId, visit.getId(), review.getId()));
-            granted = ReviewDrawTicket.DRAWS_PER_REVIEW;
-        }
+        // 뽑기 3회. visitId 가 unique 라 동시에 두 번 써도 하나는 실패하고 리뷰까지 롤백됨
+        ticketRepository.saveAndFlush(new ReviewDrawTicket(memberId, visit.getId(), review.getId()));
+        int granted = ReviewDrawTicket.DRAWS_PER_REVIEW;
         notificationService.notifyReviewCreated(review);
         return new CreateResponse(ReviewResponse.from(review, granted), granted);
     }
@@ -210,23 +212,22 @@ public class ReviewService {
         return ReviewResponse.from(reviewRepository.saveAndFlush(review));
     }
 
-    /** 리뷰를 쓸 수 있는 QR 방문 인증: 내 인증 전부 (최근 인증 순) + 보상 여부 · 그 인증으로 쓴 리뷰 수 */
+    /** 리뷰를 쓸 수 있는 QR 방문 인증: 아직 리뷰를 안 쓴 내 인증만 (최근 인증 순). 리뷰를 지운 인증도 빠짐 */
     @Transactional(readOnly = true)
     public List<WritableVisitResponse> getWritableVisits(Long memberId) {
-        Map<Long, Long> reviewCounts = reviewRepository.findAllByMemberIdOrderByCreatedAtDesc(memberId).stream()
-                .filter(r -> r.getVisitId() != null)
-                .collect(Collectors.groupingBy(Review::getVisitId, Collectors.counting()));
         List<QuestVisit> visits = visitRepository.findAllByMemberId(memberId).stream()
                 .sorted(Comparator.comparing(QuestVisit::getId).reversed())
                 .toList();
-        Set<Long> rewarded = ticketRepository.findAllByVisitIdIn(visits.stream().map(QuestVisit::getId).toList()).stream()
-                .map(ReviewDrawTicket::getVisitId).collect(Collectors.toSet());
-        Map<Long, Store> stores = storeRepository.findAllById(visits.stream().map(QuestVisit::getStoreId).distinct().toList())
+        Set<Long> used = ticketRepository.findAllByVisitIdIn(visits.stream().map(QuestVisit::getId).toList()).stream()
+                .map(ReviewDrawTicket::getVisitId).collect(Collectors.toCollection(HashSet::new));
+        reviewRepository.findAllByMemberIdOrderByCreatedAtDesc(memberId).stream()
+                .map(Review::getVisitId).filter(id -> id != null).forEach(used::add);
+        List<QuestVisit> writable = visits.stream().filter(v -> !used.contains(v.getId())).toList();
+        Map<Long, Store> stores = storeRepository.findAllById(writable.stream().map(QuestVisit::getStoreId).distinct().toList())
                 .stream().collect(Collectors.toMap(Store::getId, Function.identity()));
-        return visits.stream()
+        return writable.stream()
                 .filter(v -> stores.containsKey(v.getStoreId()))
-                .map(v -> WritableVisitResponse.of(v, stores.get(v.getStoreId()), !rewarded.contains(v.getId()),
-                        reviewCounts.getOrDefault(v.getId(), 0L).intValue()))
+                .map(v -> WritableVisitResponse.of(v, stores.get(v.getStoreId()), true, 0))
                 .toList();
     }
 
