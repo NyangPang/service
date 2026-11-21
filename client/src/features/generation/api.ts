@@ -40,6 +40,9 @@ export async function postGeneration(body: GenerationRequest): Promise<Generatio
       menuInfo: toMenuInfo(body),
       appeal: body.appeal?.trim() || undefined,
       photoUrls: photoUrls.slice(0, MAX_POST_PHOTOS),
+      // 생성 느낌 (서버 영상 프롬프트 작업 중 — 아직 모르면 무시됨)
+      videoStyle: body.videoStyle,
+      emphases: body.emphases?.length ? body.emphases : undefined,
     }),
   )
 }
