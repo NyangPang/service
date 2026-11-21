@@ -8,8 +8,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface ShortformRepository extends JpaRepository<Shortform, Long> {
+
+    /** 성과지표: 가게의 공개 게시물 전부 (최신순) */
+    List<Shortform> findAllByStoreAndPublishedTrueOrderByCreatedAtDesc(Store store);
 
     /** 가게별 피드: 공개한 게시물만 */
     Page<Shortform> findAllByStoreAndPublishedTrue(Store store, Pageable pageable);

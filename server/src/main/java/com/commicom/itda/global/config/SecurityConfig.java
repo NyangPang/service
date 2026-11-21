@@ -28,6 +28,8 @@ public class SecurityConfig {
             "/h2-console/**",
             "/error",
             "/api/members/signup", "/api/members/login",
+            // 게시물 조회 기록: 비로그인 손님도 센다 (로그인했으면 토큰으로 손님을 구분)
+            "/api/shortforms/*/views",
             "/api/members/email-verifications", "/api/members/email-verifications/confirm",
     };
 
@@ -59,7 +61,8 @@ public class SecurityConfig {
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/api/stores/me", "/api/stores/*/quest-templates", "/api/stores/*/quest-qr",
-                                "/api/stores/*/coupons", "/api/stores/*/coupon-settlements", "/api/stores/*/pro").authenticated()
+                                "/api/stores/*/coupons", "/api/stores/*/coupon-settlements", "/api/stores/*/pro",
+                                "/api/stores/*/metrics").authenticated()
                         .requestMatchers(PUBLIC_PATHS).permitAll()
                         .requestMatchers(HttpMethod.GET, PUBLIC_GET_PATHS).permitAll()
                         .anyRequest().authenticated());
