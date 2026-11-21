@@ -36,6 +36,8 @@ const MODES: { mode: AppMode; label: string; desc: string }[] = [
 function AccountSection({ onLoggedIn, onLoggedOut }: { onLoggedIn: (mode: AppMode) => void; onLoggedOut: () => void }) {
   const me = useMe()
   const logout = useLogout()
+  const navigate = useNavigate()
+  const setMode = useModeStore((s) => s.setMode)
 
   if (!me) {
     return (
@@ -100,6 +102,10 @@ function AccountSection({ onLoggedIn, onLoggedOut }: { onLoggedIn: (mode: AppMod
             type="button"
             onClick={() => {
               logout()
+              if (owner) {
+                setMode('USER')
+                navigate('/', { replace: true })
+              }
               onLoggedOut()
             }}
             className="w-full border-b border-q-line py-3.5 text-left text-q-muted"
