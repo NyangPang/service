@@ -265,21 +265,52 @@ class StoryboardValidatorTest {
     @Test
     void 영상_프롬프트에_사람이나_신체가_있으면_오류() throws IOException {
         List<String> errors = errorsOf("01-donkatsu", sb -> {
-            scene(sb, 0).put("video_prompt", "chef's hands placing a pork cutlet, slow push-in, warm light");
+            scene(sb, 0).put("video_prompt", "chef's fingers placing a pork cutlet, slow push-in, warm light");
             scene(sb, 2).put("video_prompt", "Customer smiling at a cheese cutlet, close-up, soft light");
         });
         assertThat(errors).anyMatch(e -> e.contains("[장면 id=1]") && e.contains("사람·신체")
-                        && e.contains("\"chef\", \"hands\""))
+                        && e.contains("\"chef\", \"fingers\""))
                 .anyMatch(e -> e.contains("[장면 id=3]") && e.contains("\"customer\""));
     }
 
     @Test
-    void 영상_프롬프트에_손이_필요한_동작이_있으면_오류() throws IOException {
-        // 젓가락으로 들어 올리면 Runway가 젓가락을 쥔 손을 그려 넣는다
+    void 장갑_낀_손과_도구로_하는_동작은_허용() throws IOException {
+        // 카메라 무빙만으로는 정적이라, 집게로 집기·포크와 나이프로 찢기·단면 보여 주기 같은 동작을 쓰게 한다
+        List<String> errors = errorsOf("01-donkatsu", sb -> {
+            scene(sb, 0).put("video_prompt", "a gloved hand uses metal tongs to pick up the pork cutlet and place it on a tray, slow push-in, warm light");
+            scene(sb, 2).put("video_prompt", "a fork and knife tear the cheese cutlet apart, revealing the melting cheese inside, close-up, warm light");
+        });
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void 영상_프롬프트에_입이_필요한_동작이_있으면_오류() throws IOException {
+        // 먹는 동작을 쓰면 Runway가 얼굴을 그려 넣는다
         List<String> errors = errorsOf("01-donkatsu", sb ->
-                scene(sb, 2).put("video_prompt", "cheese cutlet lifted with chopsticks, sauce pouring, slow motion close-up"));
-        assertThat(errors).anyMatch(e -> e.contains("[장면 id=3]") && e.contains("손이 있어야 하는 동작")
-                && e.contains("동작(\"lifted\")"));
+                scene(sb, 2).put("video_prompt", "close-up of biting into the cheese cutlet, sauce pouring, slow motion"));
+        assertThat(errors).anyMatch(e -> e.contains("[장면 id=3]") && e.contains("입이 있어야 하는 동작")
+                && e.contains("동작(\"biting\")"));
+    }
+
+    @Test
+    void 외관_사진으로_넘어가는_마지막_장면은_transition으로_쓸_수_있음() throws IOException {
+        // 01-donkatsu: 4번째 장면은 음식(1번 사진), 마지막 장면은 외관(3번 사진)
+        List<String> errors = errorsOf("01-donkatsu", sb -> scene(sb, 4).put("motion", "transition").put("video_prompt",
+                "the camera pulls back from the cutlet on the table, glides out through the window and reveals the storefront from the street, warm evening light"));
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void transition은_외관_사진으로_넘어갈_때만_한_번() throws IOException {
+        String prompt = "the camera glides from the cutlet to the next plate, smooth continuous motion";
+        List<String> first = errorsOf("01-donkatsu", sb -> scene(sb, 0).put("motion", "transition").put("video_prompt", prompt));
+        assertThat(first).anyMatch(e -> e.contains("[장면 id=1] 첫 장면은 motion \"transition\"일 수 없습니다"));
+
+        List<String> notExterior = errorsOf("01-donkatsu", sb -> scene(sb, 3).put("motion", "transition").put("video_prompt", prompt));
+        assertThat(notExterior).anyMatch(e -> e.contains("[장면 id=4] motion \"transition\"은 가게 외관(exterior) 사진으로"));
+
+        List<String> noPrompt = errorsOf("01-donkatsu", sb -> scene(sb, 4).put("motion", "transition").putNull("video_prompt"));
+        assertThat(noPrompt).anyMatch(e -> e.contains("[장면 id=5] motion이 \"transition\"이면 video_prompt가 있어야"));
     }
 
     @ParameterizedTest
@@ -299,14 +330,14 @@ class StoryboardValidatorTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "hand-pulled noodles in a bowl, slow push-in",   // hand- 붙은 말은 손을 그릴 수 있어 막는다
             "a woman sipping iced latte by the window",
-            "crowded cozy izakaya interior, warm light"
+            "crowded cozy izakaya interior, warm light",
+            "close-up of a face smiling over the cutlet, warm light"
     })
     void 사람을_떠올리게_하는_표현은_막는다(String videoPrompt) throws IOException {
         List<String> errors = errorsOf("01-donkatsu", sb -> scene(sb, 0).put("video_prompt", videoPrompt));
         assertThat(errors).anyMatch(e -> e.startsWith("[장면 id=1] video_prompt에")
-                && (e.contains("사람·신체") || e.contains("손이 있어야 하는 동작")));
+                && (e.contains("사람·신체") || e.contains("입이 있어야 하는 동작")));
     }
 
     @Test

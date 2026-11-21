@@ -71,8 +71,8 @@
 | `type` | enum | ✅ | `hook` / `menu` / `detail` / `review` / `cta`. 처음은 `hook`, 마지막은 `cta` |
 | `duration` | number | ✅ | 초, 0.5 단위, 1.5~5 (Runway 클립 5초). `hook`은 2 이하 |
 | `image_index` | int | ✅ | `photoUrls` 순번. `menu_board` 사진 사용 불가 |
-| `motion` | enum | ✅ | `ai` (Runway, 영상당 최대 3개, `ai` 장면끼리 같은 사진 금지) / `zoom_in` / `zoom_out` / `static` (FFmpeg, 무료) |
-| `video_prompt` | string \| null | `ai`일 때 | 영어, 40단어 이내, `[음식] + [음식 묘사] + [카메라] + [조명] + [분위기]`, 글자·간판·로고 요청 금지, 사람·신체(`chef`, `hands`…)와 손·입이 필요한 동작(`lifted`, `stirring`, `eating`…) 금지. 붓기·뿌리기는 됨 |
+| `motion` | enum | ✅ | `ai` (Runway Gen-4 Turbo, 영상당 최대 3개, `ai` 장면끼리 같은 사진 금지) / `transition` (앞 장면 사진 → 이 장면 가게 외관 사진을 AI가 이어 줌. Runway Kling 2.5 Turbo Pro 첫·끝 화면, 5초 60 credits. 영상당 1개, 외관 사진으로 넘어가는 장면만, 첫 장면 불가. Runway가 꺼져 있거나 실패하면 `zoom_out`으로 대체) / `zoom_in` / `zoom_out` / `static` (FFmpeg, 무료) |
+| `video_prompt` | string \| null | `ai`·`transition`일 때 | 영어, 40단어 이내. `ai`: `[음식] + [음식을 다루는 동작 1개] + [음식 묘사] + [카메라] + [조명] + [분위기]` — 카메라 무빙만으로는 정적이라 집기·옮기기("a gloved hand uses tongs to pick up the bread and place it on a tray")·찢기·자르기·단면("a fork and knife tear the bread apart, revealing the cream inside")·붓기 중 하나를 넣음. `transition`: 앞 장면 음식에서 외관으로 이어지는 카메라 이동. 글자·간판·로고 요청 금지, 사람 전체·얼굴·손가락(`chef`, `fingers`, `face`…)과 입이 필요한 동작(`eating`, `biting`, `sipping`…) 금지. 손은 장갑 낀 손(`a gloved hand`)과 도구로만 |
 | `menu_ref` | string \| null | 가격 자막 있을 때 | 메뉴 데이터 `menus[].name`과 정확히 일치. 장면 사진도 같은 메뉴여야 함 |
 | `narration` | string | ✅ | 한국어 TTS이자 그 장면 자막 (대사 한 조각). 모든 장면에 쓰고, 공백 포함 40자 이내 (화면에서는 18자 안팎 조각 최대 3개로 나뉘어 차례로 뜸 — `caption.text` 참고). 긴 문장은 쉼표·이어 주는 말에서 나눠 다음 장면으로. 공백·문장부호 제외 글자 수 ≤ `duration` × 7 (가격은 "만 이천 원"처럼 읽는 형태로 셈). 숫자는 `menu_ref` 메뉴 가격(`12,000원`)만, 이모지 금지. 장면끼리 마지막 세 글자가 같으면 안 됨 |
 | `caption.text` | string | ✅ | 그 장면 `narration`과 같은 글 (띄어쓰기·문장부호까지, 여러 칸 띄어쓰기만 허용). 마지막 장면만 가게 이름. 공백 포함 40자 이내. 렌더러(`CaptionSplitter`)가 띄어쓰기에서 18자 이내 조각 최대 3개로 나누고, 조각마다 읽는 글자 수 비율로 나레이션 구간을 나눠 말하는 속도에 맞춰 바꿔 띄움 (예: "딸기 복숭아 샤인머스켓 / 골라 먹는 재미예요."). 가격은 앞 단어와 같은 조각. 띄어쓰기 없이 18자가 넘으면 나눌 수 없어 오류. 가격 조각은 "메뉴 + 가격"으로 끝내면 가격이 따로 크게 나옴. 가격은 `12,000원` 형식. 이모지 금지 (폰트가 못 그림) |
@@ -123,7 +123,7 @@
 - **흐름**: 메뉴 추출 (A, `image_requests` 작성) → 이미지 생성 (B, Runway `gen4_image`, 요청을 동시에 보냄) → 사장님 확인 → 장면 JSON (A) → 영상 (B)
 - **몇 개**: 쓸 수 있는 사진(메뉴판·`low` 제외)이 3장 이상이면 `[]`, 적으면 정확히 `3 − 쓸 수 있는 사진 수`개. `menus`가 비면 `[]`
 - **무엇을**: 메뉴 2~3가지가 함께 놓인 모습이 기본 (`menu_ref: null`), `is_signature` 메뉴는 꼭 포함. 외관·건물은 만들지 않음
-- **`prompt` 규칙**: `[음식과 담음새] + [그릇·배경] + [조명] + [구도]`, `realistic food photography`, `vertical composition` 포함. 메뉴판에 없는 재료를 지어 넣지 않음. 글자·간판·로고, 사람·신체, 손이 필요한 동작, 가게 이름 금지 (`video_prompt`와 같은 금지어 검사)
+- **`prompt` 규칙**: `[음식과 담음새] + [그릇·배경] + [조명] + [구도]`, `realistic food photography`, `vertical composition` 포함. 메뉴판에 없는 재료를 지어 넣지 않음. 글자·간판·로고, 사람·신체(정지 이미지라 손도 금지), 손이 필요한 동작, 가게 이름 금지
 - **B 파트가 할 일**: 요청마다 이미지 1장을 만들어 `photos[]` 끝에 붙인다. `photoUrls`도 같은 순서로 붙인다.
 
 ```json
@@ -168,6 +168,7 @@
 | 바뀐 필드 | B 파트 작업 | 비용 |
 | --- | --- | --- |
 | `ai` 장면의 `video_prompt` · `image_index` · `motion` | 해당 장면 Runway 재생성 + 재합성 | 크레딧 |
+| `transition` 장면의 `video_prompt` · 앞 장면이나 이 장면의 `image_index` | 화면 전환 클립 Runway 재생성 + 재합성 | 크레딧 (60) |
 | 그 외 장면의 `image_index` · `motion` | 해당 장면 FFmpeg 클립 재생성 + 재합성 | 무료 |
 | `narration` | 해당 장면 TTS 재합성 + 재합성 | 거의 무료 |
 | `caption` · `style` · `bgm` · `order` · `duration` · `title` | 재합성만 | 무료 |

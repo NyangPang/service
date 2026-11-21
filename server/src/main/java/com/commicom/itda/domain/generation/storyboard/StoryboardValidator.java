@@ -34,7 +34,9 @@ public class StoryboardValidator {
     static final Set<String> FONTS = Set.of("gothic_bold", "gothic_regular");
     static final Set<String> BGM_MOODS = Set.of("upbeat_acoustic", "calm_lofi", "bright_pop", "jazz");
     static final Set<String> SCENE_TYPES = Set.of("hook", "menu", "detail", "review", "cta");
-    static final Set<String> MOTIONS = Set.of("ai", "zoom_in", "zoom_out", "static");
+    /** transition = 앞 장면 사진 → 이 장면 외관 사진을 AI가 이어 주는 장면 ({@link #checkTransition}) */
+    static final Set<String> MOTIONS = Set.of("ai", "transition", "zoom_in", "zoom_out", "static");
+    static final int MAX_TRANSITIONS = 1;
     /** bottom = 화면 가운데보다 조금 아래 왼쪽(기본), center = 정중앙 (가게 이름) */
     static final Set<String> POSITIONS = Set.of("center", "bottom");
     static final Set<String> EMPHASES = Set.of("normal", "large", "price");
@@ -72,7 +74,9 @@ public class StoryboardValidator {
                     + "poster|posters|banner|banners|watermark|menu board|chalkboard|neon sign)\\b",
             Pattern.CASE_INSENSITIVE);
     /**
-     * Runway가 사람·손·얼굴을 뭉개서 그리므로 사람과 신체를 가리키는 단어 금지.
+     * Runway가 사람 전체·얼굴·손가락을 뭉개서 그리므로 사람과 그런 신체를 가리키는 단어 금지.
+     * 손(hand, hands)은 허용한다 — "a gloved hand uses tongs to pick up the bread"처럼 손과 도구만 화면에 나오는 동작이
+     * 카메라 무빙보다 영상을 훨씬 살아 있게 만든다. 손가락·팔처럼 더 드러나는 신체는 여전히 막는다.
      * mouth-watering(군침 도는)처럼 음식 묘사에 흔한 표현은 뺀다.
      */
     static final Pattern PERSON_WORDS = Pattern.compile(
@@ -80,15 +84,19 @@ public class StoryboardValidator {
                     + "someone|somebody|crowd|crowded|friend|friends|portrait|selfie|"
                     + "chef|chefs|baker|bakers|barista|baristas|bartender|bartenders|waiter|waiters|waitress|waitresses|"
                     + "staff|employee|employees|worker|workers|owner|owners|customer|customers|guest|guests|"
-                    + "hand|hands|finger|fingers|fingertip|fingertips|thumb|thumbs|wrist|wrists|arm|arms|elbow|elbows|"
+                    + "finger|fingers|fingertip|fingertips|thumb|thumbs|arm|arms|elbow|elbows|"
                     + "face|faces|mouth(?![-\\s]?watering)|lip|lips)\\b",
             Pattern.CASE_INSENSITIVE);
     /**
-     * 들어 올리기·젓기·먹기처럼 손이나 입이 있어야 하는 동작을 쓰면 Runway가 사람을 그려 넣으므로 금지.
-     * 붓기(pour)는 우유·소스가 위에서 흘러내리는 모습으로 쓸 수 있어 허용한다 (손은 프롬프트에서 화면 밖으로).
-     * stir-fried(볶음), pour-over(핸드드립)처럼 요리 이름에 쓰이는 표현은 뺀다.
-     * freshly poured / picked처럼 이미 끝난 상태를 말하는 과거형은 허용.
+     * 먹기·마시기처럼 입이 있어야 하는 동작을 쓰면 Runway가 얼굴을 그려 넣으므로 금지.
+     * 집기·옮기기·찢기·자르기는 손과 도구(집게·포크·나이프)로 하는 동작이라 허용한다.
      */
+    static final Pattern MOUTH_ACTION_WORDS = Pattern.compile(
+            "\\b(biting|eat|eats|eating|drinking|sip|sips|sipping|chewing|licking|tasting)\\b",
+            Pattern.CASE_INSENSITIVE);
+    /** 정지 이미지(메뉴 이미지 생성)에는 동작이 없으니 손도 그리지 않는다 — {@link MenuExtractionValidator}에서 씀 */
+    static final Pattern STILL_HAND_WORDS = Pattern.compile("\\b(hand|hands|wrist|wrists)\\b", Pattern.CASE_INSENSITIVE);
+    /** 정지 이미지에서 손이 있어야 하는 동작 (손이 그려진다). freshly poured / picked처럼 끝난 상태는 허용 */
     static final Pattern HAND_ACTION_WORDS = Pattern.compile(
             "\\b(hold|holds|holding|held|lift|lifts|lifting|lifted|pick|picks|picking|grab|grabs|grabbing|grabbed|"
                     + "stir(?![-\\s]?fr)|stirs|stirring|stirred|scooping|"
@@ -112,6 +120,7 @@ public class StoryboardValidator {
         checkNarrationEndings(scenes, errors);
 
         int aiCount = 0;
+        int transitionCount = 0;
         /** 사진 번호 → 그 사진으로 AI 클립을 처음 만든 장면 */
         Map<Integer, String> aiPhotos = new HashMap<>();
         for (int i = 0; i < scenes.size(); i++) {
@@ -130,12 +139,19 @@ public class StoryboardValidator {
                 aiCount++;
                 checkVideoPrompt(scene, at, errors);
                 checkAiPhotoReuse(scene, at, aiPhotos, errors);
+            } else if ("transition".equals(scene.motion())) {
+                transitionCount++;
+                checkTransition(scenes, i, at, menu, errors);
             }
         }
         checkEveryPhotoMoves(scenes, menu, errors);
         if (aiCount > MAX_AI_SCENES) {
             errors.add("motion이 \"ai\"인 장면이 " + aiCount + "개입니다. 최대 " + MAX_AI_SCENES
                     + "개까지만 쓰고, 나머지는 zoom_in / zoom_out / static으로 바꾸세요.");
+        }
+        if (transitionCount > MAX_TRANSITIONS) {
+            errors.add("motion이 \"transition\"인 장면이 " + transitionCount + "개입니다. 외관 사진으로 넘어가는 장면 " + MAX_TRANSITIONS
+                    + "개에만 쓰고, 나머지는 zoom_in / zoom_out / static으로 바꾸세요.");
         }
         return errors;
     }
@@ -539,7 +555,7 @@ public class StoryboardValidator {
     private void checkVideoPrompt(Scene s, String at, List<String> errors) {
         String p = s.videoPrompt();
         if (isBlank(p)) {
-            errors.add(at + " motion이 \"ai\"이면 video_prompt가 있어야 합니다.");
+            errors.add(at + " motion이 \"" + s.motion() + "\"이면 video_prompt가 있어야 합니다.");
             return;
         }
         if (HANGUL.matcher(p).find()) {
@@ -557,14 +573,42 @@ public class StoryboardValidator {
         List<String> people = findAll(PERSON_WORDS, p);
         if (!people.isEmpty()) {
             errors.add(at + " video_prompt에 사람·신체를 가리키는 단어(" + String.join(", ", people)
-                    + ")가 있습니다. AI 영상에서 사람과 손·얼굴은 뭉개져 보이니 빼고, 음식과 공간만 묘사하세요.");
+                    + ")가 있습니다. AI 영상에서 사람·얼굴·손가락은 뭉개져 보이니 빼세요. 동작은 \"a gloved hand uses tongs to pick up the bread\"처럼 "
+                    + "손과 도구만 화면에 나오게 쓰면 됩니다.");
         }
-        List<String> actions = findAll(HAND_ACTION_WORDS, p);
+        List<String> actions = findAll(MOUTH_ACTION_WORDS, p);
         if (!actions.isEmpty()) {
-            errors.add(at + " video_prompt에 손이 있어야 하는 동작(" + String.join(", ", actions)
-                    + ")이 있습니다. 영상에 손이 그려지니, 김이 오르거나 치즈가 녹아 흐르는 것처럼 음식이 스스로 움직이는 모습과 카메라 움직임으로 바꾸세요. "
-                    + "붓기는 \"milk pouring into the latte from above\"처럼 흐르는 모습만 쓰면 됩니다.");
+            errors.add(at + " video_prompt에 입이 있어야 하는 동작(" + String.join(", ", actions)
+                    + ")이 있습니다. 영상에 얼굴이 그려지니, 집게로 집기·포크와 나이프로 찢기·단면 보여 주기처럼 손과 도구로 하는 동작으로 바꾸세요.");
         }
+    }
+
+    /**
+     * transition: 앞 장면 사진(첫 화면) → 이 장면 가게 외관 사진(끝 화면)을 AI가 이어 주는 장면.
+     * Runway에 처음·끝 화면을 둘 다 주는 모델(Kling)을 쓰므로 영상 전체에서 하나만, 외관 사진으로 넘어갈 때만.
+     */
+    private void checkTransition(List<Scene> scenes, int i, String at, MenuData menu, List<String> errors) {
+        Scene s = scenes.get(i);
+        checkVideoPrompt(s, at, errors);
+        if (i == 0) {
+            errors.add(at + " 첫 장면은 motion \"transition\"일 수 없습니다. 앞 장면 사진에서 이 장면 사진으로 넘어가는 효과입니다.");
+            return;
+        }
+        Scene prev = scenes.get(i - 1);
+        if (prev == null || prev.imageIndex() == null || s.imageIndex() == null) return;
+        if (prev.imageIndex().equals(s.imageIndex())) {
+            errors.add(at + " motion \"transition\"은 앞 장면과 다른 사진으로 넘어갈 때만 씁니다. (앞 장면도 " + s.imageIndex() + "번 사진)");
+        }
+        if (menu != null && !isExterior(menu, s.imageIndex())) {
+            errors.add(at + " motion \"transition\"은 가게 외관(exterior) 사진으로 넘어가는 장면에만 씁니다. 이 장면의 motion을 zoom_in / zoom_out / static으로 바꾸세요.");
+        }
+        if (menu != null && isExterior(menu, prev.imageIndex())) {
+            errors.add(at + " motion \"transition\"의 앞 장면은 음식·가게 안 사진이어야 합니다. 외관 사진에서 외관 사진으로는 넘어가지 않습니다.");
+        }
+    }
+
+    private static boolean isExterior(MenuData menu, Integer imageIndex) {
+        return imageIndex != null && menu.findPhoto(imageIndex).map(p -> "exterior".equals(p.kind())).orElse(false);
     }
 
     /** 같은 사진으로 AI 클립을 두 번 만들면 거의 같은 영상에 Runway 크레딧을 두 번 쓰게 된다 */

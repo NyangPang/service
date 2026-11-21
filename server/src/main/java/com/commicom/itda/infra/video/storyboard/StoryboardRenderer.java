@@ -63,6 +63,14 @@ public final class StoryboardRenderer {
 
     private record CaptionCue(Path image, double start, double end) {}
 
+    /** 화면 전환 클립 요청: first 사진(앞 장면) → last 사진(이 장면), 결과는 raw에 저장 */
+    private record TransitionJob(Path first, Path last, String prompt, Path raw) {}
+
+    /** 클립이 이만큼 모자라면 느리게 늘여 채운다 (그 이상이면 왕복 재생). 집기·찢기 같은 동작은 거꾸로 돌리면 어색하다 */
+    private static final double MAX_SLOW_DOWN = 1.8;
+    /** 화면 전환은 이 배속까지 빠르게 돌려 장면 안에서 외관 화면에 도착하게 한다 */
+    private static final double TRANSITION_MAX_SPEED = 1.4;
+
     private final Ffmpeg ff;
     private final Path cacheDir;
     private final Narrator narrator;          // null이면 무음
@@ -115,16 +123,63 @@ public final class StoryboardRenderer {
                 }
             }
         }
-        // 사진별 Runway 클립을 먼저 한꺼번에 요청해 둔다 (하나씩 기다리면 사진 수만큼 시간이 늘어남)
-        Map<Integer, State> rawStates = generateClips(clipPrompts, photos);
+        // 화면 전환(transition) 장면: 앞 장면 사진 → 이 장면 사진(가게 외관)을 잇는 클립. 사진 클립과 동시에 요청한다
+        Map<Integer, TransitionJob> transitions = new HashMap<>();
+        if (runwayOn) {
+            for (int idx = 1; idx < ordered.size(); idx++) {
+                Scene s = ordered.get(idx);
+                Scene prev = ordered.get(idx - 1);
+                if (!"transition".equals(s.motion()) || s.videoPrompt() == null || s.videoPrompt().isBlank()) continue;
+                if (!validPhoto(s, photos) || !validPhoto(prev, photos) || prev.imageIndex() == s.imageIndex()) continue;
+                Path first = photos.get(prev.imageIndex());
+                Path last = photos.get(s.imageIndex());
+                Path raw = cacheDir.resolve("transition-" + hash("transition", fileHash(first), fileHash(last), s.videoPrompt()) + ".mp4");
+                transitions.put(idx, new TransitionJob(first, last, s.videoPrompt(), raw));
+            }
+        }
+        ExecutorService transitionPool = Executors.newCachedThreadPool();
+        Map<Integer, State> transitionStates = new HashMap<>();
+        Map<Integer, State> rawStates;
+        try {
+            Map<Integer, Future<State>> pending = new HashMap<>();
+            transitions.forEach((idx, job) -> pending.put(idx, transitionPool.submit(
+                    () -> cached(job.raw(), tmp -> runway.generateTransition(job.first(), job.last(), job.prompt(), tmp, ff)))));
+            if (!pending.isEmpty()) log.accept("  Runway 화면 전환 " + pending.size() + "개 요청 (" + RunwayClipClient.TRANSITION_MODEL + ")");
+            // 사진별 Runway 클립을 먼저 한꺼번에 요청해 둔다 (하나씩 기다리면 사진 수만큼 시간이 늘어남)
+            rawStates = generateClips(clipPrompts, photos);
+            // 화면 전환은 덤이라 실패해도 영상은 만든다 (그 장면만 줌으로 대체)
+            for (Map.Entry<Integer, Future<State>> e : pending.entrySet()) {
+                try {
+                    transitionStates.put(e.getKey(), e.getValue().get());
+                } catch (ExecutionException ex) {
+                    log.accept("  ⚠ 화면 전환 생성 실패 → 줌으로 대체: " + ex.getCause().getMessage());
+                    transitionStates.put(e.getKey(), State.FALLBACK);
+                }
+            }
+        } finally {
+            transitionPool.shutdownNow();   // 생성 취소(인터럽트)면 기다리던 요청도 멈춤
+        }
+        // 사진마다 그 Runway 클립을 몇 초까지 이어 쓰는지 (5초보다 길면 느리게 늘이거나 왕복 재생)
+        Map<Integer, Double> clipNeeded = new HashMap<>();
+        Map<Integer, Double> usedSoFar = new HashMap<>();
+        for (int idx = 0; idx < ordered.size(); idx++) {
+            Scene s = ordered.get(idx);
+            if (!clipPrompts.containsKey(s.imageIndex()) || transitions.containsKey(idx)) continue;
+            double len = s.duration() + (idx == ordered.size() - 1 ? 0 : theme.transitionSec);
+            double start = usedSoFar.getOrDefault(s.imageIndex(), 0.0);
+            usedSoFar.put(s.imageIndex(), start + s.duration());
+            clipNeeded.merge(s.imageIndex(), start + len, Math::max);
+        }
         /** 사진 번호 → 그 사진 클립에서 이미 쓴 시간(초) */
         Map<Integer, Double> clipUsed = new HashMap<>();
+        /** AI 화면 전환 장면 순번 — 그 앞 경계는 녹아들기(fade)로 잇는다 */
+        java.util.Set<Integer> dissolveInto = new java.util.HashSet<>();
         double sceneStart = 0;
         for (int idx = 0; idx < ordered.size(); idx++) {
             Scene scene = ordered.get(idx);
             boolean lastScene = idx == ordered.size() - 1;
             double length = scene.duration() + (lastScene ? 0 : theme.transitionSec);
-            if (scene.imageIndex() < 0 || scene.imageIndex() >= photos.size()) {
+            if (!validPhoto(scene, photos)) {
                 throw new IllegalArgumentException("장면 " + scene.id() + ": image_index " + scene.imageIndex()
                         + " 에 해당하는 사진이 없음 (사진 " + photos.size() + "장)");
             }
@@ -138,17 +193,34 @@ public final class StoryboardRenderer {
             String clipKey;
             State clipState;
             String clipPrompt = clipPrompts.get(scene.imageIndex());
-            if (clipPrompt != null) {
+            TransitionJob transition = transitions.get(idx);
+            if ("transition".equals(motion) && transition != null && Files.exists(transition.raw())) {
+                // 전환 클립을 장면 안에 담는다: 조금 빠르게(최대 1.4배) 재생하고 남는 시간은 외관 화면에서 멈춰 보여 줌
+                Path raw = transition.raw();
+                clipKey = hash("transition-fit", VERSION, raw.getFileName().toString(), fmt(length));
+                clip = cacheDir.resolve("clip-" + clipKey + ".mp4");
+                cached(clip, tmp -> fitTransition(raw, length, tmp));
+                clipState = transitionStates.getOrDefault(idx, State.CACHED);
+                // 전환 클립의 첫 화면이 앞 장면 사진이라, 주제 전환(밀기·회전) 대신 짧게 녹아들게 잇는다
+                dissolveInto.add(idx);
+            } else if ("transition".equals(motion)) {
+                note = runway == null ? "Runway 끔 → zoom_out으로 대체"
+                        : !runway.enabled() ? "Runway 키 없음 → zoom_out으로 대체" : "화면 전환 실패 → zoom_out으로 대체";
+                clipKey = hash("zoom", photoHash, "zoom_out", fmt(length), clipW + "x" + clipH);
+                clip = cacheDir.resolve("clip-" + clipKey + ".mp4");
+                Path zoomOut = clip;
+                cached(zoomOut, tmp -> zoomClip(photo, "zoom_out", length, clipW, clipH, tmp));
+                clipState = State.FALLBACK;
+            } else if (clipPrompt != null) {
                 String runwayKey = hash("runway", photoHash, clipPrompt);
                 Path raw = cacheDir.resolve("clip-" + runwayKey + ".mp4");
                 // generateClips가 이미 만들어 둠. 새로 만든 클립은 그 사진의 첫 장면에서만 "새로"로 표시
                 State rawState = rawStates.getOrDefault(scene.imageIndex(), State.CACHED);
                 rawStates.put(scene.imageIndex(), State.CACHED);
-                Path loop = cacheDir.resolve("loop-" + runwayKey + ".mp4");
-                cached(loop, tmp -> pingPong(raw, tmp));
+                Path loop = extendedClip(raw, runwayKey, clipNeeded.getOrDefault(scene.imageIndex(), length));
                 double start = clipUsed.getOrDefault(scene.imageIndex(), 0.0);
                 clipUsed.put(scene.imageIndex(), start + scene.duration());
-                clipKey = hash("runway-part", runwayKey, fmt(start), fmt(length));
+                clipKey = hash("runway-part", loop.getFileName().toString(), fmt(start), fmt(length));
                 clip = cacheDir.resolve("clip-" + clipKey + ".mp4");
                 Path loopF = loop;
                 cached(clip, tmp -> subClip(loopF, start, length, tmp));
@@ -242,7 +314,7 @@ public final class StoryboardRenderer {
         // 전체: 겹쳐 넘기며 이어붙이기 → BGM → 최종
         Files.createDirectories(out.toAbsolutePath().getParent());
         Path body = cacheDir.resolve("body-" + System.nanoTime() + ".mp4");
-        joinWithTransitions(segments, durations, theme, body);
+        joinWithTransitions(segments, durations, theme, dissolveInto, body);
         Path header = null;
         if (template.hasHeader() && sb.title() != null && !sb.title().isBlank()) {
             header = cacheDir.resolve("header-" + hash(VERSION, template.id(), sb.title(), sb.storeName()) + ".png");
@@ -370,6 +442,45 @@ public final class StoryboardRenderer {
         ff.run(args);
     }
 
+    private static boolean validPhoto(Scene s, List<Path> photos) {
+        return s.imageIndex() >= 0 && s.imageIndex() < photos.size();
+    }
+
+    /**
+     * 사진 하나의 Runway 클립을 needed초 동안 이어 쓸 수 있게 늘인다.
+     * 클립 길이 안이면 그대로, {@value #MAX_SLOW_DOWN}배까지는 느리게 늘이고(동작이 거꾸로 돌지 않게),
+     * 그보다 길면 정방향 + 역방향 왕복.
+     */
+    private Path extendedClip(Path raw, String runwayKey, double needed) throws Exception {
+        double rawSec = ff.duration(raw);
+        if (needed <= rawSec + 0.05) return raw;
+        double factor = needed / rawSec;
+        if (factor <= MAX_SLOW_DOWN) {
+            Path slow = cacheDir.resolve("slow-" + hash(runwayKey, fmt(factor)) + ".mp4");
+            cached(slow, tmp -> ff.run(List.of("-i", raw.toString(),
+                    "-vf", "setpts=" + fmt(factor) + "*PTS,fps=" + FPS,
+                    "-an", "-c:v", "libx264", "-preset", "veryfast", "-crf", "18", "-pix_fmt", "yuv420p", tmp.toString())));
+            return slow;
+        }
+        Path loop = cacheDir.resolve("loop-" + runwayKey + ".mp4");
+        cached(loop, tmp -> pingPong(raw, tmp));
+        return loop;
+    }
+
+    /**
+     * 화면 전환 클립을 length초 장면에 담는다. 최대 {@value #TRANSITION_MAX_SPEED}배속으로 돌려 외관 화면에 도착한 뒤,
+     * 남는 시간은 마지막 화면(가게 외관)을 이어 보여 준다. 장면이 더 짧으면 장면 길이에 맞춰 더 빠르게.
+     */
+    private void fitTransition(Path raw, double length, Path out) throws Exception {
+        double rawSec = ff.duration(raw);
+        double played = Math.min(length, rawSec / TRANSITION_MAX_SPEED);
+        double factor = played / rawSec;
+        ff.run(List.of("-i", raw.toString(),
+                "-vf", "setpts=" + fmt(factor) + "*PTS,fps=" + FPS + ",tpad=stop_mode=clone:stop_duration=" + fmt(length),
+                "-t", fmt(length),
+                "-an", "-c:v", "libx264", "-preset", "veryfast", "-crf", "18", "-pix_fmt", "yuv420p", out.toString()));
+    }
+
     /** Runway 클립 → 정방향 + 역방향을 이은 클립 (끝에서 멈추지 않고 되감기듯 계속 움직임) */
     private void pingPong(Path clip, Path out) throws Exception {
         ff.run(List.of("-i", clip.toString(),
@@ -407,7 +518,8 @@ public final class StoryboardRenderer {
      * 장면 조각들을 주제의 전환 효과로 겹쳐 이어붙인다 (소리는 장면 시작 시점에 그대로 섞음).
      * 앞 장면들은 전환 시간만큼 길게 만들어 두었으므로 k번째 장면은 정확히 앞 장면 duration 합 시점에 시작한다.
      */
-    private void joinWithTransitions(List<Path> segments, List<Double> durations, ThemeStyle theme, Path out) throws Exception {
+    private void joinWithTransitions(List<Path> segments, List<Double> durations, ThemeStyle theme,
+                                     java.util.Set<Integer> dissolveInto, Path out) throws Exception {
         if (segments.size() == 1) {
             ff.run(List.of("-i", segments.get(0).toString(), "-c", "copy", out.toString()));
             return;
@@ -420,7 +532,7 @@ public final class StoryboardRenderer {
         for (int k = 1; k < segments.size(); k++) {
             offset += durations.get(k - 1);
             String nv = "[v" + k + "]";
-            f.append(v).append("[").append(k).append(":v]xfade=transition=").append(theme.transition)
+            f.append(v).append("[").append(k).append(":v]xfade=transition=").append(dissolveInto.contains(k) ? "fade" : theme.transition)
                     .append(":duration=").append(fmt(theme.transitionSec))
                     .append(":offset=").append(fmt(offset)).append(nv).append(";");
             f.append("[").append(k).append(":a]adelay=delays=").append(Math.round(offset * 1000)).append(":all=1[a").append(k).append("];");
