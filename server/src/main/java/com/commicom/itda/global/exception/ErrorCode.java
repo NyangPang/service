@@ -104,6 +104,7 @@ public enum ErrorCode {
     REVIEW_FORBIDDEN(HttpStatus.FORBIDDEN, "REVIEW403_2", "내가 쓴 리뷰가 아니에요"),
     REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "REVIEW404", "리뷰를 찾을 수 없어요"),
     REVIEW_VISIT_NOT_FOUND(HttpStatus.NOT_FOUND, "REVIEW404_2", "방문 인증 기록을 찾을 수 없어요"),
+    REVIEW_ALREADY_WRITTEN(HttpStatus.CONFLICT, "REVIEW409", "이 방문 인증으로는 이미 리뷰를 썼어요"),
     REVIEW_NO_DRAWS_LEFT(HttpStatus.CONFLICT, "REVIEW409_2", "남은 뽑기가 없어요"),
 
     // 알림

@@ -23,7 +23,7 @@ export function ReviewWritePage() {
   if (!me) return <Navigate to={`/login?next=${encodeURIComponent(pathname + search)}`} replace />
   if (isLoading) return <Loading />
   const visit = writable?.find((v) => v.visitId === visitId)
-  if (visit) return <ReviewForm mode="create" visitId={visit.visitId} storeName={visit.storeName} rewardAvailable={visit.rewardAvailable} />
+  if (visit) return <ReviewForm mode="create" visitId={visit.visitId} storeName={visit.storeName} />
   return <ReviewNotAllowed />
 }
 

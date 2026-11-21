@@ -19,7 +19,7 @@ import {
 import { StarPicker } from './ReviewUi'
 
 type Props =
-  | { mode: 'create'; visitId: number; storeName: string; rewardAvailable: boolean }
+  | { mode: 'create'; visitId: number; storeName: string }
   | { mode: 'edit'; review: Review }
 
 function initialMedia(review: Review | null): ReviewMedia[] {
@@ -107,8 +107,8 @@ export function ReviewForm(props: Props) {
       <p className="text-center text-13 text-q-muted">방문 인증한 가게</p>
       <h2 className="mt-1 text-center text-21 font-bold text-q-text">{storeName}</h2>
       {props.mode === 'create' && (
-        <p className={`mx-auto mt-2 w-fit rounded-full px-3 py-1 text-12 font-bold ${props.rewardAvailable ? 'bg-q-mint text-fg-q-green' : 'bg-q-panel text-q-muted'}`}>
-          {props.rewardAvailable ? `🎁 리뷰를 남기면 보상 뽑기 ${REVIEW_DRAWS}회` : '이 방문 인증으로 이미 보상을 받았어요 (리뷰는 더 쓸 수 있어요)'}
+        <p className="mx-auto mt-2 w-fit rounded-full bg-q-mint px-3 py-1 text-12 font-bold text-fg-q-green">
+          🎁 리뷰를 남기면 보상 뽑기 {REVIEW_DRAWS}회
         </p>
       )}
 
