@@ -19,7 +19,9 @@ public record ShortformSummaryResponse(
         String caption,
         LocalDateTime createdAt,
         /** PRO 가게 게시물 (피드 우선 노출·추천 배지) */
-        boolean promoted
+        boolean promoted,
+        /** 처음 게시물에서 고쳐 만든 횟수 (사장님 내 게시물: 무료 수정 남은 횟수 표시) */
+        int revisionCount
 ) {
 
     public static ShortformSummaryResponse from(Shortform shortform, boolean promoted) {
@@ -33,7 +35,8 @@ public record ShortformSummaryResponse(
                 shortform.getTitle(),
                 shortform.getCaption(),
                 shortform.getCreatedAt(),
-                promoted
+                promoted,
+                shortform.getRevisionCount()
         );
     }
 }

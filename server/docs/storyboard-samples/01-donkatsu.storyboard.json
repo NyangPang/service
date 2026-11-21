@@ -1,0 +1,51 @@
+{
+  "schema_version": "0.1",
+  "title": "웨이팅 이유 있는 두툼 로스카츠",
+  "total_duration": 15,
+  "theme": "value",
+  "style": { "mood": "warm", "font": "gothic_bold", "main_color": "#FF7A00" },
+  "bgm": { "mood": "upbeat_acoustic" },
+  "scenes": [
+    {
+      "id": 1, "order": 1, "type": "hook", "duration": 2,
+      "image_index": 0, "motion": "ai",
+      "video_prompt": "crispy pork cutlet sliced in half with steam rising and oil sizzling on the crust, quick push-in, warm side lighting, bold appetizing mood",
+      "menu_ref": null,
+      "narration": "여기 모르면 진짜 손해예요.",
+      "caption": { "text": "여기 모르면 진짜 손해예요.", "position": "center", "emphasis": "large" }
+    },
+    {
+      "id": 2, "order": 2, "type": "menu", "duration": 3.5,
+      "image_index": 0, "motion": "zoom_in",
+      "video_prompt": null,
+      "menu_ref": "로스카츠",
+      "narration": "두툼한 로스카츠 12,000원",
+      "caption": { "text": "두툼한 로스카츠 12,000원", "position": "bottom", "emphasis": "price" }
+    },
+    {
+      "id": 3, "order": 3, "type": "detail", "duration": 3,
+      "image_index": 2, "motion": "ai",
+      "video_prompt": "cheese cutlet cut open with molten cheese stretching and dripping, slow push-in, warm lighting, rich indulgent mood",
+      "menu_ref": "치즈카츠",
+      "narration": "치즈 쭉 늘어나는 치즈카츠까지.",
+      "caption": { "text": "치즈 쭉 늘어나는 치즈카츠까지.", "position": "bottom", "emphasis": "normal" }
+    },
+    {
+      "id": 4, "order": 4, "type": "review", "duration": 3,
+      "image_index": 1, "motion": "ai",
+      "video_prompt": "golden tenderloin cutlet on a plate with steam rising and a small dish of sauce beside it, slow orbit, warm light, hearty mood",
+      "menu_ref": null,
+      "narration": "손님들 후기도 겉바속촉이래요.",
+      "caption": { "text": "손님들 후기도 겉바속촉이래요.", "position": "bottom", "emphasis": "normal" }
+    },
+    {
+      "id": 5, "order": 5, "type": "cta", "duration": 3.5,
+      "image_index": 3, "motion": "zoom_in",
+      "video_prompt": null,
+      "menu_ref": null,
+      "narration": "카츠하우스, 오늘 점심 어때요?",
+      "caption": { "text": "카츠하우스", "position": "center", "emphasis": "large" }
+    }
+  ],
+  "meta": { "category": "RESTAURANT", "prompt_version": "dummy" }
+}

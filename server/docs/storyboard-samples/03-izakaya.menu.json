@@ -1,0 +1,17 @@
+{
+  "store_name": "골목이자카야",
+  "category": "CAFE_BAKERY_PUB",
+  "menus": [
+    { "name": "모둠꼬치", "price_text": "18,000원", "price": 18000, "description": "숯불에 구운 꼬치 5종", "is_signature": true },
+    { "name": "하이볼", "price_text": "7,000원", "price": 7000, "description": null, "is_signature": false },
+    { "name": "오코노미야키", "price_text": "15,000원", "price": 15000, "description": null, "is_signature": false }
+  ],
+  "review_keywords": ["분위기", "사장님 친절", "하이볼 진함"],
+  "photos": [
+    { "index": 0, "source": "upload", "kind": "food", "menu_ref": "모둠꼬치", "description": "숯불 위 꼬치" },
+    { "index": 1, "source": "upload", "kind": "food", "menu_ref": "하이볼", "description": "하이볼 잔과 안주" }
+  ],
+  "image_requests": [
+    { "menu_ref": null, "prompt": "assorted charcoal grilled skewers and an okonomiyaki side by side on a dark wooden izakaya counter, warm amber lighting, close-up, realistic food photography, vertical composition" }
+  ]
+}

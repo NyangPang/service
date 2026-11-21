@@ -34,6 +34,19 @@ spring:
       mail.smtp.timeout: 5000
 
   ai:
+    model:
+      # 글 생성(메뉴판 인식·스토리보드·소개 글)을 어디로 보낼지
+      #   bedrock-converse → AWS Bedrock (BEDROCK_MODEL_ID 필요) — 기본
+      #   anthropic        → Anthropic API 직접 (ANTHROPIC_API_KEY 필요) — Bedrock이 막혔을 때 대안
+      chat: ${AI_CHAT_PROVIDER:bedrock-converse}
+    anthropic:
+      # 키가 없어도 서버는 뜨고, AI를 부를 때만 인증 오류가 남 (AI 안 쓰는 팀원도 개발 가능하게)
+      api-key: ${ANTHROPIC_API_KEY:no-key-set}
+      chat:
+        options:
+          model: ${ANTHROPIC_MODEL:claude-haiku-5-5}
+          # 생각 + JSON 응답이 잘리지 않을 만큼 (Spring AI 기본값 4096은 부족할 수 있음)
+          max-tokens: 16000
     bedrock:
       aws:
         region: ${AWS_REGION:ap-northeast-2}
@@ -43,6 +56,8 @@ spring:
         chat:
           options:
             model: ${BEDROCK_MODEL_ID}
+            # 생각 + JSON 응답이 잘리지 않을 만큼 (비워 두면 모델 기본값이라 짧을 수 있음)
+            max-tokens: 16000
 
 jwt:
   secret: ${JWT_SECRET}
@@ -61,6 +76,8 @@ aws:
 video:
   ffmpeg-path: ${FFMPEG_PATH:ffmpeg}
   work-dir: ${VIDEO_WORK_DIR:./tmp/video}
+  # 장면 JSON 영상의 내레이션: auto(ElevenLabs 키 → AWS 키(Polly) → macOS say → 무음 순) / elevenlabs / polly / say / none
+  tts: ${VIDEO_TTS:auto}
 
 email-verification:
   # 보내는 사람 주소 (비우면 MAIL_USERNAME)
@@ -85,6 +102,11 @@ unsplash:
 
 runway:
   api-key: ${RUNWAYML_API_SECRET:${RUNWAY_API_KEY:}}
+
+generation:
+  video:
+    # motion=ai 장면과 사진이 없을 때의 메뉴 이미지에 Runway 크레딧을 쓴다 (false면 줌 효과로 대체, 무료)
+    runway: ${GENERATION_RUNWAY:true}
 
 cors:
   allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}

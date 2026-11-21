@@ -61,12 +61,23 @@ public class Shortform extends BaseTimeEntity {
     @Column(nullable = false)
     private boolean published;
 
+    /** 처음 만든 게시물에서 몇 번 고쳐 만든 버전인지 (0 = 처음). 무료는 FREE_REVISIONS 번까지, PRO는 무제한 */
+    @Column(nullable = false)
+    private int revisionCount;
+
+    public static final int FREE_REVISIONS = 3;
+
+    /** 생성 요청의 수정 횟수를 이어받음 (새로 만들기 0, 수정이면 고칠 게시물 + 1) */
+    public void markRevision(int revisionCount) {
+        this.revisionCount = revisionCount;
+    }
+
     /** 게시물 한 개의 사진은 AI 사진 1장 + 사장님 사진 4장까지 */
     public static final int MAX_PHOTOS = 4;
 
     @Builder
     private Shortform(Store store, String imageUrl, String videoUrl, String title, String caption, List<String> photoUrls,
-                      Boolean published) {
+                      Boolean published, Integer revisionCount) {
         this.store = store;
         this.imageUrl = imageUrl;
         this.videoUrl = videoUrl;
@@ -74,6 +85,7 @@ public class Shortform extends BaseTimeEntity {
         this.caption = caption;
         // 따로 정하지 않으면 공개 (샘플 데이터 등). AI 생성 결과는 false 로 만듦
         this.published = published == null || published;
+        this.revisionCount = revisionCount == null ? 0 : revisionCount;
         if (photoUrls != null) {
             this.photoUrls = new ArrayList<>(photoUrls.stream().limit(MAX_PHOTOS).toList());
         }

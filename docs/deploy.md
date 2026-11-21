@@ -118,7 +118,7 @@ SPRING_PROFILES_ACTIVE=local
 JWT_SECRET=
 
 # AWS — 서버가 이 키로 직접 접속함 (EC2 IAM Role 은 쓰지 않으므로 운영에서도 필요)
-# 필요한 권한: 업로드 버킷 S3 PutObject, Bedrock InvokeModel(대화 모델 + amazon.nova-canvas-v1:0)
+# 필요한 권한: 업로드 버킷 S3 PutObject, Bedrock InvokeModel(대화 모델), Polly SynthesizeSpeech(영상 내레이션)
 AWS_REGION=ap-northeast-2
 AWS_ACCESS_KEY_ID=
 AWS_SECRET_ACCESS_KEY=
@@ -174,6 +174,35 @@ CORS_ALLOWED_ORIGINS=http://localhost:5173
 # Swagger 문서 공개 (기본 true, 운영에서 숨기려면 false)
 # SWAGGER_ENABLED=true
 
-# 지금은 쓰지 않는 영상 생성 기능용 (넣지 않아도 됨):
-# RUNWAYML_API_SECRET, AWS_POLLY_VOICE_ID, FFMPEG_PATH, VIDEO_WORK_DIR
+# 시연용 샘플 가게 125곳 + 영상 게시물 (기본 false, 운영 시연 땐 true)
+# SAMPLE_DATA_ENABLED=false
+
+# 인증 메일 보내는 사람 이름 (기본: 잇츠)
+# MAIL_FROM_NAME=잇츠
+
+# ------------------------------------------------------------
+# AI 숏폼 영상 파이프라인 (메뉴 추출 → 장면 JSON → 영상). 자세한 흐름은 server/docs/video-pipeline.md
+# ------------------------------------------------------------
+
+# 글 생성(메뉴판 인식·스토리보드·소개 글)을 어디로 보낼지: bedrock-converse(기본, BEDROCK_MODEL_ID 사용) / anthropic
+# AI_CHAT_PROVIDER=bedrock-converse
+# anthropic 일 때만: Anthropic API 키와 모델
+# ANTHROPIC_API_KEY=
+# ANTHROPIC_MODEL=
+
+# Runway (사진 → 움직이는 장면, 사진이 모자랄 때 메뉴 이미지). 키가 없으면 줌 효과로 대체
+# RUNWAYML_API_SECRET=
+# Runway 크레딧 사용 여부 (기본 true — 영상 하나 만들 때마다 크레딧이 나감. false 면 무료 줌 효과)
+# GENERATION_RUNWAY=true
+
+# 내레이션 음성: auto(ElevenLabs 키 → AWS Polly → macOS say → 무음 순, 기본) / elevenlabs / polly / say / none
+# VIDEO_TTS=auto
+# ELEVENLABS_API_KEY=
+# ELEVENLABS_VOICE_ID=
+# ELEVENLABS_MODEL=eleven_v3
+# AWS_POLLY_VOICE_ID=Seoyeon
+
+# 영상 합성 도구와 작업 폴더 (Docker 이미지엔 ffmpeg 가 들어 있어 보통 그대로)
+# FFMPEG_PATH=ffmpeg
+# VIDEO_WORK_DIR=./tmp/video
 ```

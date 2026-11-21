@@ -1,6 +1,7 @@
 package com.commicom.itda.domain.generation.service;
 
 import com.commicom.itda.domain.generation.dto.GenerationRequest;
+import com.commicom.itda.domain.generation.dto.MenuItemDto;
 import com.commicom.itda.domain.generation.dto.GenerationResponse;
 import com.commicom.itda.domain.generation.dto.GenerationStatusResponse;
 import com.commicom.itda.domain.generation.entity.Generation;
@@ -8,10 +9,14 @@ import com.commicom.itda.domain.generation.entity.GenerationStatus;
 import com.commicom.itda.domain.generation.repository.GenerationRepository;
 import com.commicom.itda.domain.member.entity.Member;
 import com.commicom.itda.domain.member.repository.MemberRepository;
+import com.commicom.itda.domain.pro.repository.ProSubscriptionRepository;
+import com.commicom.itda.domain.shortform.entity.Shortform;
+import com.commicom.itda.domain.shortform.repository.ShortformRepository;
 import com.commicom.itda.domain.store.entity.Store;
 import com.commicom.itda.domain.store.repository.StoreRepository;
 import com.commicom.itda.global.exception.BusinessException;
 import com.commicom.itda.global.exception.ErrorCode;
+import com.commicom.itda.global.util.KstTime;
 import com.commicom.itda.infra.storage.StorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,6 +36,8 @@ public class GenerationService {
     private final GenerationPipelineService pipelineService;
     private final StorageService storageService;
     private final GenerationCancelRegistry cancelRegistry;
+    private final ShortformRepository shortformRepository;
+    private final ProSubscriptionRepository proRepository;
 
     @Transactional
     public GenerationResponse requestGeneration(Long memberId, GenerationRequest request) {
@@ -51,10 +58,13 @@ public class GenerationService {
             throw new BusinessException(ErrorCode.GENERATION_CONFLICT);
         }
 
+        int revisionCount = nextRevisionCount(store, request.revisionOf());
+
         Generation generation = Generation.builder()
                 .store(store)
                 .requestedBy(member)
                 .status(GenerationStatus.PENDING)
+                .revisionCount(revisionCount)
                 .build();
         generationRepository.save(generation);
 
@@ -62,18 +72,45 @@ public class GenerationService {
         Long generationId = generation.getId();
         String menuInfo = request.menuInfo();
         String appeal = request.appeal();
-        String menuImageUrl = request.menuImageUrl();
+        List<MenuItemDto> menus = request.menus() == null ? List.of() : request.menus();
         // 게시물에 넣을 사장님 사진: 이 가게 사진 폴더에 올라간 것만 (POST /api/stores/{storeId}/photos)
-        List<String> photoUrls = request.photoUrls() == null ? List.of()
-                : request.photoUrls().stream().filter(u -> storageService.isUploadedUnder(u, "stores/" + store.getId())).toList();
+        List<String> photoUrls = ownUploads(request.photoUrls(), store);
+        // 메뉴판 사진: 영상 만들 때 메뉴 읽기에만 씀 (같은 폴더 검사)
+        List<String> menuBoardUrls = ownUploads(request.menuBoardUrls(), store);
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
-                pipelineService.execute(generationId, menuInfo, appeal, menuImageUrl, photoUrls);
+                pipelineService.execute(generationId, menuInfo, appeal, menus, photoUrls, menuBoardUrls);
             }
         });
 
         return GenerationResponse.from(generation);
+    }
+
+    /**
+     * 수정 요청이면 고칠 게시물의 수정 횟수 + 1. 무료는 게시물마다 FREE_REVISIONS 번까지, PRO는 무제한.
+     * 새로 만들기(revisionOf 없음)는 0.
+     */
+    int nextRevisionCount(Store store, Long revisionOf) {
+        if (revisionOf == null) return 0;
+        Shortform base = shortformRepository.findById(revisionOf)
+                .orElseThrow(() -> new BusinessException(ErrorCode.SHORTFORM_NOT_FOUND));
+        if (!base.getStore().getId().equals(store.getId())) {
+            throw new BusinessException(ErrorCode.STORE_FORBIDDEN);
+        }
+        boolean pro = proRepository.findByStoreId(store.getId())
+                .map(p -> p.isActive(KstTime.now()))
+                .orElse(false);
+        if (!pro && base.getRevisionCount() >= Shortform.FREE_REVISIONS) {
+            throw new BusinessException(ErrorCode.GENERATION_REVISION_LIMIT);
+        }
+        return base.getRevisionCount() + 1;
+    }
+
+    /** 이 가게 사진 폴더에 올라간 주소만 (다른 곳 주소를 저장하거나 내려받지 않게) */
+    private List<String> ownUploads(List<String> urls, Store store) {
+        return urls == null ? List.of()
+                : urls.stream().filter(u -> storageService.isUploadedUnder(u, "stores/" + store.getId())).toList();
     }
 
     @Transactional(readOnly = true)

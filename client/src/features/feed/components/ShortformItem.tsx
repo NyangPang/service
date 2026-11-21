@@ -7,23 +7,23 @@ import { toast } from '@/stores/toastStore'
 import { useCanScrap, useIsScrapped, useToggleScrap } from '../hooks'
 import type { Shortform } from '../schema'
 import { PostCarousel } from './PostCarousel'
-import { PostVideo } from './PostVideo'
 
 interface Props {
   item: Shortform
-  /** 화면에 보이는 게시물 (영상이면 이때만 재생) */
-  active: boolean
   couponCount: number
   onOpenCoupons: () => void
 }
 
 /**
- * 피드 게시물 한 장 — 사장님이 AI로 만든 사진을 인스타그램 게시물처럼:
+ * 피드 게시물 한 장 — 사장님이 AI로 만든 영상·사진을 인스타그램 게시물처럼:
  * 가게 프로필 → 사진 → 버튼(스크랩·위치·공유·쿠폰) → 소개 글·메뉴·올린 날짜. 한 화면에 한 장씩 (위아래로 넘기기는 ShortformFeed)
  */
-export function ShortformItem({ item, active, couponCount, onOpenCoupons }: Props) {
+export function ShortformItem({ item, couponCount, onOpenCoupons }: Props) {
   const navigate = useNavigate()
   const [menusOpen, setMenusOpen] = useState(false)
+  // 본문은 두 줄만 보이고 [더보기]로 펼침 (가게 소개·메뉴·주소까지 담겨 길어짐)
+  const [bodyOpen, setBodyOpen] = useState(false)
+  const bodyLong = (item.description?.length ?? 0) > 60 || (item.description?.includes('\n') ?? false)
   const scrapped = useIsScrapped(item.shortformId)
   const canScrap = useCanScrap()
   const toggleScrap = useToggleScrap()
@@ -71,7 +71,7 @@ export function ShortformItem({ item, active, couponCount, onOpenCoupons }: Prop
 
       {/* 사진: 남는 높이를 모두 써서 화면을 채움 */}
       <div className="relative min-h-0 flex-1 overflow-hidden bg-q-mint">
-        <PostPhoto item={item} icon={icon} active={active} />
+        <PostPhoto item={item} icon={icon} />
       </div>
 
       {/* 버튼 */}
@@ -88,7 +88,8 @@ export function ShortformItem({ item, active, couponCount, onOpenCoupons }: Prop
           onClick={() =>
             shareLink({
               title: `${item.storeName} | 잇츠`,
-              text: `우리 동네 ${item.storeName} 게시물 보러 가기${item.description ? ` - ${item.description}` : ''}`,
+              // 본문이 길어서 공유 문구엔 첫 줄만
+              text: `우리 동네 ${item.storeName} 게시물 보러 가기${item.description ? ` - ${item.description.split('\n')[0]}` : ''}`,
               path: `/map/stores/${item.storeId}/shortform?start=${item.shortformId}`,
             })
           }
@@ -112,10 +113,17 @@ export function ShortformItem({ item, active, couponCount, onOpenCoupons }: Prop
       {/* 소개 글 */}
       <div className="shrink-0 px-4 pb-3">
         {item.description && (
-          <p className="line-clamp-2 text-14 leading-snug text-ink">
-            <span className="mr-1.5 font-bold">{item.storeName}</span>
-            {item.description}
-          </p>
+          <>
+            <p className={`whitespace-pre-line text-14 leading-snug text-ink ${bodyOpen ? '' : 'line-clamp-2'}`}>
+              <span className="mr-1.5 font-bold">{item.storeName}</span>
+              {item.description}
+            </p>
+            {bodyLong && (
+              <button type="button" onClick={() => setBodyOpen((v) => !v)} className="mt-0.5 text-13 text-q-sub">
+                {bodyOpen ? '접기' : '더보기'}
+              </button>
+            )}
+          </>
         )}
         {item.menus.length > 0 && (
           <button type="button" onClick={() => setMenusOpen((v) => !v)} className="mt-1 block w-full text-left text-13 text-q-sub">
@@ -139,9 +147,15 @@ export function ShortformItem({ item, active, couponCount, onOpenCoupons }: Prop
   )
 }
 
-/** 게시물 사진 (여러 장이면 옆으로 넘김) 또는 홍보 영상. 없거나 못 불러오면 업종 그림으로 채움 */
-function PostPhoto({ item, icon, active }: { item: Shortform; icon?: string; active: boolean }) {
-  const alt = item.description || `${item.storeName} 사진`
+/**
+ * 게시물 사진 (여러 장이면 옆으로 넘김).
+ * AI 홍보 영상이 있으면 릴스·숏츠처럼 영상 한 장만 (사장님 사진은 이미 영상 안에 들어 있음).
+ * 영상을 못 불러오면 사진 넘겨보기로, 사진도 없거나 못 불러오면 업종 그림으로 채움
+ */
+function PostPhoto({ item, icon }: { item: Shortform; icon?: string }) {
+  const [videoFailed, setVideoFailed] = useState(false)
+  const showVideo = !!item.videoUrl && !videoFailed
+  const images = item.images?.length ? item.images : item.posterUrl ? [item.posterUrl] : []
   const fallback = (
     <div className="flex size-full flex-col items-center justify-center bg-gradient-to-br from-q-mint to-[#d7ebe0] dark:to-q-panel text-center">
       {icon && <img src={icon} alt="" className="h-[120px] w-auto object-contain opacity-90" />}
@@ -149,13 +163,12 @@ function PostPhoto({ item, icon, active }: { item: Shortform; icon?: string; act
       <p className="mt-0.5 text-12 text-q-muted">사진을 준비하고 있어요</p>
     </div>
   )
-  if (item.videoUrl) {
-    return <PostVideo url={item.videoUrl} posterUrl={item.posterUrl} alt={alt} active={active} frame={item.frame} fallback={fallback} />
-  }
   return (
     <PostCarousel
-      images={item.images?.length ? item.images : item.posterUrl ? [item.posterUrl] : []}
-      alt={alt}
+      key={showVideo ? 'video' : 'photo'}
+      video={showVideo ? { url: item.videoUrl!, onError: () => setVideoFailed(true) } : undefined}
+      images={showVideo ? images.slice(0, 1) : images}
+      alt={item.description || `${item.storeName} 사진`}
       frame={item.frame}
       fallback={fallback}
     />

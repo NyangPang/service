@@ -47,11 +47,16 @@ public class Generation extends BaseTimeEntity {
     @Column(length = 500)
     private String errorMessage;
 
+    /** 만들어질 게시물의 수정 횟수 (새로 만들기 0, 수정이면 고칠 게시물 + 1) */
+    @Column(nullable = false)
+    private int revisionCount;
+
     @Builder
-    private Generation(Store store, Member requestedBy, GenerationStatus status) {
+    private Generation(Store store, Member requestedBy, GenerationStatus status, Integer revisionCount) {
         this.store = store;
         this.requestedBy = requestedBy;
         this.status = status;
+        this.revisionCount = revisionCount == null ? 0 : revisionCount;
     }
 
     public void startProcessing() {

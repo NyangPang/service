@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import pigeonCrying from '@/assets/generation/pigeon-crying.jpg'
 import pigeonUpload from '@/assets/generation/pigeon-upload.jpg'
 import { PostCarousel } from '@/features/feed/components/PostCarousel'
-import { PostVideo } from '@/features/feed/components/PostVideo'
 import { ShortformThumb } from '@/features/feed/components/ShortformThumb'
 import { useDeleteShortform, useStoreShortforms } from '@/features/feed/hooks'
 import type { Shortform } from '@/features/feed/schema'
 import { Dialog } from '@/features/generation/components/Dialog'
+import { REVISION_LIMIT_DIALOG, revisionsLeft, videoFileName } from '@/features/generation/schema'
 import { useIsPro } from '@/features/pro/hooks'
 import { errorMessage } from '@/shared/lib/error'
 import { toast } from '@/stores/toastStore'
@@ -16,7 +16,7 @@ import { useMyStoreId } from '../hooks'
 import { OWNER_ILLUST } from '../illustrations'
 import { OwnerScreen } from './OwnerUi'
 
-/** 사장님 내 영상 — 우리 가게가 올린 숏폼 목록, 눌러서 보기·다운로드(PRO)·삭제 */
+/** 사장님 내 영상 — 우리 가게가 올린 숏폼 목록, 눌러서 보기·수정(무료 3번)·다운로드·삭제 */
 export function OwnerVideos() {
   const navigate = useNavigate()
   const storeId = useMyStoreId()
@@ -111,12 +111,18 @@ export function OwnerVideos() {
   )
 }
 
-/** 영상 크게 보기 + 손님 화면에서 보기 / 다운로드(PRO) / 삭제 */
+/** 영상 크게 보기 + 손님 화면에서 보기 / 수정(무료 3번, PRO 무제한) / 다운로드 / 삭제 */
 function VideoDetail({ video, onClose }: { video: Shortform; onClose: () => void }) {
   const navigate = useNavigate()
   const isPro = useIsPro()
   const remove = useDeleteShortform()
-  const [modal, setModal] = useState<'delete' | 'pro-edit' | 'pro-download' | null>(null)
+  const [modal, setModal] = useState<'delete' | 'pro-edit' | null>(null)
+  const left = revisionsLeft(video.revisionCount, isPro)
+  // 영상 게시물이면 영상, 아니면 게시물 사진을 내려받음 (무료)
+  const downloadUrl = video.videoUrl ?? video.posterUrl ?? undefined
+  const downloadName = video.videoUrl
+    ? videoFileName(video.storeName)
+    : `${video.storeName}-게시물${video.posterUrl?.match(/\.\w+(?=$|\?)/)?.[0] ?? ''}`
 
   return (
     <div role="dialog" aria-modal aria-label="게시물 보기" className="fixed inset-0 z-40 flex items-end justify-center bg-black/50">
@@ -134,11 +140,12 @@ function VideoDetail({ video, onClose }: { video: Shortform; onClose: () => void
         </div>
 
         <div className="relative mx-auto mt-2 aspect-[4/5] w-full max-w-[280px] overflow-hidden rounded-3xl shadow-[0_10px_30px_rgba(8,104,22,0.18)]">
-          {video.videoUrl ? (
-            <PostVideo url={video.videoUrl} posterUrl={video.posterUrl} alt={video.description || video.storeName} active frame={video.frame} />
-          ) : (
-            <PostCarousel images={video.images ?? (video.posterUrl ? [video.posterUrl] : [])} alt={video.description || video.storeName} frame={video.frame} />
-          )}
+          <PostCarousel
+            images={video.videoUrl ? [video.posterUrl ?? ''] : (video.images ?? (video.posterUrl ? [video.posterUrl] : []))}
+            video={video.videoUrl ? { url: video.videoUrl, onError: () => undefined, autoPlay: false } : undefined}
+            alt={video.description || video.storeName}
+            frame={video.frame}
+          />
         </div>
 
         <p className="mt-4 text-16 font-bold text-q-text">{video.description || video.storeName}</p>
@@ -150,24 +157,18 @@ function VideoDetail({ video, onClose }: { video: Shortform; onClose: () => void
               <PhotoIcon />
             </span>
           </Action>
-          {/* PRO 기능: 재수정 · 다운로드 (PRO가 아니면 안내) */}
-          <Action label="수정" pro={!isPro} onClick={() => (isPro ? navigate(`/owner/videos/${video.shortformId}/edit`) : setModal('pro-edit'))}>
+          {/* 수정: 무료는 게시물마다 3번 (다 쓰면 PRO 안내), PRO는 무제한. 다운로드는 무료 */}
+          <Action label="수정" pro={left <= 0} onClick={() => (left > 0 ? navigate(`/owner/videos/${video.shortformId}/edit`) : setModal('pro-edit'))}>
             <img src={OWNER_ILLUST.videoEdit} alt="" className="size-9 object-contain" />
           </Action>
-          {isPro ? (
-            <a
-              href={video.posterUrl ?? undefined}
-              download={`${video.storeName}-게시물${video.posterUrl?.match(/\.\w+(?=$|\?)/)?.[0] ?? ''}`}
-              className="flex flex-col items-center gap-1 rounded-xl bg-q-panel py-3 text-12 font-bold text-q-text active:bg-q-mint"
-            >
-              <img src={OWNER_ILLUST.videoDownload} alt="" className="size-9 object-contain" />
-              다운로드
-            </a>
-          ) : (
-            <Action label="다운로드" pro onClick={() => setModal('pro-download')}>
-              <img src={OWNER_ILLUST.videoDownload} alt="" className="size-9 object-contain" />
-            </Action>
-          )}
+          <a
+            href={downloadUrl}
+            download={downloadName}
+            className="flex flex-col items-center gap-1 rounded-xl bg-q-panel py-3 text-12 font-bold text-q-text active:bg-q-mint"
+          >
+            <img src={OWNER_ILLUST.videoDownload} alt="" className="size-9 object-contain" />
+            다운로드
+          </a>
           <Action label="삭제" danger onClick={() => setModal('delete')}>
             <TrashIcon />
           </Action>
@@ -193,14 +194,10 @@ function VideoDetail({ video, onClose }: { video: Shortform; onClose: () => void
           }}
         />
       )}
-      {(modal === 'pro-download' || modal === 'pro-edit') && (
+      {modal === 'pro-edit' && (
         <Dialog
-          title={modal === 'pro-edit' ? '게시물 수정은 PRO 기능이에요' : '다운로드는 PRO 기능이에요'}
-          text={
-            modal === 'pro-edit'
-              ? 'PRO를 구독하면 올린 게시물도 사진·문구를 원하는 대로 고쳐 새 버전으로 바꿀 수 있어요'
-              : 'PRO를 구독하면 완성된 게시물 사진을 원본 화질로 내려받아 다른 SNS에도 올릴 수 있어요'
-          }
+          title={REVISION_LIMIT_DIALOG.title}
+          text={REVISION_LIMIT_DIALOG.text}
           image={pigeonUpload}
           primary={{ label: 'PRO 알아보기', onClick: () => navigate('/owner/pro') }}
           secondary={{ label: '닫기', onClick: () => setModal(null) }}

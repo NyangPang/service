@@ -829,7 +829,7 @@ Response 예시 (200)
 > 게시물은 AI가 가게 정보로 만드는 가게 홍보 게시물입니다. 앱 화면에서는 "게시물", API·코드 이름은 그대로 `shortform`을 씁니다.
 > 생성 흐름은 AI 이미지(Bedrock SDXL)로 바뀌었습니다 (dev `Feat: Replace video pipeline with AI image feed`). 게시물 응답은 **`imageUrl`(게시물 사진)·`title`·`createdAt`** 이고, 아래 표의 `videoUrl`·`thumbnailUrl`·`script`·`duration`은 더 이상 오지 않습니다. 피드 목록에는 PRO 우선 노출 `promoted`가 더 붙습니다.
 > 생성 요청은 `storeId`, `menuInfo`에 더해 참고할 사진 `menuImageUrl`(선택)을 받고, 생성 상태 응답에도 `imageUrl`이 옵니다.
-> **게시물 소개 글**: 생성 요청의 `appeal`(사장님이 적은 가게 어필, 200자 이내, 앱에선 필수)을 Bedrock Claude가 1~2문장으로 다듬어 게시물 `caption`에 저장합니다 (없는 사실은 지어내지 않음, AI 실패 시 어필 그대로). 피드·상세 응답에 `caption`이 붙습니다. 예) "가게가 넓고 고기가 맛있어요" → "넓고 편안한 자리에서 즐기는 육즙 가득한 고기 한 판! 🥩". DB: [`docs/sql/2026-10-09-shortform-caption.sql`](sql/2026-10-09-shortform-caption.sql)
+> **게시물 본문**: 가게 정보(이름·주소·영업시간·가게 소개)와 메뉴(`menus`, 없으면 `menuInfo`), 사장님 한마디(`appeal`, 200자 이내)로 Bedrock Claude가 3~5문장, 300자 이내 본문을 써서 게시물 `caption`에 저장합니다. 순서는 가게 이름과 한마디 → 가게 소개 → 대표 메뉴와 가격 → 마지막 줄 주소(·영업시간)입니다 (없는 사실은 지어내지 않음, AI 실패 시 한마디 그대로). 피드·상세 응답에 `caption`이 붙고, 피드는 두 줄만 보이다 [더보기]로 펼칩니다. DB: [`docs/sql/2026-10-09-shortform-caption.sql`](sql/2026-10-09-shortform-caption.sql)
 > **게시물 사진 여러 장 (옆으로 넘겨 보기)**: 게시물 = AI 사진 1장 + 사장님 사진 최대 4장. 피드·상세 응답에 `imageUrls`(첫 장 = `imageUrl`, 최대 5장)가 붙습니다.
 > 1. `POST /api/stores/{storeId}/photos` (multipart `photos` 여러 개, **사장님 본인 가게만** — 아니면 `STORE403_2`) → S3 주소 목록
 > 2. `POST /api/generation`에 `photoUrls`(최대 4개, 넘으면 `COMMON400`)로 보냄. 이 가게 사진 폴더(`stores/{storeId}/`)에 올라간 주소만 저장하고 나머지는 버림
@@ -838,14 +838,21 @@ Response 예시 (200)
 
 #### 게시물 관리 (사장님)
 
+> **생성 = 영상 (2026-11-19)**: `POST /api/generation`은 이제 홍보 영상을 만듭니다. 사장님 사진(`photoUrls`)과 메뉴판(`menuBoardUrls`, 최대 3개, 선택) → 메뉴 추출 → 장면 JSON → mp4(Runway·내레이션·자막) → `videoUrl` 게시물. 메뉴판은 메뉴 읽기에만 쓰고 영상 장면에는 넣지 않습니다 (`photoUrls`에 같은 주소가 있으면 게시물 사진으로는 그대로 붙음). 영상을 못 만들면 `FAILED`(`영상을 만들지 못했어요. 잠시 후 다시 시도해 주세요`)입니다 (예전 AI 이미지 게시물 대체는 Bedrock Nova Canvas 종료로 2026-11-20에 뺐음). 보통 2~5분 걸립니다. 설정: `GENERATION_RUNWAY`(기본 true, false면 Runway 대신 줌 효과로 크레딧 0). 생성 상태 응답에 `videoUrl`이 붙습니다.
+>
+> **AI 홍보 영상**: 영상 게시물은 `videoUrl`(세로 mp4, 15초)이 있고 `imageUrl`은 그 영상의 썸네일입니다. 이미지만 있는 게시물은 `videoUrl`이 `null`입니다. 피드·상세 응답 모두 같습니다. 영상 파일은 "가게이름_잇츠.mp4"라는 다운로드 이름을 붙여 올리므로, 앱의 [다운로드]는 `videoUrl`을 그대로 열면 됩니다(`<video>` 재생에는 영향 없음). 서버에서는 `ShortformVideoService.saveDraft(...)`가 렌더링된 영상을 S3에 올리고 비공개 게시물로 저장합니다. DB: [`docs/sql/2026-11-19-shortform-video.sql`](sql/2026-11-19-shortform-video.sql)
+>
 > AI로 만든 게시물은 **비공개**로 생기고(`published=false`), 사장님이 결과를 보고 [업로드]해야 손님 피드(`GET /api/shortforms`)에 보입니다. 단건 조회(`GET /api/shortforms/{id}`)는 공개 전에도 됩니다(만들기 결과 확인용).
 > 게시물 생성(`POST /api/generation`)도 **내 가게만** 됩니다 (아니면 `STORE403_2`). DB: [`docs/sql/2026-10-09-shortform-publish.sql`](sql/2026-10-09-shortform-publish.sql)
+
+> **수정 횟수 제한**: 수정 요청은 `POST /api/generation`에 `revisionOf`(고칠 게시물 ID)를 같이 보냅니다. 무료는 게시물마다 **3번**까지, PRO는 무제한이고, 넘으면 `GENERATION403_2`. 새 버전은 `revisionCount`(고칠 게시물 + 1)를 이어받고, 게시물 단건 조회에 `revisionCount`·`freeRevisions`(3)가 옵니다. 다운로드는 무료. DB: [`docs/sql/2026-11-20-revision-count.sql`](sql/2026-11-20-revision-count.sql)
 
 | API | Method · Path | 설명 |
 | --- | --- | --- |
 | 게시물 공개 ([업로드]) | `POST /api/shortforms/{shortformId}/publish` | 손님 피드에 보이게. 응답은 단건 조회와 같음 |
 | 게시물 삭제 | `DELETE /api/shortforms/{shortformId}` | 손님 스크랩·사장님 사진도 같이 지움. 생성 기록은 연결만 끊음 |
-| 재수정본으로 교체 (PRO) | `PUT /api/shortforms/{shortformId}/replace` | Body `shortformId`(새 버전). 새 버전을 공개하고 옛 게시물은 지움. 옛 게시물 스크랩은 새 버전으로 옮김 |
+| 재수정본으로 교체 | `PUT /api/shortforms/{shortformId}/replace` | Body `shortformId`(새 버전). 새 버전을 공개하고 옛 게시물은 지움. 옛 게시물 스크랩은 새 버전으로 옮김 |
+| 메뉴판에서 메뉴 읽기 (메뉴 확인 화면) | `POST /api/generation/menus` | multipart `storeId` + `menuBoards`(1~3장). 영상과 같은 AI 메뉴 추출기(`MenuExtractor`)로 읽어 `[{ name, price, description, signature }]`. 재시도까지 수십 초. 사장님이 고친 목록을 `POST /api/generation`의 `menus`로 보내면 영상은 메뉴판을 다시 읽지 않고 그 메뉴로 만듦. 끝내 못 읽으면 `GENERATION502` (앱은 예전 `/api/ocr`로 한 번 더) |
 | 생성 취소 | `POST /api/generation/{generationId}/cancel` | 만드는 중(PENDING·PROCESSING)일 때만. 결과를 저장하지 않고 FAILED(`사장님이 생성을 취소했어요`). 취소한 요청은 끝나기 전이라도 새 생성 요청을 막지 않음 |
 
 | 상태코드 | 의미 |
@@ -855,7 +862,9 @@ Response 예시 (200)
 | SHORTFORM400 | 교체: 같은 가게의 다른 게시물이 아님 |
 | GENERATION403 | 생성 취소: 내가 요청한 생성이 아님 |
 | GENERATION409_2 | 생성 취소: 이미 끝난 생성 |
-| STORE403_2 | 생성 요청: 내 가게가 아님 |
+| STORE403_2 | 생성 요청·메뉴 읽기: 내 가게가 아님 |
+| GENERATION403_2 | 생성 요청: 무료 수정 3번을 다 씀 (PRO는 무제한) |
+| GENERATION502 | 메뉴 읽기: 메뉴판을 끝내 읽지 못함 (직접 입력) |
 > 생성 흐름: 생성 요청(`POST /api/generation`) → 비동기 처리 → 상태 폴링(`GET /api/generation/{id}`) → 완료 후 게시물 조회
 
 ### 게시물 피드 조회
@@ -967,7 +976,7 @@ Response 예시 (404)
 | HTTP Method | `POST` |
 | API Path | `/api/generation` |
 | Header | `Authorization: Bearer {accessToken}` (필수)<br>`Content-Type: application/json` |
-| Request | Body<br>`storeId` (필수, Long): 게시물을 생성할 가게 ID |
+| Request | Body<br>`storeId` (필수, Long): 게시물을 생성할 가게 ID<br>`menuInfo` (선택, String): 사장님이 확인한 메뉴·수정 요청<br>`appeal` (선택, String, 200자): 사장님 한마디 → 게시물 본문<br>`photoUrls` (선택, 최대 4개): 게시물 사진 = 영상 장면 사진<br>`menuBoardUrls` (선택, 최대 3개): 메뉴판 사진 (메뉴 읽기에만)<br>`menus` (선택, 최대 30개): 메뉴 확인 화면에서 확정한 메뉴 `[{ name, price, description, signature }]`. 있으면 메뉴판을 다시 읽지 않고 이 메뉴만 씀 |
 | Response | `generationId` (Long)<br>`storeId` (Long)<br>`storeName` (String)<br>`status` (String)<br>`requestedAt` (String) |
 | 로직 간단 설명 | 특정 가게에 대한 AI 게시물 생성을 요청한다. 내부적으로 가게 정보 스크래핑 → AI 스크립트 생성 → TTS 음성 합성 → 영상 합성 순으로 비동기 처리된다. 완료까지 수십 초가 소요되므로 클라이언트는 상태 조회 API를 폴링해야 한다. 동일 가게에 이미 진행 중인 요청이 있으면 409로 거절한다.<br><br>**result 필드**<br>`generationId`: 생성 요청 ID (상태 조회 API에 사용)<br>`storeId`: 요청한 가게 ID<br>`storeName`: 요청한 가게 이름<br>`status`: 요청 직후 항상 `PENDING`<br>`requestedAt`: 요청 일시 (ISO 8601) |
 | 상태코드 | COMMON201: 생성 요청 접수<br>COMMON400: 필수 필드 누락<br>COMMON401: 토큰 없음·만료<br>STORE404: 가게가 존재하지 않음<br>GENERATION409: 해당 가게에 이미 진행 중(`PENDING` / `PROCESSING`)인 생성 요청 있음 |
@@ -1016,7 +1025,7 @@ Response 예시 (409, 이미 진행 중)
 | API Path | `/api/generation/{generationId}` |
 | Header | `Authorization: Bearer {accessToken}` (필수) |
 | Request | Path `generationId` (필수, Long) |
-| Response | `generationId` (Long)<br>`storeId` (Long)<br>`storeName` (String)<br>`status` (String)<br>`shortformId` (Long \| null)<br>`errorMessage` (String \| null)<br>`requestedAt` (String) |
+| Response | `generationId` (Long)<br>`storeId` (Long)<br>`storeName` (String)<br>`status` (String)<br>`shortformId` (Long \| null)<br>`errorMessage` (String \| null)<br>`imageUrl` (String \| null)<br>`videoUrl` (String \| null, 영상 게시물일 때)<br>`requestedAt` (String) |
 | 로직 간단 설명 | 생성 요청 ID로 AI 게시물 생성 진행 상태를 조회한다. 클라이언트는 `COMPLETED` 또는 `FAILED`가 될 때까지 폴링(예: 3초 간격)한다. `COMPLETED`이면 `shortformId`로 게시물을 바로 조회할 수 있다.<br><br>**result 필드**<br>`generationId`: 생성 요청 ID<br>`storeId`: 가게 ID<br>`storeName`: 가게 이름<br>`status`: 현재 상태 (`PENDING` / `PROCESSING` / `COMPLETED` / `FAILED`)<br>`shortformId`: 생성 완료된 게시물 ID. `COMPLETED`일 때만 값이 있고 그 외엔 `null`<br>`errorMessage`: 실패 사유 메시지. `FAILED`일 때만 값이 있고 그 외엔 `null`<br>`requestedAt`: 최초 요청 일시 (ISO 8601) |
 | 상태코드 | COMMON200: 조회 성공<br>COMMON401: 토큰 없음·만료<br>GENERATION403: 자신이 요청하지 않은 생성 요청<br>GENERATION404: 해당 생성 요청 없음 |
 

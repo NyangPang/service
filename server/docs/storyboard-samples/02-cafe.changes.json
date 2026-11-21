@@ -1,0 +1,6 @@
+[
+  { "scene_id": 2, "field": "narration", "before": "매일 굽는 버터 소금빵이 3,500원", "after": "대표 메뉴 소금빵이 3,500원" },
+  { "scene_id": 2, "field": "caption.text", "before": "매일 굽는 버터 소금빵이 3,500원", "after": "대표 메뉴 소금빵이 3,500원" },
+  { "scene_id": 3, "field": "narration", "before": "바닐라라떼 한 잔 곁들이면 딱이죠.", "after": "달콤한 바닐라라떼도 함께요." },
+  { "scene_id": 3, "field": "caption.text", "before": "바닐라라떼 한 잔 곁들이면 딱이죠.", "after": "달콤한 바닐라라떼도 함께요." }
+]

@@ -52,13 +52,4 @@ public class AwsConfig {
                 .credentialsProvider(credentialsProvider())
                 .build();
     }
-
-    /** 이미지 생성 모델(SDXL)은 us-east-1에서만 지원 */
-    @Bean("bedrockImageRuntimeClient")
-    public BedrockRuntimeClient bedrockImageRuntimeClient() {
-        return BedrockRuntimeClient.builder()
-                .region(Region.US_EAST_1)
-                .credentialsProvider(credentialsProvider())
-                .build();
-    }
 }
