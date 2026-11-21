@@ -35,6 +35,11 @@ public class MenuExtractionValidator {
 
     /** @param photoCount 사진 칸에 올린 이미지 수 (메뉴판 칸 제외). photos[]가 정확히 이만큼이어야 한다 */
     public List<String> validate(MenuData data, int photoCount) {
+        return validate(data, photoCount, 0);
+    }
+
+    /** @param extraImages 영상 스타일 때문에 기본 개수보다 더 요청해도 되는 생성 이미지 수 ({@link StyleImages#extra()}) */
+    public List<String> validate(MenuData data, int photoCount, int extraImages) {
         List<String> errors = new ArrayList<>();
         if (data == null) {
             errors.add("결과가 비어 있습니다.");
@@ -42,7 +47,7 @@ public class MenuExtractionValidator {
         }
         Set<String> names = checkMenus(data.menus(), errors);
         checkPhotos(data.photos(), photoCount, names, errors);
-        checkImageRequests(data, names, errors);
+        checkImageRequests(data, names, Math.max(0, extraImages), errors);
         return errors;
     }
 
@@ -126,7 +131,7 @@ public class MenuExtractionValidator {
      * 쓸 수 있는 사진(메뉴판 제외)이 {@value #TARGET_PHOTOS}장보다 적으면 모자란 만큼 만든다. 3장 이상이면 [].
      * 메뉴 하나(menu_ref)나 여러 메뉴를 함께 담은 모습(menu_ref null) 모두 된다. prompt는 장면 video_prompt와 같은 금지어 규칙
      */
-    private void checkImageRequests(MenuData data, Set<String> names, List<String> errors) {
+    private void checkImageRequests(MenuData data, Set<String> names, int extra, List<String> errors) {
         List<ImageRequest> requests = data.imageRequests();
         if (requests == null) {
             errors.add("image_requests가 없습니다. 만들 이미지가 없으면 빈 배열 []로 두세요.");
@@ -141,7 +146,11 @@ public class MenuExtractionValidator {
             }
             return;
         }
-        if (requests.size() != needed) {
+        if (extra > 0 && (requests.size() < needed || requests.size() > needed + extra)) {
+            errors.add("영상에 쓸 수 있는 사진(메뉴판 제외)이 " + usable + "장이므로 image_requests는 " + needed + "개에 "
+                    + "[영상 스타일 이미지] 규칙대로 최대 " + extra + "개를 더한 " + needed + "~" + (needed + extra)
+                    + "개여야 합니다. (현재 " + requests.size() + "개)");
+        } else if (extra == 0 && requests.size() != needed) {
             errors.add("영상에 쓸 수 있는 사진(메뉴판 제외)이 " + usable + "장이므로 image_requests는 정확히 "
                     + needed + "개여야 합니다. (현재 " + requests.size() + "개) 사진이 " + TARGET_PHOTOS
                     + "장이 되도록 모자란 만큼만 만들고, " + TARGET_PHOTOS + "장 이상이면 빈 배열 []로 두세요.");

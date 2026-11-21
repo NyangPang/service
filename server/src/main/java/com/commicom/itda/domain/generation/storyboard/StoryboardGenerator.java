@@ -31,19 +31,26 @@ public class StoryboardGenerator {
 
     /** @param address 가게 주소 — 제목에 동네 이름을 넣을 때 쓴다 (없으면 null) */
     public Result generate(MenuData menu, String appeal, String address) {
-        String original = prompt.build(menu, appeal, address);
+        return generate(menu, appeal, address, VideoOptions.NONE);
+    }
+
+    /** @param options 생성 느낌 — 스타일별 프롬프트와 검사 규칙을 고른다 */
+    public Result generate(MenuData menu, String appeal, String address, VideoOptions options) {
+        VideoOptions o = options == null ? VideoOptions.NONE : options;
+        String original = prompt.build(menu, appeal, address, o);
         String request = original;
         List<Attempt> attempts = new ArrayList<>();
 
         for (int i = 0; i <= MAX_RETRIES; i++) {
-            log.info("[스토리보드] {} 시도 {}/{}", menu.storeName(), i + 1, MAX_RETRIES + 1);
+            log.info("[스토리보드] {} 시도 {}/{} (스타일 {})", menu.storeName(), i + 1, MAX_RETRIES + 1,
+                    o.style() == null ? "없음" : o.style());
             String raw = chatClient.prompt().user(request).call().content();
 
             List<String> errors;
             Storyboard parsed = null;
             try {
                 parsed = StoryboardJson.parseStoryboard(raw);
-                errors = validator.validate(parsed, menu);
+                errors = validator.validate(parsed, menu, o, appeal);
             } catch (Exception e) {
                 errors = List.of("JSON으로 읽을 수 없습니다: " + e.getMessage()
                         + " — 장면 JSON 객체 하나만, 코드블록이나 설명 없이 출력하세요.");

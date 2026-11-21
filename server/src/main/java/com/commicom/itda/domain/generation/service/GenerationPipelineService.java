@@ -3,6 +3,7 @@ package com.commicom.itda.domain.generation.service;
 import com.commicom.itda.domain.generation.dto.MenuItemDto;
 import com.commicom.itda.domain.generation.entity.Generation;
 import com.commicom.itda.domain.generation.repository.GenerationRepository;
+import com.commicom.itda.domain.generation.storyboard.VideoOptions;
 import com.commicom.itda.domain.shortform.entity.Shortform;
 import com.commicom.itda.domain.shortform.repository.ShortformRepository;
 import com.commicom.itda.domain.store.entity.Store;
@@ -61,17 +62,18 @@ public class GenerationPipelineService {
 
     @Async(AsyncConfig.VIDEO_GENERATION_EXECUTOR)
     public void execute(Long generationId, String menuInfo, String appeal, List<MenuItemDto> menus,
-                        List<String> photoUrls, List<String> menuBoardUrls) {
+                        List<String> photoUrls, List<String> menuBoardUrls, VideoOptions options) {
         Store store = tx.execute(status -> start(generationId));
         if (store == null) return;
-        log.info("[생성 {}] 시작 - {}", generationId, store.getName());
+        log.info("[생성 {}] 시작 - {} (스타일 {}, 강조 {})", generationId, store.getName(),
+                options.style() == null ? "없음" : options.style(), options.emphases());
 
         try {
             // 게시물 본문: 가게 정보·메뉴·사장님 한마디로 씀 (실패하면 한마디 그대로)
             String caption = postCaptionService.write(store, appeal, menuInfo, menus);
 
             Shortform shortform = videoService.make(store, menuInfo, appeal, menus, photoUrls, menuBoardUrls, caption,
-                    () -> cancelRegistry.isCanceled(generationId));
+                    options, () -> cancelRegistry.isCanceled(generationId));
 
             Long shortformId = shortform.getId();
             finish(generationId, g -> {

@@ -5,6 +5,8 @@ import com.commicom.itda.domain.generation.storyboard.MenuData;
 import com.commicom.itda.domain.generation.storyboard.MenuExtractionPrompt.Slot;
 import com.commicom.itda.domain.generation.storyboard.MenuExtractor;
 import com.commicom.itda.domain.generation.storyboard.StoryboardVideoPipeline;
+import com.commicom.itda.domain.generation.storyboard.StyleImages;
+import com.commicom.itda.domain.generation.storyboard.VideoOptions;
 import com.commicom.itda.domain.shortform.entity.Shortform;
 import com.commicom.itda.domain.shortform.service.ShortformVideoService;
 import com.commicom.itda.domain.store.entity.Store;
@@ -69,11 +71,12 @@ public class GenerationVideoService {
      * @param photoUrls     게시물 사진 (메뉴판이 섞여 있을 수 있음, 게시물엔 그대로 붙음)
      * @param menuBoardUrls 메뉴판 사진. 확정 메뉴가 없을 때만 메뉴 읽기에 쓰고, 영상 장면에서는 뺀다
      * @param caption       게시물 소개 글 (이미 다듬은 것)
+     * @param options       생성 느낌 (영상 스타일·강조 포인트). 스타일마다 생성 이미지·장면 프롬프트·목소리가 달라진다
      * @param canceled      긴 단계 사이마다 확인. true면 {@link CanceledException}
      */
     public Shortform make(Store store, String menuInfo, String appeal, List<MenuItemDto> confirmedMenus,
                           List<String> photoUrls, List<String> menuBoardUrls,
-                          String caption, BooleanSupplier canceled) throws Exception {
+                          String caption, VideoOptions options, BooleanSupplier canceled) throws Exception {
         List<MenuData.Menu> fixedMenus = toMenus(confirmedMenus);
         List<String> boards = menuBoardUrls == null ? List.of() : menuBoardUrls.stream()
                 .limit(MenuExtractor.MAX_MENU_BOARDS).toList();
@@ -94,13 +97,14 @@ public class GenerationVideoService {
             for (Path p : photos) images.add(new MenuExtractor.Image(Files.readAllBytes(p), Slot.PHOTO));
             for (Path p : boardFiles) images.add(new MenuExtractor.Image(Files.readAllBytes(p), Slot.MENU_BOARD));
             MenuData menu = menuExtractor.getObject()
-                    .extract(store.getName(), store.getCategory().name(), extraInfo(menuInfo, fixedMenus), images, fixedMenus)
+                    .extract(store.getName(), store.getCategory().name(), extraInfo(menuInfo, fixedMenus), images, fixedMenus,
+                            StyleImages.of(options, appeal))
                     .menuData();
             log.info("[영상 생성] {} 메뉴 {}개 ({})", store.getName(), menu.menus().size(),
                     fixedMenus.isEmpty() ? "메뉴판에서 읽음" : "사장님 확정 메뉴");
             check(canceled);
 
-            // ③ 사진이 3장보다 적으면 모자란 만큼 메뉴 이미지 생성 (Runway) — 영상 파이프라인의 addGeneratedImages를 그대로 씀.
+            // ③ 사진이 3장보다 적으면 모자란 만큼 메뉴 이미지 생성 (Runway). 스타일에 따라 한 상·신메뉴·이벤트 이미지가 더 붙을 수 있음 — 영상 파이프라인의 addGeneratedImages를 그대로 씀.
             //    여기서 먼저 부르는 건 실패해도 있는 사진으로 계속하고, 만든 이미지를 게시물 사진에도 올리기 위해서
             if (menu.imageRequests() != null && !menu.imageRequests().isEmpty()) {
                 if (useRunway) {
@@ -126,7 +130,7 @@ public class GenerationVideoService {
             }
 
             // ④ 장면 JSON → mp4 (사진이 하나도 없으면 여기서 IllegalArgumentException → 호출한 쪽이 이미지 게시물로 대체)
-            StoryboardVideoPipeline.Result result = videoPipeline.getObject().make(menu, appeal, photos, useRunway, store.getAddress());
+            StoryboardVideoPipeline.Result result = videoPipeline.getObject().make(menu, appeal, photos, useRunway, store.getAddress(), options);
             StoryboardVideoService.Result video = result.video();
             // 크레딧이 실제로 나갔는지 로그만 보고 알 수 있게: 새 클립 = 크레딧 사용, 캐시 = 같은 사진·프롬프트 재사용, 대체 = 줌 효과
             List<StoryboardRenderer.SceneReport> ai = video.scenes().stream().filter(s -> "ai".equals(s.motion())).toList();

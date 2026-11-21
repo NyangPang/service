@@ -2,6 +2,7 @@ package com.commicom.itda.domain.generation.storyboard;
 
 import com.commicom.itda.infra.video.storyboard.MenuImageGenerator;
 import com.commicom.itda.infra.video.storyboard.MenuImageService;
+import com.commicom.itda.infra.video.storyboard.NarrationVoice;
 import com.commicom.itda.infra.video.storyboard.StoryboardVideoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Lazy;
@@ -34,12 +35,20 @@ public class StoryboardVideoPipeline {
 
     /** @param storeAddress 제목에 쓸 동네 이름을 추출할 때 사용하는 주소 (없으면 null) */
     public Result make(MenuData menu, String appeal, List<Path> photos, boolean useRunway, String storeAddress) throws Exception {
+        return make(menu, appeal, photos, useRunway, storeAddress, VideoOptions.NONE);
+    }
+
+    /** @param options 생성 느낌 — 장면 프롬프트·검사 규칙과 나레이션 목소리(남자/기본)를 고른다 */
+    public Result make(MenuData menu, String appeal, List<Path> photos, boolean useRunway, String storeAddress,
+                       VideoOptions options) throws Exception {
+        VideoOptions o = options == null ? VideoOptions.NONE : options;
         Images images = addGeneratedImages(menu, photos);
         checkPhotos(images.menu(), images.photos());
-        StoryboardGenerator.Result generated = generator.generate(images.menu(), appeal, storeAddress);
+        StoryboardGenerator.Result generated = generator.generate(images.menu(), appeal, storeAddress, o);
         Storyboard sb = generated.storyboard();
         if (sb.meta() != null) sb = sb.withMeta(sb.meta().withStoreName(images.menu().storeName()));
-        StoryboardVideoService.Result video = render(sb, images.photos(), useRunway);
+        StoryboardVideoService.Result video = videoService.render(StoryboardJson.toJson(sb), images.photos(), useRunway,
+                o.maleVoice() ? NarrationVoice.MALE : NarrationVoice.DEFAULT);
         return new Result(sb, generated.attempts(), video, images);
     }
 
