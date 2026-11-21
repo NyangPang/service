@@ -16,7 +16,7 @@ import { useMyStoreId } from '../hooks'
 import { OWNER_ILLUST } from '../illustrations'
 import { OwnerScreen } from './OwnerUi'
 
-/** 사장님 내 영상 — 우리 가게가 올린 숏폼 목록, 눌러서 보기·수정(무료 3번)·다운로드·삭제 */
+/** 사장님 내 영상 — 우리 가게가 올린 숏폼 목록, 눌러서 보기·수정(무료 1번)·다운로드·삭제 */
 export function OwnerVideos() {
   const navigate = useNavigate()
   const storeId = useMyStoreId()
@@ -111,7 +111,7 @@ export function OwnerVideos() {
   )
 }
 
-/** 영상 크게 보기 + 손님 화면에서 보기 / 수정(무료 3번, PRO 무제한) / 다운로드 / 삭제 */
+/** 영상 크게 보기 + 손님 화면에서 보기 / 수정(무료 1번, PRO 무제한) / 다운로드 / 삭제 */
 function VideoDetail({ video, onClose }: { video: Shortform; onClose: () => void }) {
   const navigate = useNavigate()
   const isPro = useIsPro()
@@ -157,7 +157,7 @@ function VideoDetail({ video, onClose }: { video: Shortform; onClose: () => void
               <PhotoIcon />
             </span>
           </Action>
-          {/* 수정: 무료는 게시물마다 3번 (다 쓰면 PRO 안내), PRO는 무제한. 다운로드는 무료 */}
+          {/* 수정: 무료는 게시물마다 1번 (다 쓰면 PRO 안내), PRO는 무제한. 다운로드는 무료 */}
           <Action label="수정" pro={left <= 0} onClick={() => (left > 0 ? navigate(`/owner/videos/${video.shortformId}/edit`) : setModal('pro-edit'))}>
             <img src={OWNER_ILLUST.videoEdit} alt="" className="size-9 object-contain" />
           </Action>

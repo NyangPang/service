@@ -44,7 +44,7 @@ type Step = 'source' | 'menus' | 'appeal' | 'generate' | 'editPick' | 'editInput
 
 /**
  * 숏폼 만들기 (Figma 9:220 ~ 9:1170, 사장님 전용)
- * 재료 입력 → 메뉴 확인 → 어필 → 생성 대기(폴링) → 확인 → (수정: 무료 3번, PRO 무제한) → 업로드 → 완료
+ * 재료 입력 → 메뉴 확인 → 어필 → 생성 대기(폴링) → 확인 → (수정: 무료 1번, PRO 무제한) → 업로드 → 완료
  */
 export function CreateShortformFlow() {
   const navigate = useNavigate()

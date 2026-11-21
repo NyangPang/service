@@ -20,7 +20,7 @@ import { DraftPreview } from './DraftPreview'
 type Step = 'pick' | 'input' | 'generate' | 'done'
 
 /**
- * 이미 올린 숏폼 수정 (무료는 게시물마다 3번, PRO는 무제한).
+ * 이미 올린 숏폼 수정 (무료는 게시물마다 1번, PRO는 무제한).
  * 새 버전을 만드는 동안 기존 영상은 손님 피드에 그대로 → 확인 후 "이걸로 교체"하면 그때 바뀜.
  */
 export function ReviseShortformFlow({ shortformId }: { shortformId: number }) {

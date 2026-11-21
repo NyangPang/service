@@ -61,7 +61,7 @@ export async function postGeneration(body: GenerationRequest): Promise<Generatio
       appeal: body.appeal?.trim() || undefined,
       photoUrls: photoUrls.slice(0, MAX_POST_PHOTOS),
       menuBoardUrls: uploaded.slice(photos.length),
-      // 수정이면 고칠 게시물 (무료 3번까지, 넘으면 GENERATION403_2)
+      // 수정이면 고칠 게시물 (무료 1번까지, 넘으면 GENERATION403_2)
       revisionOf: body.revision?.shortformId,
       // 메뉴 확인 화면에서 확정한 메뉴 → 서버는 메뉴판을 다시 읽지 않고 이 메뉴로 영상을 만듦
       menus: confirmedMenus(body),
