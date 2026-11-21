@@ -5,6 +5,7 @@ import { useOwnerCoupons, useSettlement } from '@/features/coupon/hooks'
 import { untilText } from '@/features/coupon/schema'
 import { useIsPro } from '@/features/pro/hooks'
 import { useQuestSubscription } from '@/features/quest/hooks'
+import { openCoach } from '@/features/tutorial/coach'
 import { HAS_MOCK, resetAllLocalData } from '@/mocks/db'
 import { useMyStoreId, useMyStoreName, useStoreManageAccess } from '../hooks'
 import { OWNER_ILLUST } from '../illustrations'
@@ -27,7 +28,20 @@ export function OwnerHome() {
 
   return (
     <OwnerScreen>
-      <p className="text-13 text-q-muted">안녕하세요, 사장님</p>
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-13 text-q-muted">안녕하세요, 사장님</p>
+        {/* 처음 들어오면 자동으로 뜨는 버튼별 안내를 다시 보기 */}
+        <button
+          type="button"
+          onClick={() => openCoach('owner-home')}
+          className="flex items-center gap-1 rounded-full bg-surface px-3 py-1 text-12 font-bold text-fg-q-green"
+        >
+          <span aria-hidden className="flex size-4 items-center justify-center rounded-full bg-q-green text-[10px] text-white">
+            ?
+          </span>
+          사용법
+        </button>
+      </div>
       <h2 className="text-24 font-bold text-q-text">{storeName}</h2>
 
       <div className="mt-4 grid grid-cols-2 gap-2.5">

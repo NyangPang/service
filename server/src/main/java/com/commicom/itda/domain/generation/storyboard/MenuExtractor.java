@@ -48,6 +48,13 @@ public class MenuExtractor {
      *                   (사진의 menu_ref도 이 이름 기준으로 검증), 없으면(null·빈 목록) 메뉴판에서 읽은 그대로
      */
     public Result extract(String storeName, String category, String extraInfo, List<Image> input, List<MenuData.Menu> fixedMenus) {
+        return extract(storeName, category, extraInfo, input, fixedMenus, StyleImages.NONE);
+    }
+
+    /** @param styleImages 영상 스타일 때문에 더 요청할 수 있는 이미지 (한 상 차림, 신메뉴·이벤트) */
+    public Result extract(String storeName, String category, String extraInfo, List<Image> input, List<MenuData.Menu> fixedMenus,
+                          StyleImages styleImages) {
+        StyleImages style = styleImages == null ? StyleImages.NONE : styleImages;
         boolean fixed = fixedMenus != null && !fixedMenus.isEmpty();
         // 사진을 앞에, 메뉴판을 뒤에 (각자 넣은 순서 유지) — 프롬프트의 사진 index와 첨부 순서를 맞춘다
         List<Image> images = input.stream().sorted(Comparator.comparing(img -> img.slot() != Slot.PHOTO)).toList();
@@ -59,7 +66,7 @@ public class MenuExtractor {
         List<Slot> slots = images.stream().map(Image::slot).toList();
         Media[] media = images.stream().map(img -> AiImage.toMedia(img.bytes())).toArray(Media[]::new);
 
-        String original = prompt.build(storeName, category, slots, extraInfo);
+        String original = prompt.build(storeName, category, slots, extraInfo, style);
         String request = original;
         List<Attempt> attempts = new ArrayList<>();
 
@@ -76,7 +83,7 @@ public class MenuExtractor {
                     parsed = new MenuData(parsed.storeName(), parsed.category(), fixedMenus, parsed.reviewKeywords(),
                             parsed.photos(), parsed.imageRequests());
                 }
-                errors = validator.validate(parsed, photoCount);
+                errors = validator.validate(parsed, photoCount, style.extra());
             } catch (Exception e) {
                 errors = List.of("JSON으로 읽을 수 없습니다: " + e.getMessage()
                         + " — menus와 photos가 있는 JSON 객체 하나만, 코드블록이나 설명 없이 출력하세요.");

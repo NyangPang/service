@@ -102,12 +102,28 @@ public class StoryboardValidator {
     static final Pattern UTENSIL_WORDS = Pattern.compile(
             "\\b(fork|forks|knife|knives|tongs|chopsticks|spoon|spoons|spatula)\\b", Pattern.CASE_INSENSITIVE);
 
+    /** 메뉴가 잘 보이는 영상: 나레이션 전체(공백·문장부호 빼고, 가격은 읽는 대로) 최대 글자 수. 프롬프트는 55자로 안내 */
+    static final int MENU_FOCUS_NARRATION_MAX = 65;
+    /** 신메뉴 알림 영상에서 사장님 한마디에 있으면 나레이션에 써도 되는 숫자 ("20%", "30", "2.5") */
+    private static final Pattern NUMBER_TOKEN = Pattern.compile("\\d+(?:[.,]\\d+)*\\s*%?");
+
     public List<String> validate(Storyboard sb, MenuData menu) {
+        return validate(sb, menu, VideoOptions.NONE, null);
+    }
+
+    /**
+     * @param options 생성 느낌. 메뉴가 잘 보이는 영상은 사진·나레이션 규칙이, 신메뉴 알림 영상은 숫자 규칙이 달라진다
+     * @param appeal  사장님 한마디 (신메뉴 알림 영상에서 할인율·날짜 숫자를 허용할 근거)
+     */
+    public List<String> validate(Storyboard sb, MenuData menu, VideoOptions options, String appeal) {
         List<String> errors = new ArrayList<>();
         if (sb == null) {
             errors.add("장면 JSON이 비어 있습니다.");
             return errors;
         }
+        VideoOptions o = options == null ? VideoOptions.NONE : options;
+        boolean menuFocus = o.is(VideoStyle.MENU_FOCUS);
+        Set<String> allowedNumbers = o.is(VideoStyle.NEWS_PROMO) ? numberTokens(appeal) : Set.of();
         checkTopLevel(sb, errors);
         checkTitle(sb.title(), menu, errors);
 
@@ -115,8 +131,9 @@ public class StoryboardValidator {
         checkStructure(scenes, errors);
         checkDurations(sb, scenes, errors);
 
-        checkOpeningAndEnding(scenes, menu, errors);
+        checkOpeningAndEnding(scenes, menu, !menuFocus, errors);
         checkNarrationEndings(scenes, errors);
+        if (menuFocus) checkMenuFocus(scenes, menu, errors);
 
         int aiCount = 0;
         int transitionCount = 0;
@@ -132,7 +149,7 @@ public class StoryboardValidator {
             checkSceneFields(scene, at, errors);
             checkCaption(scene, at, menu, errors);
             if (i < scenes.size() - 1) checkCaptionIsNarration(scene, at, errors);
-            checkNarration(scene, at, menu, errors);
+            checkNarration(scene, at, menu, allowedNumbers, errors);
             checkPhoto(scene, at, menu, errors);
             if ("ai".equals(scene.motion())) {
                 aiCount++;
@@ -258,7 +275,53 @@ public class StoryboardValidator {
     // ── 3-1. 끝은 가게 외관 + 가게 이름 ─────────────────
     // 시작은 가게 이름이 아니라 멈춰 보게 만드는 한마디(hook)라서 따로 검사하지 않는다.
 
-    private void checkOpeningAndEnding(List<Scene> scenes, MenuData menu, List<String> errors) {
+    /**
+     * 메뉴가 잘 보이는 영상: 음식 사진만, 외관으로 넘어가는 transition 없이, 마지막은 한 상 사진(여러 메뉴가 함께 있는 food 사진),
+     * 나레이션은 짧게
+     */
+    private void checkMenuFocus(List<Scene> scenes, MenuData menu, List<String> errors) {
+        if (scenes.isEmpty() || menu == null) return;
+        int spoken = 0;
+        for (int i = 0; i < scenes.size(); i++) {
+            Scene s = scenes.get(i);
+            if (s == null) continue;
+            String at = where(s, i);
+            Optional<Photo> photo = menu.findPhoto(s.imageIndex());
+            if (photo.isPresent() && ("exterior".equals(photo.get().kind()) || "store".equals(photo.get().kind()))) {
+                errors.add(at + " " + photo.get().index() + "번은 가게 " + ("exterior".equals(photo.get().kind()) ? "외관" : "안")
+                        + " 사진입니다. 메뉴가 잘 보이는 영상은 음식(food) 사진만 씁니다.");
+            }
+            if ("transition".equals(s.motion())) {
+                errors.add(at + " 메뉴가 잘 보이는 영상은 외관으로 넘어가지 않으니 motion \"transition\"을 쓰지 마세요.");
+            }
+            if (!isBlank(s.narration())) spoken += countSpokenChars(SpokenPrice.speak(s.narration()));
+        }
+        // 한 상 사진: 여러 메뉴가 함께 있는 food 사진(menu_ref null). AI가 만든 것이 있으면 그것 (사장님 사진의 null은 메뉴를 몰라서일 수 있음)
+        List<Photo> multi = menu.photos() == null ? List.of() : menu.photos().stream()
+                .filter(p -> p != null && "food".equals(p.kind()) && p.menuRef() == null).toList();
+        List<Photo> generatedMulti = multi.stream().filter(Photo::isGenerated).toList();
+        List<Photo> spreads = generatedMulti.isEmpty() ? multi : generatedMulti;
+        Scene last = scenes.get(scenes.size() - 1);
+        if (last != null && !spreads.isEmpty() && spreads.stream().noneMatch(p -> Integer.valueOf(p.index()).equals(last.imageIndex()))) {
+            errors.add(where(last, scenes.size() - 1) + " 마지막 장면은 메뉴를 한 상에 차린 사진("
+                    + String.join(", ", spreads.stream().map(p -> p.index() + "번").toList()) + ")으로 끝내세요.");
+        }
+        if (spoken > MENU_FOCUS_NARRATION_MAX) {
+            errors.add("나레이션을 모두 합쳐 " + spoken + "자입니다. 메뉴가 잘 보이는 영상은 말을 최대한 줄여 공백·문장부호 빼고 "
+                    + (MENU_FOCUS_NARRATION_MAX - 10) + "자 안팎으로 씁니다. 메뉴 이름·가격·생김새 한 가지만 남기고 줄이세요.");
+        }
+    }
+
+    /** 글에 있는 숫자 ("20%", "30", "2.5"), 띄어쓰기 없이 */
+    static Set<String> numberTokens(String text) {
+        Set<String> tokens = new HashSet<>();
+        if (text == null) return tokens;
+        Matcher m = NUMBER_TOKEN.matcher(text);
+        while (m.find()) tokens.add(m.group().replaceAll("\\s", ""));
+        return tokens;
+    }
+
+    private void checkOpeningAndEnding(List<Scene> scenes, MenuData menu, boolean exteriorLast, List<String> errors) {
         if (scenes.isEmpty() || menu == null) return;
         String name = storeLabel(menu.storeName());
         if (name.isEmpty()) return;
@@ -270,7 +333,7 @@ public class StoryboardValidator {
         if (last == null) return;
         String at = where(last, scenes.size() - 1);
         boolean onExterior = last.imageIndex() != null && exteriors.stream().anyMatch(p -> p.index() == last.imageIndex());
-        if (!exteriors.isEmpty() && !onExterior) {
+        if (exteriorLast && !exteriors.isEmpty() && !onExterior) {
             String list = String.join(", ", exteriors.stream().map(p -> String.valueOf(p.index())).toList());
             errors.add(at + " 가게 외관 사진(" + list + "번)이 있으니 마지막 장면은 외관 사진으로 끝내세요.");
         }
@@ -470,7 +533,8 @@ public class StoryboardValidator {
 
     // ── 6. 나레이션 ──────────────────────────────────────────────
 
-    private void checkNarration(Scene s, String at, MenuData menu, List<String> errors) {
+    /** @param allowedNumbers 가격 말고도 나레이션에 써도 되는 숫자 (신메뉴 알림 영상에서 사장님 한마디에 있는 것) */
+    private void checkNarration(Scene s, String at, MenuData menu, Set<String> allowedNumbers, List<String> errors) {
         String n = s.narration();
         if (isBlank(n)) {
             errors.add(at + " narration이 없습니다. 나레이션이 장면 사이에서 끊기지 않게 모든 장면에 쓰세요.");
@@ -499,8 +563,17 @@ public class StoryboardValidator {
             }
         }
         String withoutPrices = SpokenPrice.PRICE.matcher(n).replaceAll("");
+        if (!allowedNumbers.isEmpty()) {
+            Matcher nm = NUMBER_TOKEN.matcher(withoutPrices);
+            StringBuilder rest = new StringBuilder();
+            while (nm.find()) nm.appendReplacement(rest, allowedNumbers.contains(nm.group().replaceAll("\\s", "")) ? "" : "$0");
+            nm.appendTail(rest);
+            withoutPrices = rest.toString();
+        }
         if (DIGIT.matcher(withoutPrices).find()) {
-            errors.add(at + " narration에 숫자가 있습니다. 숫자는 메뉴 가격(\"12,000원\")만 쓸 수 있습니다. (\"" + n + "\")");
+            errors.add(at + " narration에 숫자가 있습니다. 숫자는 메뉴 가격(\"12,000원\")"
+                    + (allowedNumbers.isEmpty() ? "" : "과 사장님 한마디에 있는 숫자(" + String.join(", ", allowedNumbers) + ")")
+                    + "만 쓸 수 있습니다. (\"" + n + "\")");
         } else if (KOREAN_PRICE.matcher(n).find()) {
             errors.add(at + " narration의 한글 금액은 \"12,000원\"처럼 숫자로 쓰세요. (\"" + n + "\")");
         }
@@ -611,7 +684,7 @@ public class StoryboardValidator {
 
     /**
      * transition: 앞 장면 사진(첫 화면) → 이 장면 가게 외관 사진(끝 화면)을 AI가 이어 주는 장면.
-     * Runway에 처음·끝 화면을 둘 다 주는 모델(Kling)을 쓰므로 영상 전체에서 하나만, 외관 사진으로 넘어갈 때만.
+     * 이전 장면 JSON 호환용으로 영상 전체에서 하나만, 외관 사진으로 넘어갈 때만 받는다.
      */
     private void checkTransition(List<Scene> scenes, int i, String at, MenuData menu, List<String> errors) {
         Scene s = scenes.get(i);

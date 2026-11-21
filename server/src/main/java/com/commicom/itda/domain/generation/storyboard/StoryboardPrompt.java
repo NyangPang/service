@@ -20,6 +20,7 @@ public class StoryboardPrompt {
 
     private final String template;
     private final String fixTemplate;
+    private final java.util.Map<VideoStyle, String> styleGuides = new java.util.concurrent.ConcurrentHashMap<>();
 
     public StoryboardPrompt(@Value("classpath:prompts/storyboard.txt") Resource template,
                             @Value("classpath:prompts/storyboard-fix.txt") Resource fixTemplate) {
@@ -33,13 +34,42 @@ public class StoryboardPrompt {
 
     /** @param address 가게 주소. 제목 윗줄의 동네 이름을 여기서만 고르게 한다 (없으면 null) */
     public String build(MenuData menu, String appeal, String address) {
+        return build(menu, appeal, address, VideoOptions.NONE);
+    }
+
+    /**
+     * @param options 생성 느낌. 스타일 규칙(prompts/storyboard-style-*.txt)과 강조 포인트를 [영상 스타일]로 붙인다.
+     *                고르지 않았으면 기존 프롬프트와 글자 하나 다르지 않다
+     */
+    public String build(MenuData menu, String appeal, String address, VideoOptions options) {
+        VideoOptions o = options == null ? VideoOptions.NONE : options;
         return template
+                .replace("{styleNotice}", styleNotice(o))
+                .replace("{styleGuide}", styleGuide(o))
                 // 영상 첫 자막·마지막 자막에 그대로 들어가므로 "[샘플] " 앞말은 뺀다 (검사도 같은 이름으로)
                 .replace("{storeName}", orNone(StoryboardValidator.storeLabel(menu.storeName())))
                 .replace("{category}", categoryLabel(menu.category()))
                 .replace("{address}", orNone(address))
                 .replace("{appeal}", orNone(appeal))
                 .replace("{menuJson}", StoryboardJson.toPrettyJson(menu.withoutImageRequests()));
+    }
+
+    private static String styleNotice(VideoOptions o) {
+        if (o.style() == null || !o.style().hasOwnPrompt()) return "";
+        return "이번 영상은 \"" + o.style().label() + "\"입니다. 아래 [영상 스타일] 규칙이 다른 규칙과 부딪히면 [영상 스타일] 규칙을 따르세요.\n";
+    }
+
+    private String styleGuide(VideoOptions o) {
+        StringBuilder sb = new StringBuilder();
+        if (o.style() != null && o.style().hasOwnPrompt()) {
+            sb.append(styleGuides.computeIfAbsent(o.style(), s -> StyleImages.read("prompts/storyboard-style-" + s.name() + ".txt")));
+        }
+        if (!o.emphases().isEmpty()) {
+            if (!sb.isEmpty()) sb.append("\n\n");
+            sb.append("[강조 포인트]\n사장님이 고른 강조 포인트입니다. 위 규칙(특히 장면 4~6개, 합계 15초, 글자 수)을 지키는 범위에서 맞춰 주세요.");
+            o.emphases().stream().sorted().forEach(e -> sb.append("\n- ").append(e.label()).append(": ").append(e.hint()));
+        }
+        return sb.isEmpty() ? "" : "\n" + sb + "\n";
     }
 
     public String buildFix(String originalPrompt, String previousOutput, List<String> errors) {
