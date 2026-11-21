@@ -65,7 +65,7 @@ public class Shortform extends BaseTimeEntity {
     @Column(nullable = false)
     private int revisionCount;
 
-    public static final int FREE_REVISIONS = 3;
+    public static final int FREE_REVISIONS = 1;
 
     /** 생성 요청의 수정 횟수를 이어받음 (새로 만들기 0, 수정이면 고칠 게시물 + 1) */
     public void markRevision(int revisionCount) {

@@ -126,7 +126,7 @@ export function videoFileName(storeName: string) {
 }
 
 /** 게시물마다 무료로 고칠 수 있는 횟수 (서버 Shortform.FREE_REVISIONS 와 같음). PRO는 무제한 */
-export const FREE_REVISIONS = 3
+export const FREE_REVISIONS = 1
 
 /** 남은 무료 수정 횟수. PRO면 Infinity */
 export function revisionsLeft(revisionCount: number | undefined, isPro: boolean) {

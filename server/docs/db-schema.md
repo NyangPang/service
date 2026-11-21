@@ -147,7 +147,7 @@ AI 홍보 영상 파이프라인(NyangPang/AI)을 합치면 아래 칼럼이 추
 
 | 테이블 | 칼럼 | 용도 |
 | --- | --- | --- |
-| `shortform` | `revision_count INT NOT NULL DEFAULT 0` | 게시물 수정 횟수. 무료는 3번까지, PRO 구독 중이면 무제한 |
+| `shortform` | `revision_count INT NOT NULL DEFAULT 0` | 게시물 수정 횟수. 무료는 1번까지, PRO 구독 중이면 무제한 |
 | `generation` | `revision_count INT NOT NULL DEFAULT 0` | 이 요청이 몇 번째 수정인지 |
 
 ## 5. 다음에 보강할 점

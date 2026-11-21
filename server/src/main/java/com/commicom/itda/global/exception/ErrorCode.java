@@ -91,7 +91,7 @@ public enum ErrorCode {
     GENERATION_FORBIDDEN(HttpStatus.FORBIDDEN, "GENERATION403", "해당 생성 요청에 접근할 수 없어요"),
     GENERATION_CONFLICT(HttpStatus.CONFLICT, "GENERATION409", "이미 생성 중인 요청이 있어요"),
     GENERATION_NOT_CANCELABLE(HttpStatus.CONFLICT, "GENERATION409_2", "이미 끝난 생성은 취소할 수 없어요"),
-    GENERATION_REVISION_LIMIT(HttpStatus.FORBIDDEN, "GENERATION403_2", "무료 수정 3번을 다 썼어요. PRO를 구독하면 계속 고칠 수 있어요"),
+    GENERATION_REVISION_LIMIT(HttpStatus.FORBIDDEN, "GENERATION403_2", "무료 수정 1번을 다 썼어요. PRO를 구독하면 계속 고칠 수 있어요"),
     MENU_READ_FAILED(HttpStatus.BAD_GATEWAY, "GENERATION502", "메뉴판을 읽지 못했어요. 메뉴를 직접 입력해 주세요"),
 
     // 스크랩

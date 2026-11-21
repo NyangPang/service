@@ -26,7 +26,7 @@ public record GenerationRequest(
          * 있으면 영상은 메뉴판을 다시 읽지 않고 이 메뉴만 쓴다. 없으면 메뉴판(menuBoardUrls)에서 읽는다
          */
         @Valid @Size(max = 30, message = "메뉴는 30개까지 넣을 수 있어요") List<MenuItemDto> menus,
-        /** 고쳐 만들 게시물 ID (수정 요청일 때만). 무료는 게시물마다 3번까지, PRO는 무제한 */
+        /** 고쳐 만들 게시물 ID (수정 요청일 때만). 무료는 게시물마다 1번까지, PRO는 무제한 */
         Long revisionOf,
         /** 생성 느낌: 영상 스타일 (MENU_FOCUS / PERSON_INTRO / NEWS_PROMO, 선택). 없으면 기본 프롬프트·기본 목소리 */
         VideoStyle videoStyle,
