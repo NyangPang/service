@@ -1,3 +1,5 @@
+import { MetricsScreen } from '@/features/metrics/components/MetricsScreen'
+import { VideoMetricsScreen } from '@/features/metrics/components/VideoMetricsScreen'
 import { CouponCreateForm } from '@/features/owner/components/CouponCreateForm'
 import { OwnerCouponTabs } from '@/features/owner/components/OwnerCouponTabs'
 import { OwnerHome } from '@/features/owner/components/OwnerHome'
@@ -16,6 +18,7 @@ const OWNER_GATE = {
   couponNew: { image: OWNER_ILLUST.couponNew, title: '로그인하면 쿠폰을 발행할 수 있어요', description: '손님을 부르는 할인 쿠폰을\n직접 만들어 보세요' },
   redeem: { image: OWNER_ILLUST.coupon, title: '로그인하면 쿠폰을 사용 처리할 수 있어요', description: '손님이 보여 준 6자리 코드를 입력해\n쿠폰 사용을 처리해요' },
   quests: { image: OWNER_ILLUST.qr, title: '로그인하면 참여할 퀘스트를 고를 수 있어요', description: '우리 가게가 참여할 퀘스트를 고르면\n손님이 퀘스트를 하러 찾아와요' },
+  metrics: { image: OWNER_ILLUST.qr, title: '로그인하면 성과지표를 볼 수 있어요', description: '우리 가게 게시물 조회수·스크랩과\n손님 방문 인증을 한눈에 볼 수 있어요' },
 } as const
 
 export const OwnerHomePage = () => <OwnerHome />
@@ -45,3 +48,13 @@ export const QuestStorePage = () => <QuestStoreScreen />
 export const ProPage = () => <ProPlan />
 export const OwnerVideosPage = () => <OwnerVideos />
 export const OwnerProfilePage = () => <OwnerProfile />
+export const OwnerMetricsPage = () => (
+  <OwnerLoginGate feature="metrics" {...OWNER_GATE.metrics}>
+    <MetricsScreen />
+  </OwnerLoginGate>
+)
+export const OwnerVideoMetricsPage = () => (
+  <OwnerLoginGate feature="metrics" {...OWNER_GATE.metrics}>
+    <VideoMetricsScreen />
+  </OwnerLoginGate>
+)

@@ -847,6 +847,7 @@ Response 예시 (200)
 | 게시물 삭제 | `DELETE /api/shortforms/{shortformId}` | 손님 스크랩·사장님 사진도 같이 지움. 생성 기록은 연결만 끊음 |
 | 재수정본으로 교체 (PRO) | `PUT /api/shortforms/{shortformId}/replace` | Body `shortformId`(새 버전). 새 버전을 공개하고 옛 게시물은 지움. 옛 게시물 스크랩은 새 버전으로 옮김 |
 | 생성 취소 | `POST /api/generation/{generationId}/cancel` | 만드는 중(PENDING·PROCESSING)일 때만. 결과를 저장하지 않고 FAILED(`사장님이 생성을 취소했어요`). 취소한 요청은 끝나기 전이라도 새 생성 요청을 막지 않음 |
+| 게시물 조회 기록 | `POST /api/shortforms/{shortformId}/views` | **로그인 없어도 됨.** 피드에서 2초 이상 보면 앱이 보냄. 로그인 손님은 같은 게시물을 하루 1번만, 공개 전 게시물·사장님이 자기 가게 게시물을 본 것은 안 셈. 응답 `{ counted }`. DB: [`docs/sql/2026-11-21-shortform-view.sql`](sql/2026-11-21-shortform-view.sql) |
 
 | 상태코드 | 의미 |
 | --- | --- |
@@ -857,6 +858,18 @@ Response 예시 (200)
 | GENERATION409_2 | 생성 취소: 이미 끝난 생성 |
 | STORE403_2 | 생성 요청: 내 가게가 아님 |
 > 생성 흐름: 생성 요청(`POST /api/generation`) → 비동기 처리 → 상태 폴링(`GET /api/generation/{id}`) → 완료 후 게시물 조회
+
+#### 성과지표 (사장님)
+
+`GET /api/stores/{storeId}/metrics?period=7d` — 로그인 필요, **내 가게만** (`STORE403_2`). `period`: `7d`(최근 7일, 기본) / `30d`(최근 30일) / `month`(이번 달). 그 밖의 값은 `COMMON400`.
+
+| 필드 | 설명 |
+| --- | --- |
+| `from` · `to` | 이번 기간 (KST 날짜, 양 끝 포함). `previousFrom` · `previousTo` = 바로 앞 같은 길이 기간 (`month`는 지난달 1일부터 같은 날수) |
+| `views` · `scraps` · `visits` | `{ current, previous }` — 게시물 조회수 / 그 기간에 새로 생긴 스크랩 / QR 방문 인증 수 |
+| `viewToVisit` | `{ views, visitsAfterView, rate }` — 조회 후 방문율. 이번 기간 방문 인증 중 **그 손님이 방문 전 7일 안에 이 가게 게시물을 본 건수** ÷ 이번 기간 조회수 (%, 소수 첫째 자리, 조회 0이면 `null`). 비로그인 조회는 손님을 알 수 없어 연결하지 않음 |
+| `dailyVisits` | `[{ date, count }]` 이번 기간 날짜별 방문 인증 (빈 날은 0) |
+| `videos` | `[{ shortformId, title, imageUrl, videoUrl, postedAt, views, scraps }]` 공개 게시물 최신순. `views`는 게시 후 전체 조회수, `scraps`는 지금 스크랩 수 |
 
 ### 게시물 피드 조회
 

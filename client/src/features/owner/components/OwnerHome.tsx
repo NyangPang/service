@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import guideScrap from '@/assets/feed/guide-scrap.png'
 import pigeonWalk from '@/assets/map/pigeon-walk.png'
 import { useOwnerCoupons, useSettlement } from '@/features/coupon/hooks'
 import { untilText } from '@/features/coupon/schema'
@@ -66,6 +67,25 @@ export function OwnerHome() {
           <Stat label="손님 할인" value={`${(settlement?.totalDiscount ?? 0).toLocaleString()}원`} />
         </dl>
       </OwnerCard>
+
+      <section className="mt-3 rounded-2xl border border-q-green/60 bg-surface px-5 py-4">
+        <h3 className="mb-3 text-16 font-bold text-q-text">성과지표 조회</h3>
+        <div className="grid grid-cols-2 gap-2.5">
+          <Link to="/owner/metrics" className="rounded-xl border border-q-green/50 px-3 py-2.5 active:bg-q-panel">
+            <span className="text-13 font-bold text-q-text">게시물 조회</span>
+            <span className="mt-1 grid grid-cols-2">
+              <MetricIcon image={OWNER_ILLUST.videoDownload} label="조회수" />
+              <MetricIcon image={guideScrap} label="스크랩수" />
+            </span>
+          </Link>
+          <Link to="/owner/metrics" className="rounded-xl border border-q-green/50 px-3 py-2.5 active:bg-q-panel">
+            <span className="text-13 font-bold text-q-text">방문 인증</span>
+            <span className="mt-1 grid">
+              <MetricIcon image={OWNER_ILLUST.qr} label="QR · GPS" />
+            </span>
+          </Link>
+        </div>
+      </section>
 
       <OwnerCard title="바로가기" className="mt-3">
         <div className="grid grid-cols-5 gap-1">
@@ -135,5 +155,14 @@ function Shortcut({ to, image, label }: { to: string; image: string; label: stri
       </span>
       <span className="text-11 font-medium whitespace-nowrap text-q-sub">{label}</span>
     </Link>
+  )
+}
+
+function MetricIcon({ image, label }: { image: string; label: string }) {
+  return (
+    <span className="flex flex-col items-center">
+      <img src={image} alt="" className="size-10 object-contain" />
+      <span className="text-11 text-q-sub">{label}</span>
+    </span>
   )
 }
