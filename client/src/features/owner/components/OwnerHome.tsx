@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import pigeonWalk from '@/assets/map/pigeon-walk.png'
 import { useOwnerCoupons, useSettlement } from '@/features/coupon/hooks'
 import { untilText } from '@/features/coupon/schema'
 import { useIsPro } from '@/features/pro/hooks'
@@ -68,11 +69,11 @@ export function OwnerHome() {
 
       <OwnerCard title="바로가기" className="mt-3">
         <div className="grid grid-cols-5 gap-1">
+          <Shortcut to="/owner/profile" image={pigeonWalk} label="가게 프로필" />
           <Shortcut to="/owner/create" image={OWNER_ILLUST.videoEdit} label="게시물 제작" />
-          <Shortcut to="/owner/redeem" image={OWNER_ILLUST.coupon} label="쿠폰 사용" />
-          <Shortcut to="/owner/coupons/new" image={OWNER_ILLUST.couponNew} label="쿠폰 발행" />
-          <Shortcut to="/owner/quest-store" image={OWNER_ILLUST.qr} label="방문 QR" />
-          <Shortcut to="/owner/pro" image={OWNER_ILLUST.pro} label="PRO" />
+          <Shortcut to="/owner/quest-store" image={OWNER_ILLUST.qr} label="퀘스트·QR" />
+          <Shortcut to="/owner/coupons" image={OWNER_ILLUST.couponNew} label="쿠폰" />
+          <Shortcut to="/owner/pro" image={OWNER_ILLUST.pro} label="잇츠 PRO" />
         </div>
       </OwnerCard>
 
