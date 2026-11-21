@@ -845,7 +845,7 @@ Response 예시 (200)
 > AI로 만든 게시물은 **비공개**로 생기고(`published=false`), 사장님이 결과를 보고 [업로드]해야 손님 피드(`GET /api/shortforms`)에 보입니다. 단건 조회(`GET /api/shortforms/{id}`)는 공개 전에도 됩니다(만들기 결과 확인용).
 > 게시물 생성(`POST /api/generation`)도 **내 가게만** 됩니다 (아니면 `STORE403_2`). DB: [`docs/sql/2026-10-09-shortform-publish.sql`](sql/2026-10-09-shortform-publish.sql)
 
-> **수정 횟수 제한**: 수정 요청은 `POST /api/generation`에 `revisionOf`(고칠 게시물 ID)를 같이 보냅니다. 무료는 게시물마다 **3번**까지, PRO는 무제한이고, 넘으면 `GENERATION403_2`. 새 버전은 `revisionCount`(고칠 게시물 + 1)를 이어받고, 게시물 단건 조회에 `revisionCount`·`freeRevisions`(3)가 옵니다. 다운로드는 무료. DB: [`docs/sql/2026-11-20-revision-count.sql`](sql/2026-11-20-revision-count.sql)
+> **수정 횟수 제한**: 수정 요청은 `POST /api/generation`에 `revisionOf`(고칠 게시물 ID)를 같이 보냅니다. 무료는 게시물마다 **1번**까지, PRO는 무제한이고, 넘으면 `GENERATION403_2`. 새 버전은 `revisionCount`(고칠 게시물 + 1)를 이어받고, 게시물 단건 조회에 `revisionCount`·`freeRevisions`(1)가 옵니다. 다운로드는 무료. DB: [`docs/sql/2026-11-20-revision-count.sql`](sql/2026-11-20-revision-count.sql)
 
 | API | Method · Path | 설명 |
 | --- | --- | --- |
@@ -864,7 +864,7 @@ Response 예시 (200)
 | GENERATION403 | 생성 취소: 내가 요청한 생성이 아님 |
 | GENERATION409_2 | 생성 취소: 이미 끝난 생성 |
 | STORE403_2 | 생성 요청·메뉴 읽기: 내 가게가 아님 |
-| GENERATION403_2 | 생성 요청: 무료 수정 3번을 다 씀 (PRO는 무제한) |
+| GENERATION403_2 | 생성 요청: 무료 수정 1번을 다 씀 (PRO는 무제한) |
 | GENERATION502 | 메뉴 읽기: 메뉴판을 끝내 읽지 못함 (직접 입력) |
 > 생성 흐름: 생성 요청(`POST /api/generation`) → 비동기 처리 → 상태 폴링(`GET /api/generation/{id}`) → 완료 후 게시물 조회
 

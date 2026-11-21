@@ -26,7 +26,7 @@ export interface Shortform {
    * 없으면 전체를 그대로 보여줌.
    */
   frame?: { top: number; height: number }
-  /** 처음 게시물에서 고쳐 만든 횟수 (사장님 내 게시물: 무료 수정 3번) */
+  /** 처음 게시물에서 고쳐 만든 횟수 (사장님 내 게시물: 무료 수정 1번) */
   revisionCount?: number
   /** 올린 시각 (내 영상 목록 정렬·표시) */
   createdAt?: string

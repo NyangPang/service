@@ -38,7 +38,7 @@ export const mockGenerationApi = {
       (j) => j.request.storeId === body.storeId && !canceled.has(j.state.generationId) && ['PENDING', 'PROCESSING'].includes(status(j)),
     )
     if (running) throw new ApiError('GENERATION409', '이미 생성 중인 요청이 있어요')
-    // 수정 횟수: 무료는 게시물마다 3번, PRO는 무제한 (서버 GenerationService.nextRevisionCount 와 같음)
+    // 수정 횟수: 무료는 게시물마다 1번, PRO는 무제한 (서버 GenerationService.nextRevisionCount 와 같음)
     if (body.revision) {
       const { expiresAt } = useProStore.getState()
       const pro = !!expiresAt && Date.parse(expiresAt) > Date.now()

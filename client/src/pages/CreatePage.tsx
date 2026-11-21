@@ -12,7 +12,7 @@ export function CreatePage() {
   return mode === 'OWNER' ? <CreateShortformFlow /> : <OwnerOnlyNotice />
 }
 
-/** 내 영상 → 올린 영상 수정 (사장님만. 무료는 게시물마다 3번, PRO는 무제한 — 횟수는 수정 화면에서 확인) */
+/** 내 영상 → 올린 영상 수정 (사장님만. 무료는 게시물마다 1번, PRO는 무제한 — 횟수는 수정 화면에서 확인) */
 export function RevisePage() {
   const mode = useModeStore((s) => s.mode)
   const { pathname } = useLocation()

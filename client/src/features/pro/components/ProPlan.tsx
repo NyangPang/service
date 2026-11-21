@@ -14,7 +14,7 @@ const COMPARE = [
   ['AI 홍보 게시물 만들기', true, true],
   ['지도·피드에 게시물 올리기', true, true],
   ['영상 다운로드', true, true],
-  ['게시물 수정', '3번', '무제한'],
+  ['게시물 수정', '1번', '무제한'],
   ['피드 우선 노출', false, true],
 ] as const
 

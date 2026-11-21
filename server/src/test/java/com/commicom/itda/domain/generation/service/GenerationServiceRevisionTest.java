@@ -33,13 +33,13 @@ class GenerationServiceRevisionTest {
 
     @Test
     void 수정하면_고칠_게시물_횟수에_1을_더한다() {
-        base(10L, store, 2);
-        assertThat(service.nextRevisionCount(store, 10L)).isEqualTo(3);
+        base(10L, store, 0);
+        assertThat(service.nextRevisionCount(store, 10L)).isEqualTo(1);
     }
 
     @Test
-    void 무료는_3번_고친_게시물을_더_고칠_수_없다() {
-        base(10L, store, 3);
+    void 무료는_1번_고친_게시물을_더_고칠_수_없다() {
+        base(10L, store, 1);
         assertThatThrownBy(() -> service.nextRevisionCount(store, 10L))
                 .isInstanceOfSatisfying(BusinessException.class,
                         e -> assertThat(e.getErrorCode()).isEqualTo(ErrorCode.GENERATION_REVISION_LIMIT));
@@ -55,7 +55,7 @@ class GenerationServiceRevisionTest {
 
     @Test
     void 만료된_PRO는_무료와_같다() {
-        base(10L, store, 3);
+        base(10L, store, 1);
         when(pros.findByStoreId(1L)).thenReturn(Optional.of(
                 new ProSubscription(1L, KstTime.now().minusDays(40), KstTime.now().minusDays(10))));
         assertThatThrownBy(() -> service.nextRevisionCount(store, 10L)).isInstanceOf(BusinessException.class);
