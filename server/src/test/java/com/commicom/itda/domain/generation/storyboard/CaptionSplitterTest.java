@@ -36,6 +36,35 @@ class CaptionSplitterTest {
     }
 
     @Test
+    void 의존명사_앞뒤에서_끊지_않음() {
+        // 실제 생성 영상에서 "취향 맞는 맛을 고를 / 수 있는 광운 카페예요."로 끊겼던 문장
+        assertThat(CaptionSplitter.split("취향 맞는 맛을 고를 수 있는 광운 카페예요."))
+                .containsExactly("취향 맞는 맛을", "고를 수 있는 광운 카페예요.");
+        assertThat(CaptionSplitter.split("취향에 맞게 고를 수 있는 광운 카페예요."))
+                .containsExactly("취향에 맞게", "고를 수 있는 광운 카페예요.");
+    }
+
+    @Test
+    void 보조_용언은_앞말과_같은_조각() {
+        assertThat(CaptionSplitter.split("그 안에 과일 크림이 쫀득하게 차 있고"))
+                .containsExactly("그 안에 과일 크림이", "쫀득하게 차 있고");
+        assertThat(CaptionSplitter.splitsUnit("차", "있고")).isTrue();
+        assertThat(CaptionSplitter.splitsUnit("먹어", "보세요.")).isTrue();
+        assertThat(CaptionSplitter.splitsUnit("맵지", "않은")).isTrue();
+        assertThat(CaptionSplitter.splitsUnit("크림을", "듬뿍")).isFalse();
+        assertThat(CaptionSplitter.splitsUnit("바삭하게", "두툼한")).isFalse();
+    }
+
+    @Test
+    void 길이가_같으면_조사_뒤에서_끊음() {
+        // "무려 수제 그릭요거트 / 크림을 듬뿍…"도 길이 차이는 같지만 "크림을" 뒤가 말이 쉬는 자리
+        assertThat(CaptionSplitter.split("무려 수제 그릭요거트 크림을 듬뿍 넣은 쫀득빵을"))
+                .containsExactly("무려 수제 그릭요거트 크림을", "듬뿍 넣은 쫀득빵을");
+        assertThat(CaptionSplitter.split("다양한 종류의 과일마다 쫀득빵이 따로 있는데"))
+                .containsExactly("다양한 종류의 과일마다", "쫀득빵이 따로 있는데");
+    }
+
+    @Test
     void 가격은_메뉴_이름과_같은_조각() {
         List<String> parts = CaptionSplitter.split("매일 아침 두드려 튀긴 두툼한 로스카츠 12,000원");
         assertThat(parts).anyMatch(p -> p.endsWith("로스카츠 12,000원"));
