@@ -19,8 +19,8 @@
       "image_index": 0, "motion": "zoom_in",
       "video_prompt": null,
       "menu_ref": "소금빵",
-      "narration": "매일 굽는 버터 소금빵이 3,500원",
-      "caption": { "text": "매일 굽는 버터 소금빵이 3,500원", "position": "bottom", "emphasis": "price" }
+      "narration": "매일 굽는 버터 소금빵이 3,500원이라",
+      "caption": { "text": "매일 굽는 버터 소금빵이 3,500원이라", "position": "bottom", "emphasis": "price" }
     },
     {
       "id": 3, "order": 3, "type": "detail", "duration": 4,

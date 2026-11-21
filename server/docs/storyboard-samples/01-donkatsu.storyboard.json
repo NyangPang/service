@@ -19,8 +19,8 @@
       "image_index": 0, "motion": "zoom_in",
       "video_prompt": null,
       "menu_ref": "로스카츠",
-      "narration": "두툼한 로스카츠 12,000원",
-      "caption": { "text": "두툼한 로스카츠 12,000원", "position": "bottom", "emphasis": "price" }
+      "narration": "두툼한 로스카츠가 12,000원이라",
+      "caption": { "text": "두툼한 로스카츠가 12,000원이라", "position": "bottom", "emphasis": "price" }
     },
     {
       "id": 3, "order": 3, "type": "detail", "duration": 3,

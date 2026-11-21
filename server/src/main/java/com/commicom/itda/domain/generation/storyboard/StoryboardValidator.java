@@ -528,7 +528,20 @@ public class StoryboardValidator {
             if (first != null) {
                 errors.add(where(s, i) + " 나레이션이 " + first + "과 같은 \"…" + ending + "\"로 끝납니다. 기승전결이 이어지게 장면마다 어미를 바꾸세요.");
             }
+            if (i < scenes.size() - 1 && endsWithNieun(letters)) {
+                errors.add(where(s, i) + " 나레이션이 \"…" + letters.substring(Math.max(0, letters.length() - ENDING_CHARS))
+                        + "\"처럼 ㄴ 받침으로 끝나 다음 장면 말에 걸린 채 멈춥니다. 가운데 장면은 \"~고\", \"~해서\", \"~나오고\", \"~좋고\", "
+                        + "\"~한데\", \"~되는데\", \"~까지\"처럼 이어 주는 말로 끝내세요 (예: \"맛이 다른\" → \"맛이 다르고\", \"바삭하게 튀긴\" → "
+                        + "\"바삭하게 튀겨서\", \"하이볼은\" → \"하이볼이 진한데\", \"12,000원\" → \"12,000원이라\"). (\"" + s.narration() + "\")");
+            }
         }
+    }
+
+    /** 마지막 글자가 ㄴ 받침인 한글 음절인가 (다른·튀긴·찾는·하이볼은·원) */
+    static boolean endsWithNieun(String text) {
+        if (text == null || text.isEmpty()) return false;
+        char last = text.charAt(text.length() - 1);
+        return last >= '가' && last <= '힣' && (last - '가') % 28 == 4;
     }
 
     // ── 6. 나레이션 ──────────────────────────────────────────────
