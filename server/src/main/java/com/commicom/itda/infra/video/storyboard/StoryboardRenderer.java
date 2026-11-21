@@ -89,8 +89,8 @@ public final class StoryboardRenderer {
     /** 한 편으로 이어 붙인 배경 영상과, 장면 순번별 클립 상태·메모 */
     private record OneTake(Path track, Map<Integer, State> states, Map<Integer, String> notes) {}
 
-    /** 컷이 이보다 길면 Runway에 10초 클립을 요청한다 (5초 클립을 너무 느리게 늘리지 않게) */
-    private static final double LONG_SHOT_SEC = 7.5;
+    /** 마지막 단일 사진 컷에만 적용되는 Gen-4 길이 기준 */
+    private static final double LONG_GEN4_SHOT_SEC = 7.5;
 
     /** 장면 순서대로 같은 사진이 이어지는 구간을 컷으로 묶는다 */
     static List<Shot> planShots(List<Scene> ordered) {
@@ -111,8 +111,14 @@ public final class StoryboardRenderer {
         return shots;
     }
 
+    /** 마지막 사진에 도착하는 이동에는 컷 길이가 허용할 때 1초를 더 쓴다. */
+    static int oneTakeTransitionSeconds(Shot shot, boolean entersLastShot) {
+        int minimum = RunwayClipClient.MIN_TRANSITION_SECONDS;
+        return entersLastShot && shot.span() > minimum ? minimum + 1 : minimum;
+    }
+
     /**
-     * 원테이크 배경 영상: 컷마다 그 사진을 첫 화면, 다음 컷 사진을 끝 화면으로 하는 AI 클립(Kling)을 만들어 이어 붙인다.
+     * 원테이크 배경 영상: 각 컷 사진에서 다음 컷 사진으로 넘어가는 Gemini 클립을 이어 붙인다.
      * 앞 클립이 끝나는 화면 = 다음 클립이 시작하는 화면(같은 사진)이라 한 번에 찍은 영상처럼 이어진다.
      * 마지막 컷은 프롬프트가 있으면 그 사진에서 시작하는 클립(Gen-4 Turbo), 없으면(가게 외관 등) 그 사진에서 시작하는 줌.
      * 클립은 모두 동시에 요청하고, 실패하거나 Runway가 꺼져 있으면 그 컷만 줌으로 대신한다.
@@ -134,16 +140,17 @@ public final class StoryboardRenderer {
             for (int i = 0; i < shots.size() && runwayOn; i++) {
                 Shot shot = shots.get(i);
                 if (shot.prompt() == null) continue;
-                int seconds = shot.span() > LONG_SHOT_SEC ? RunwayClipClient.LONG_CLIP_SECONDS : RunwayClipClient.CLIP_SECONDS;
                 Path photo = photos.get(shot.imageIndex());
                 Path raw;
                 if (i < shots.size() - 1) {
                     Path next = photos.get(shots.get(i + 1).imageIndex());
-                    raw = cacheDir.resolve("onetake-" + hash("kling", fileHash(photo), fileHash(next), shot.prompt(), String.valueOf(seconds)) + ".mp4");
+                    int seconds = oneTakeTransitionSeconds(shot, i == shots.size() - 2);
+                    raw = transitionRaw("onetake", photo, next, shot.prompt(), seconds);
                     Path rawF = raw;
                     jobs.put(i, pool.submit(() -> cached(rawF, tmp -> runway.generateTransition(photo, next, shot.prompt(), seconds, tmp, ff))));
                     transitionsRequested++;
                 } else {
+                    int seconds = shot.span() > LONG_GEN4_SHOT_SEC ? RunwayClipClient.LONG_CLIP_SECONDS : RunwayClipClient.CLIP_SECONDS;
                     raw = cacheDir.resolve("onetake-" + hash("gen4", fileHash(photo), shot.prompt(), String.valueOf(seconds)) + ".mp4");
                     Path rawF = raw;
                     jobs.put(i, pool.submit(() -> cached(rawF, tmp -> runway.generate(photo, shot.prompt(), seconds, tmp, ff))));
@@ -176,10 +183,11 @@ public final class StoryboardRenderer {
             State state;
             String note;
             if (raw != null && Files.exists(raw)) {
+                boolean transition = i < shots.size() - 1;
                 part = cacheDir.resolve("shot-" + hash(VERSION, raw.getFileName().toString(), fmt(shot.span())) + ".mp4");
-                cached(part, tmp -> fitShot(raw, shot.span(), tmp));
+                cached(part, tmp -> fitShot(raw, shot.span(), transition, tmp));
                 state = shotStates.getOrDefault(i, State.CACHED);
-                note = i < shots.size() - 1
+                note = transition
                         ? String.format(Locale.ROOT, "%d번 사진 → %d번 사진 AI로 이어 찍음", shot.imageIndex(), shots.get(i + 1).imageIndex())
                         : String.format(Locale.ROOT, "%d번 사진 AI 클립", shot.imageIndex());
             } else {
@@ -199,13 +207,16 @@ public final class StoryboardRenderer {
         return new OneTake(track, states, notes);
     }
 
-    /** AI 클립 하나를 컷 길이에 정확히 맞춘다 (빠르게·느리게 재생, 모자라면 마지막 화면 유지), 1080x1920 30fps로 */
-    private void fitShot(Path raw, double span, Path out) throws Exception {
+    /** 전환은 다음 사진으로 끝나도록 첫 화면에서 여유 시간을 확보한 뒤 컷 길이에 맞춘다. */
+    private void fitShot(Path raw, double span, boolean transition, Path out) throws Exception {
         double rawSec = ff.duration(raw);
-        double factor = span / rawSec;
+        double played = transition ? Math.min(span, rawSec * MAX_SLOW_DOWN) : span;
+        double factor = played / rawSec;
         ff.run(List.of("-i", raw.toString(),
                 "-vf", "scale=1080:1920:force_original_aspect_ratio=increase:flags=lanczos,crop=1080:1920,setsar=1,"
-                        + "setpts=" + fmt(factor) + "*PTS,fps=" + FPS + ",tpad=stop_mode=clone:stop_duration=1,format=yuv420p",
+                        + "setpts=" + fmt(factor) + "*PTS,fps=" + FPS
+                        + ",tpad=start_mode=clone:start_duration=" + fmt(span - played)
+                        + ":stop_mode=clone:stop_duration=1,format=yuv420p",
                 "-t", fmt(span),
                 "-an", "-c:v", "libx264", "-preset", "veryfast", "-crf", "18", out.toString()));
     }
@@ -290,7 +301,7 @@ public final class StoryboardRenderer {
                 if (!validPhoto(s, photos) || !validPhoto(prev, photos) || prev.imageIndex() == s.imageIndex()) continue;
                 Path first = photos.get(prev.imageIndex());
                 Path last = photos.get(s.imageIndex());
-                Path raw = cacheDir.resolve("transition-" + hash("transition", fileHash(first), fileHash(last), s.videoPrompt()) + ".mp4");
+                Path raw = transitionRaw("transition", first, last, s.videoPrompt(), RunwayClipClient.CLIP_SECONDS);
                 transitions.put(idx, new TransitionJob(first, last, s.videoPrompt(), raw));
             }
         }
@@ -636,6 +647,12 @@ public final class StoryboardRenderer {
 
     private static boolean validPhoto(Scene s, List<Path> photos) {
         return s.imageIndex() >= 0 && s.imageIndex() < photos.size();
+    }
+
+    private Path transitionRaw(String prefix, Path first, Path last, String prompt, int seconds) throws IOException {
+        String key = hash(RunwayClipClient.TRANSITION_MODEL, RunwayClipClient.PORTRAIT_RATIO,
+                fileHash(first), fileHash(last), prompt, String.valueOf(seconds));
+        return cacheDir.resolve(prefix + "-" + key + ".mp4");
     }
 
     /**

@@ -39,7 +39,7 @@ class VideoStyleTest {
         assertThat(text).isEqualTo(prompt.build(menu, "한마디", "서울 성동구", VideoOptions.NONE))
                 .doesNotContain("{style", "[영상 스타일", "[강조 포인트]")
                 .contains("써 주세요.\n\n[가게 정보]")
-                .contains("detail 장면에 쓰지 않습니다.\n\n[출력 형식 예시]");
+                .contains("generated 사진은 detail 장면에 쓰지 않습니다.\n\n[출력 형식 예시]");
     }
 
     @Test
@@ -67,7 +67,9 @@ class VideoStyleTest {
                 .isGreaterThan(menuFocus.indexOf("[사진 고르기]"));
 
         String news = prompt.build(menu, "신메뉴 명란카츠 출시 기념 20% 할인", null, VideoOptions.of(VideoStyle.NEWS_PROMO, List.of()));
-        assertThat(news).contains("[영상 스타일: 신메뉴 및 할인 알림 영상]").doesNotContain("[영상 스타일: 메뉴가");
+        assertThat(news).contains("[영상 스타일: 신메뉴 및 할인 알림 영상]")
+                .contains("motion \"zoom_in\", video_prompt null", "카메라가 외관으로 이동하는 동작")
+                .doesNotContain("[영상 스타일: 메뉴가");
     }
 
     @Test

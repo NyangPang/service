@@ -697,7 +697,7 @@ public class StoryboardValidator {
 
     /**
      * transition: 앞 장면 사진(첫 화면) → 이 장면 가게 외관 사진(끝 화면)을 AI가 이어 주는 장면.
-     * Runway에 처음·끝 화면을 둘 다 주는 모델(Kling)을 쓰므로 영상 전체에서 하나만, 외관 사진으로 넘어갈 때만.
+     * 이전 장면 JSON 호환용으로 영상 전체에서 하나만, 외관 사진으로 넘어갈 때만 받는다.
      */
     private void checkTransition(List<Scene> scenes, int i, String at, MenuData menu, List<String> errors) {
         Scene s = scenes.get(i);

@@ -129,7 +129,7 @@ AWS_S3_BUCKET=
 AWS_CLOUDFRONT_DOMAIN=
 
 # Bedrock 대화 모델 ID 또는 inference profile ID (게시물 소개 글·메뉴판 인식)
-BEDROCK_MODEL_ID=
+BEDROCK_MODEL_ID=global.anthropic.claude-haiku-4-5-20251001-v1:0
 
 # Unsplash API 키 (developers.unsplash.com > Your apps > Access Key)
 UNSPLASH_ACCESS_KEY=
