@@ -34,6 +34,8 @@ const MODES: { mode: AppMode; label: string; desc: string }[] = [
 function AccountSection({ onLoggedIn, onLoggedOut }: { onLoggedIn: (mode: AppMode) => void; onLoggedOut: () => void }) {
   const me = useMe()
   const logout = useLogout()
+  const navigate = useNavigate()
+  const setMode = useModeStore((s) => s.setMode)
 
   if (!me) {
     return (
@@ -74,16 +76,34 @@ function AccountSection({ onLoggedIn, onLoggedOut }: { onLoggedIn: (mode: AppMod
         </span>
       </div>
       <ul className="mt-1 text-15 text-ink">
-        <li>
-          <Link to={owner ? '/owner/profile' : '/profile'} className="flex justify-between border-b border-q-line py-3.5">
-            프로필 <span className="text-q-muted">›</span>
-          </Link>
-        </li>
+        {!owner && (
+          <>
+            <li>
+              <Link to="/profile" className="flex justify-between border-b border-q-line py-3.5">
+                프로필 <span className="text-q-muted">›</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/scraps" className="flex justify-between border-b border-q-line py-3.5">
+                스크랩 <span className="text-q-muted">›</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/profile/reviews" className="flex justify-between border-b border-q-line py-3.5">
+                내 리뷰 <span className="text-q-muted">›</span>
+              </Link>
+            </li>
+          </>
+        )}
         <li>
           <button
             type="button"
             onClick={() => {
               logout()
+              if (owner) {
+                setMode('USER')
+                navigate('/', { replace: true })
+              }
               onLoggedOut()
             }}
             className="w-full border-b border-q-line py-3.5 text-left text-q-muted"
@@ -358,3 +378,4 @@ export function SettingsDrawer({ buttonClassName, items }: { buttonClassName: st
     </>
   )
 }
+

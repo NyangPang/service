@@ -1,5 +1,5 @@
 import pigeonCouponBox from '@/assets/user/pigeon-coupon-box.png'
-import pigeonGrowth from '@/assets/user/pigeon-growth.png'
+import itdulgiReview from '@/assets/user/itdulgi-review.svg'
 import pigeonQuest from '@/assets/user/pigeon-quest.png'
 import { OWNER_ILLUST } from '@/features/owner/illustrations'
 import { FlagNavIcon, MapNavIcon, PhotoNavIcon, SearchNavIcon } from '@/shared/ui/icons'
@@ -19,7 +19,8 @@ const TABS: TabItem[] = [
 const MENU: MenuItem[] = [
   { to: '/coupons', label: '내 쿠폰함', icon: '🎟', image: pigeonCouponBox },
   { to: '/quest', label: '내 비둘기·퀘스트', icon: '🕊', image: pigeonQuest },
-  { to: '/profile/reviews', label: '내 리뷰', icon: '✍️', image: pigeonGrowth },
+  { to: '/quest/qr', label: 'QR 인식하기', icon: '📷', image: OWNER_ILLUST.qr },
+  { to: '/profile/reviews', label: '내 리뷰', icon: '✍️', image: itdulgiReview },
   { to: '/scraps', label: '스크랩한 게시물', icon: '🔖', image: OWNER_ILLUST.videoDownload },
 ]
 
