@@ -21,6 +21,8 @@ export interface MenuItem {
   icon: string
   /** 있으면 이모지 대신 일러스트 */
   image?: string
+  /** 있으면 단일 링크 대신 토글 슬라이더로 표시 */
+  tabs?: { label: string; to: string }[]
 }
 
 const MODES: { mode: AppMode; label: string; desc: string }[] = [
@@ -74,11 +76,25 @@ function AccountSection({ onLoggedIn, onLoggedOut }: { onLoggedIn: (mode: AppMod
         </span>
       </div>
       <ul className="mt-1 text-15 text-ink">
-        <li>
-          <Link to={owner ? '/owner/profile' : '/profile'} className="flex justify-between border-b border-q-line py-3.5">
-            프로필 <span className="text-q-muted">›</span>
-          </Link>
-        </li>
+        {!owner && (
+          <>
+            <li>
+              <Link to="/profile" className="flex justify-between border-b border-q-line py-3.5">
+                프로필 <span className="text-q-muted">›</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/scraps" className="flex justify-between border-b border-q-line py-3.5">
+                스크랩 <span className="text-q-muted">›</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/profile/reviews" className="flex justify-between border-b border-q-line py-3.5">
+                내 리뷰 <span className="text-q-muted">›</span>
+              </Link>
+            </li>
+          </>
+        )}
         <li>
           <button
             type="button"
@@ -265,13 +281,17 @@ export function SettingsDrawer({ buttonClassName, items }: { buttonClassName: st
                 <ul className="mt-1">
                   {items.map((item) => (
                     <li key={item.to}>
-                      <Link to={item.to} className="flex items-center gap-3 border-b border-q-line py-3.5 text-15 font-medium text-ink">
-                        <span aria-hidden className="flex size-9 items-center justify-center overflow-hidden rounded-xl bg-q-mint text-sm">
-                          {item.image ? <img src={item.image} alt="" className="size-8 object-contain" /> : item.icon}
-                        </span>
-                        <span className="flex-1">{item.label}</span>
-                        <span className="text-q-muted">›</span>
-                      </Link>
+                      {item.tabs ? (
+                        <TabbedMenuItem item={item as MenuItem & { tabs: NonNullable<MenuItem['tabs']> }} />
+                      ) : (
+                        <Link to={item.to} className="flex items-center gap-3 border-b border-q-line py-3.5 text-15 font-medium text-ink">
+                          <span aria-hidden className="flex size-9 items-center justify-center overflow-hidden rounded-xl bg-q-mint text-sm">
+                            {item.image ? <img src={item.image} alt="" className="size-8 object-contain" /> : item.icon}
+                          </span>
+                          <span className="flex-1">{item.label}</span>
+                          <span className="text-q-muted">›</span>
+                        </Link>
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -356,5 +376,49 @@ export function SettingsDrawer({ buttonClassName, items }: { buttonClassName: st
         </div>
       )}
     </>
+  )
+}
+
+/** 발행 / 사용 처리 같이 두 목적지를 토글로 선택하는 메뉴 항목 */
+function TabbedMenuItem({ item }: { item: MenuItem & { tabs: NonNullable<MenuItem['tabs']> } }) {
+  const navigate = useNavigate()
+  const [sel, setSel] = useState(0)
+
+  return (
+    <button
+      type="button"
+      onClick={() => navigate(item.tabs[sel].to)}
+      className="flex w-full items-center gap-3 border-b border-q-line py-3 text-left text-[15px] font-medium text-ink"
+    >
+      <span aria-hidden className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-q-mint text-sm">
+        {item.image ? <img src={item.image} alt="" className="size-8 object-contain" /> : item.icon}
+      </span>
+      <span className="flex-1">{item.label}</span>
+      <div
+        role="radiogroup"
+        aria-label={`${item.label} 모드`}
+        className="flex rounded-lg bg-q-panel p-0.5"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {item.tabs.map((tab, i) => (
+          <button
+            key={tab.to}
+            type="button"
+            role="radio"
+            aria-checked={sel === i}
+            onClick={(e) => {
+              e.stopPropagation()
+              setSel(i)
+            }}
+            className={`rounded-md px-2.5 py-1 text-[12px] font-semibold transition-colors ${
+              sel === i ? 'bg-white text-ink shadow-sm' : 'text-q-muted'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+      <span className="text-q-muted">›</span>
+    </button>
   )
 }
