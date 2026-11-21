@@ -341,13 +341,23 @@ class StoryboardValidatorTest {
     }
 
     @Test
-    void ai_장면에_프롬프트가_없거나_40단어를_넘으면_오류() throws IOException {
+    void ai_장면에_프롬프트가_없거나_60단어를_넘으면_오류() throws IOException {
         List<String> errors = errorsOf("01-donkatsu", sb -> {
             scene(sb, 0).putNull("video_prompt");
-            scene(sb, 2).put("video_prompt", "word ".repeat(41).replace("word", "cheese").trim());
+            scene(sb, 2).put("video_prompt", "word ".repeat(61).replace("word", "cheese").trim());
         });
         assertThat(errors).anyMatch(e -> e.contains("[장면 id=1] motion이 \"ai\"이면 video_prompt"))
-                .anyMatch(e -> e.contains("[장면 id=3] video_prompt가 41단어"));
+                .anyMatch(e -> e.contains("[장면 id=3] video_prompt가 61단어"));
+    }
+
+    @Test
+    void 동작을_담은_45단어_프롬프트는_통과() throws IOException {
+        // 동작 + 음식 묘사 + 카메라 + 조명 + 분위기를 쓰면 40단어를 쉽게 넘어서, 40단어 제한에 걸려 생성이 실패했었다
+        String prompt = "golden cheese cutlet on a wooden board, a gloved hand uses a knife to slice it in half and pulls the pieces apart "
+                + "so the molten cheese stretches between them, steam rising from the crust, slow push-in, warm side lighting, "
+                + "cozy appetizing mood";
+        assertThat(prompt.split("\\s+").length).isBetween(41, 60);
+        assertThat(errorsOf("01-donkatsu", sb -> scene(sb, 2).put("video_prompt", prompt))).isEmpty();
     }
 
     @ParameterizedTest

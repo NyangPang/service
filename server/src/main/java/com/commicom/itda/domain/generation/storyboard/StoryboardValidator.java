@@ -53,7 +53,8 @@ public class StoryboardValidator {
     static final double MAX_SCENE_SEC = 5;
     static final double HOOK_MAX_SEC = 2;
     static final int MAX_AI_SCENES = 3;
-    static final int VIDEO_PROMPT_MAX_WORDS = 40;
+    /** 동작 하나 + 음식 묘사 + 카메라 + 조명 + 분위기를 담을 만큼 (Runway promptText는 1000자까지) */
+    static final int VIDEO_PROMPT_MAX_WORDS = 60;
     /** 빠르게 말하는 쇼츠 기준 (레퍼런스 맛집 쇼츠가 초당 약 7자). 가격은 읽는 형태("만 이천 원")로 센다 */
     static final int NARRATION_CHARS_PER_SEC = 7;
 

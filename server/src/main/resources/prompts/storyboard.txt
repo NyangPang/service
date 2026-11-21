@@ -220,7 +220,7 @@ title은 영상 내내 화면 위쪽에 떠 있는 고정 제목이자, 쇼츠 �
     - photos에 exterior 사진이 있으면 마지막 장면(외관 사진)의 motion을 "transition"으로 둡니다. 바로 앞 장면은 음식·가게 안 사진이어야 합니다
     - 영상 전체에서 1개만, exterior 사진으로 넘어가는 장면에만 씁니다 (ai 3개 제한과는 따로 셉니다)
 - video_prompt: motion이 ai 또는 transition일 때만 씁니다. 아니면 null
-  - 영어로, 40단어 이내
+  - 영어로, 60단어 이내
   - ai: [사진 속 음식·장소] + [그 음식을 다루는 동작 1개] + [음식 묘사 1개] + [카메라 움직임] + [조명] + [분위기] 순서
   - 카메라 무빙만으로는 거의 정지 화면처럼 보입니다. ai 장면마다 화면 속에서 음식이 실제로 다뤄지는 동작 하나를 꼭 넣고, 그 동작이 5초 동안 처음부터 끝까지 이어지게 쓰세요. 메뉴가 무엇인지 보고 그 메뉴에서 자연스러운 동작을 고릅니다
     - 집기·옮기기: "a gloved hand uses metal tongs to pick up one bread and place it on a wooden tray", "a gloved hand slides a fresh tray of pastries onto the shelf"
