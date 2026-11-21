@@ -114,7 +114,7 @@
 | <img src="https://github.com/LEELMIO.png" width="120"> | <img src="https://github.com/CW-YI.png" width="120"> | <img src="https://github.com/imzioim.png" width="120"> | <img src="https://github.com/jangsh7.png" width="120"> | <img src="./docs/ayeon.png" width="120"> |
 |:------------------------------------------------------:|:---:|:---:|:---:|:----------------------------------------:|
 |           [성현주](https://github.com/LEELMIO)            | [이채원](https://github.com/CW-YI) | [임지오](https://github.com/imzioim) | [장서현](https://github.com/jangsh7) |                   임아연                    |
-|                리뷰, QR 인증·보상,<br>알림, 서버                 | AI 영상<br>프롬프팅·제작 | AI 영상 제작,<br>성과 조회 리포트 | 지도, 사용자 편의<br> 모드,CI/CD 배포 |             기획,<br>UI/UX 디자인             |
+|                리뷰·알림, QR 인증·<br>보상,서버, 사이드바, 쿠폰                 | AI 영상 프롬프팅·<br>제작 파이프라인, OCR | AI 영상 제작·다운로드,<br>성과 조회 리포트 | AI 홍보물 파이프라인, 동네 지도,<br>사용자 편의 모드,CI/CD 배포 |             기획,<br>UI/UX 디자인             |
 
 ## 참고 자료
 
