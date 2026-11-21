@@ -220,6 +220,56 @@ final class CaptionRenderer {
      *   <li>card: 제목 (윗줄 갈색, 아랫줄 진한 글씨 + 형광펜 밑줄)</li>
      * </ul>
      */
+    /** 엔딩 카드 안내 문구. 가게에서 사장님이 보여 주는 방문 인증 QR로 이어지게 한다 (영상에는 QR을 넣지 않음) */
+    static final String END_CARD_ASK = "\"잇츠 보고 왔어요\" 말해 주세요";
+    static final List<String> END_CARD_GUIDE = List.of("사장님 QR로 방문 인증하면", "퀘스트 보상을 받아요!");
+    private static final Color END_CARD_SUB = new Color(61, 90, 69);
+
+    /**
+     * 영상 끝에 붙는 엔딩 카드 (불투명 1080×1920 PNG): 연한 초록 배경 + 잇츠 로고 + 가게 이름 + 흰 카드 안 방문 안내.
+     * 로고는 마스코트 몸이 흰색이고 글자가 초록이라 연한 초록(#CBD7CE) 배경에서만 둘 다 잘 보인다.
+     */
+    void renderEndCard(String storeName, Path png) throws IOException {
+        BufferedImage img = new BufferedImage(W, H, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = img.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        FontRenderContext frc = g.getFontRenderContext();
+        g.setColor(BRAND_LIGHT);
+        g.fillRect(0, 0, W, H);
+
+        BufferedImage logo;
+        try (InputStream in = CaptionRenderer.class.getResourceAsStream("/brand/its-logo.png")) {
+            if (in == null) throw new IllegalStateException("로고 없음: /brand/its-logo.png");
+            logo = ImageIO.read(in);
+        }
+        int logoW = 720;
+        int logoH = Math.round(logoW * logo.getHeight() / (float) logo.getWidth());
+        g.drawImage(logo, (W - logoW) / 2, 430, logoW, logoH, null);
+
+        float y = 430 + logoH + 70;
+        if (storeName != null && !storeName.isBlank()) {
+            String name = storeName.strip();
+            y += drawCentered(g, name, fit(extraBold, 84, name, frc), BRAND_DEEP, y) * 1.3f;
+        }
+
+        // 안내: 흰 카드 안에 굵은 한 줄 + 작은 두 줄
+        float cardTop = y + 50;
+        int cardH = 330;
+        g.setColor(Color.WHITE);
+        g.fillRoundRect(90, Math.round(cardTop), W - 180, cardH, 64, 64);
+        float ty = cardTop + 56;
+        ty += drawCentered(g, END_CARD_ASK, fit(extraBold, 58, END_CARD_ASK, frc), BRAND_INK, ty) * 1.55f;
+        for (String line : END_CARD_GUIDE) {
+            ty += drawCentered(g, line, fit(semiBold, 44, line, frc), END_CARD_SUB, ty) * 1.4f;
+        }
+        g.dispose();
+        Files.createDirectories(png.toAbsolutePath().getParent());
+        ImageIO.write(img, "png", png.toFile());
+    }
+
     void renderHeader(VideoTemplate template, String title, String storeName, Path png) throws IOException {
         BufferedImage img = new BufferedImage(W, H, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = img.createGraphics();

@@ -36,7 +36,7 @@ import java.util.function.Consumer;
  *                        Runway가 없거나 그 사진에 ai 장면이 없으면 FFmpeg 줌 (zoom_in·zoom_out·static)
  *          ② 내레이션    Polly 또는 macOS say → 장면 길이에 맞춤 (길면 살짝 빠르게)
  *          ③ 장면 조각   배경과 내레이션 합성
- * 전체      조각 이어붙이기 → 고정 제목과 내레이션 구간별 자막 → BGM → 최종 mp4 + 썸네일
+ * 전체      조각 이어붙이기 → 고정 제목과 내레이션 구간별 자막 → 엔딩 카드 2초 → BGM → 최종 mp4 + 썸네일
  * </pre>
  *
  * 모든 중간 결과는 입력 내용의 해시로 캐시에 저장한다. 그래서 수정 요청 후 다시 돌리면
@@ -53,6 +53,10 @@ public final class StoryboardRenderer {
     private static final double VOICE_LEAD_IN_NEXT = 0.05;
     /** 장면 끝에 남겨 두는 여백 */
     private static final double VOICE_TAIL = 0.05;
+    /** 영상 끝에 덧붙이는 엔딩 카드 길이(초)와 앞 장면에서 넘어오는 페이드 길이 */
+    static final double END_CARD_SEC = 2.0;
+    private static final double END_CARD_FADE = 0.3;
+    private static final String END_CARD_VERSION = "1";
     private static final double MAX_TEMPO = 1.5;
 
     public enum State { NEW, CACHED, FALLBACK, NONE }
@@ -254,6 +258,13 @@ public final class StoryboardRenderer {
             Files.deleteIfExists(body);
             body = withGraphics;
         }
+        // 엔딩 카드: 잇츠 로고 + 가게 이름 + "잇츠 보고 왔어요" 방문 인증 안내 (고정 제목·자막 없이 영상 끝에 덧붙임)
+        Path endCard = cacheDir.resolve("endcard-" + hash(VERSION, END_CARD_VERSION, String.valueOf(sb.storeName())) + ".png");
+        cached(endCard, tmp -> captions.renderEndCard(sb.storeName(), tmp));
+        Path withEndCard = cacheDir.resolve("body-" + System.nanoTime() + ".mp4");
+        appendEndCard(body, endCard, withEndCard);
+        Files.deleteIfExists(body);
+        body = withEndCard;
         double total = ff.duration(body);
 
         Path bgm = bgmFile(sb.bgm() == null ? null : sb.bgm().mood());
@@ -345,6 +356,24 @@ public final class StoryboardRenderer {
     }
 
     /** 전환을 합성한 뒤에 얹어 장면 경계에서 자막이 겹치거나 밀려가지 않게 한다. */
+    /**
+     * 영상 뒤에 엔딩 카드(정지 화면)를 END_CARD_SEC초 덧붙인다. 앞 영상 끝에서 짧게 페이드로 넘어가고,
+     * 소리는 그 시간만큼 무음을 이어 붙여 BGM이 끝까지 깔린다.
+     */
+    private void appendEndCard(Path video, Path card, Path out) throws Exception {
+        double d = ff.duration(video);
+        ff.run(List.of("-i", video.toString(),
+                "-loop", "1", "-framerate", String.valueOf(FPS), "-t", fmt(END_CARD_SEC + END_CARD_FADE), "-i", card.toString(),
+                "-filter_complex",
+                "[0:v]fps=" + FPS + ",format=yuv420p,setsar=1,settb=AVTB[a0];"
+                        + "[1:v]scale=1080:1920,fps=" + FPS + ",format=yuv420p,setsar=1,settb=AVTB[c];"
+                        + "[a0][c]xfade=transition=fade:duration=" + fmt(END_CARD_FADE) + ":offset=" + fmt(d - END_CARD_FADE) + "[v];"
+                        + "[0:a]apad=pad_dur=" + fmt(END_CARD_SEC) + "[a]",
+                "-map", "[v]", "-map", "[a]", "-t", fmt(d + END_CARD_SEC),
+                "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-r", String.valueOf(FPS),
+                "-c:a", "aac", "-b:a", "160k", "-ar", "44100", out.toString()));
+    }
+
     private void overlayGraphics(Path video, Path header, List<CaptionCue> cues, Path out) throws Exception {
         List<String> args = new ArrayList<>(List.of("-i", video.toString()));
         StringBuilder filters = new StringBuilder();
