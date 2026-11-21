@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * 사장님 성과지표 조회.
  *
- * @param views       게시물 조회수 (이번 기간 / 비교 기간)
+ * @param views       게시물 조회수 (이번 기간 / 비교 기간, 전체 기간이면 비교 없음)
  * @param scraps      그 기간에 새로 생긴 스크랩 수
  * @param visits      QR 방문 인증 수
  * @param viewToVisit 조회 후 방문율: 이번 기간 방문 인증 중 그 손님이 방문 전 7일 안에 이 가게 게시물을 본 건수 ÷ 이번 기간 조회수
@@ -30,8 +30,8 @@ public record StoreMetricsResponse(
         List<VideoMetrics> videos
 ) {
 
-    /** current: 이번 기간, previous: 바로 앞 같은 길이 기간 */
-    public record Count(long current, long previous) {}
+    /** current: 이번 기간, previous: 바로 앞 같은 길이 기간 (전체 기간이면 null) */
+    public record Count(long current, Long previous) {}
 
     /** rate: 퍼센트(소수 첫째 자리). 조회가 0이면 null */
     public record ViewToVisit(long views, long visitsAfterView, Double rate) {}

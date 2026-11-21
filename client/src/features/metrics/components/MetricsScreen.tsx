@@ -6,7 +6,7 @@ import { useMyStoreId, useMyStoreName } from '@/features/owner/hooks'
 import { OWNER_ILLUST } from '@/features/owner/illustrations'
 import { mockFor } from '@/mocks/db'
 import { useStoreMetrics } from '../hooks'
-import { compareText, METRICS_PERIODS, shortDate, type MetricsPeriod, type StoreMetrics } from '../schema'
+import { chartBars, compareText, METRICS_PERIODS, periodLabel, shortDate, type MetricsPeriod, type StoreMetrics } from '../schema'
 
 /** 성과지표 조회 (Figma "지표 조회"): 요약 3개 → 조회 후 방문율 → 일별 방문 인증 → 영상별 조회·스크랩 */
 export function MetricsScreen() {
@@ -60,7 +60,7 @@ function MetricsBody({ data, period }: { data: StoreMetrics; period: MetricsPeri
       <section className="mt-3 rounded-2xl border border-q-green/60 bg-surface px-5 py-4">
         <header className="flex items-baseline gap-2">
           <h3 className="text-16 font-bold text-q-text">조회 후 방문율</h3>
-          <span className="text-11 text-q-muted">{METRICS_PERIODS.find((p) => p.value === period)?.label} 기준</span>
+          <span className="text-11 text-q-muted">{periodLabel(period)} 기준</span>
         </header>
         <p className="mt-1 text-[40px] leading-tight font-bold text-fg-q-green">{vtv.rate == null ? '-' : `${vtv.rate}%`}</p>
         <p className="text-xs text-q-sub">
@@ -71,9 +71,11 @@ function MetricsBody({ data, period }: { data: StoreMetrics; period: MetricsPeri
         <p className="mt-1 text-11 text-q-muted">게시물을 본 손님이 7일 안에 매장 QR로 방문 인증한 경우만 세요</p>
       </section>
 
-      <OwnerCard title="일별 방문 인증" className="mt-3">
-        <p className="-mt-2 text-xs text-q-muted">매장 QR로 인증된 방문 횟수</p>
-        <VisitChart days={data.dailyVisits} />
+      <OwnerCard title={data.dailyVisits.length > 31 ? '주별 방문 인증' : '일별 방문 인증'} className="mt-3">
+        <p className="-mt-2 text-xs text-q-muted">
+          매장 QR로 인증된 방문 횟수
+        </p>
+        <VisitChart days={chartBars(data.dailyVisits)} />
       </OwnerCard>
 
       <section className="mt-5">
@@ -119,13 +121,13 @@ function MetricsBody({ data, period }: { data: StoreMetrics; period: MetricsPeri
   )
 }
 
-function SummaryTile({ image, label, value, sub }: { image: string; label: string; value: string; sub: string }) {
+function SummaryTile({ image, label, value, sub }: { image: string; label: string; value: string; sub: string | null }) {
   return (
     <div className="flex flex-col items-center rounded-xl border border-q-green/40 bg-surface px-1 pt-2 pb-2.5 text-center">
       <img src={image} alt="" className="size-10 object-contain" />
       <span className="mt-1 text-11 font-bold text-q-sub">{label}</span>
       <span className="text-15 font-bold text-q-text">{value}</span>
-      <span className="mt-0.5 text-[10px] leading-tight text-q-muted">{sub}</span>
+      {sub && <span className="mt-0.5 text-[10px] leading-tight text-q-muted">{sub}</span>}
     </div>
   )
 }

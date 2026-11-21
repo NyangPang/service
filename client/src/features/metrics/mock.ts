@@ -7,7 +7,8 @@ const ymd = (t: number) => new Date(t + 9 * 3_600_000).toISOString().slice(0, 10
 /** 시연용 예시 성과 (Figma 예시 숫자와 비슷하게). 실제 서버를 쓰면 부르지 않음 */
 export function mockStoreMetrics(storeId: number, period: MetricsPeriod, storeName: string): StoreMetrics {
   const now = Date.now()
-  const days = period === '7d' ? 7 : period === '30d' ? 30 : new Date(now + 9 * 3_600_000).getUTCDate()
+  // 전체 기간 예시: 가게를 6주 전에 등록했다고 봄
+  const days = period === '7d' ? 7 : period === '30d' ? 30 : 42
   const scale = days / 7
   const from = now - (days - 1) * DAY
   // 최근으로 갈수록 방문이 느는 모양 (마지막 날 = 오늘)
@@ -38,11 +39,11 @@ export function mockStoreMetrics(storeId: number, period: MetricsPeriod, storeNa
     period,
     from: ymd(from),
     to: ymd(now),
-    previousFrom: ymd(from - days * DAY),
-    previousTo: ymd(from - DAY),
-    views: { current: views, previous: Math.round(1021 * scale) },
-    scraps: { current: Math.round(scale), previous: Math.round(scale) },
-    visits: { current: visits, previous: Math.max(0, visits - 1) },
+    previousFrom: period === 'all' ? null : ymd(from - days * DAY),
+    previousTo: period === 'all' ? null : ymd(from - DAY),
+    views: { current: views, previous: period === 'all' ? null : Math.round(1021 * scale) },
+    scraps: { current: Math.round(scale), previous: period === 'all' ? null : Math.round(scale) },
+    visits: { current: visits, previous: period === 'all' ? null : Math.max(0, visits - 1) },
     viewToVisit: { views, visitsAfterView, rate: views ? Math.round((visitsAfterView * 1000) / views) / 10 : null },
     dailyVisits,
     videos,

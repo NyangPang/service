@@ -1,18 +1,19 @@
 /** 사장님 성과지표 (GET /api/stores/{storeId}/metrics) */
 
-export type MetricsPeriod = '7d' | '30d' | 'month'
+export type MetricsPeriod = '7d' | '30d' | 'all'
 
-export const METRICS_PERIODS: { value: MetricsPeriod; label: string; previous: string }[] = [
+export const METRICS_PERIODS: { value: MetricsPeriod; label: string; previous: string | null }[] = [
   { value: '7d', label: '최근 7일', previous: '이전 7일' },
   { value: '30d', label: '최근 30일', previous: '이전 30일' },
-  { value: 'month', label: '이번 달', previous: '지난달' },
+  // 전체 기간 = 가게 등록일부터, 비교할 앞 기간이 없음
+  { value: 'all', label: '전체 기간', previous: null },
 ]
 
 export interface MetricsCount {
   /** 이번 기간 */
   current: number
-  /** 바로 앞 같은 길이 기간 */
-  previous: number
+  /** 바로 앞 같은 길이 기간 (전체 기간이면 null) */
+  previous: number | null
 }
 
 export interface VideoMetrics {
@@ -34,8 +35,8 @@ export interface StoreMetrics {
   /** "YYYY-MM-DD" (KST, 양 끝 포함) */
   from: string
   to: string
-  previousFrom: string
-  previousTo: string
+  previousFrom: string | null
+  previousTo: string | null
   views: MetricsCount
   scraps: MetricsCount
   visits: MetricsCount
@@ -45,7 +46,8 @@ export interface StoreMetrics {
   videos: VideoMetrics[]
 }
 
-export const previousLabel = (period: MetricsPeriod) => METRICS_PERIODS.find((p) => p.value === period)?.previous ?? '이전 기간'
+export const periodLabel = (period: MetricsPeriod) => METRICS_PERIODS.find((p) => p.value === period)?.label ?? ''
+export const previousLabel = (period: MetricsPeriod) => METRICS_PERIODS.find((p) => p.value === period)?.previous ?? null
 
 /** "2026-11-15" → "11.15" */
 export const shortDate = (ymd: string) => {
@@ -60,8 +62,21 @@ export const longDate = (iso: string | null) => {
   return `${y}년 ${m}월 ${d}일`
 }
 
-/** 이전 기간 비교 줄 (Figma: "▲1,021회 · 이전 7일", 같으면 "-0건 · 이전 7일") */
+/** 이전 기간 비교 줄 (Figma: "▲1,021회 · 이전 7일", 같으면 "-0건 · 이전 7일"). 전체 기간이면 비교 없이 null */
 export function compareText({ current, previous }: MetricsCount, unit: string, period: MetricsPeriod) {
+  const label = previousLabel(period)
+  if (previous == null || !label) return null
   const mark = current > previous ? '▲' : current < previous ? '▼' : '-'
-  return `${mark}${previous.toLocaleString()}${unit} · ${previousLabel(period)}`
+  return `${mark}${previous.toLocaleString()}${unit} · ${label}`
+}
+
+/** 막대가 너무 많으면(31일 넘게) 주 단위로 묶음. 라벨은 그 주의 첫 날 */
+export function chartBars(days: { date: string; count: number }[]) {
+  if (days.length <= 31) return days
+  const weeks: { date: string; count: number }[] = []
+  for (let i = 0; i < days.length; i += 7) {
+    const chunk = days.slice(i, i + 7)
+    weeks.push({ date: chunk[0].date, count: chunk.reduce((s, d) => s + d.count, 0) })
+  }
+  return weeks
 }

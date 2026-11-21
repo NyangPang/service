@@ -50,14 +50,18 @@ public class StoreMetricsService {
         if (!store.isOwnedBy(memberId)) throw new BusinessException(ErrorCode.STORE_FORBIDDEN);
 
         MetricsPeriod period = MetricsPeriod.of(periodCode);
-        MetricsPeriod.Range r = period.range(KstTime.today());
+        LocalDate registered = store.getCreatedAt() == null ? null : KstTime.fromServerTime(store.getCreatedAt()).toLocalDate();
+        MetricsPeriod.Range r = period.range(KstTime.today(), registered);
 
         long views = viewRepository.countByStoreIdAndViewDateBetween(storeId, r.from(), r.to());
-        long prevViews = viewRepository.countByStoreIdAndViewDateBetween(storeId, r.previousFrom(), r.previousTo());
         long scraps = scrapRepository.countByStoreBetween(storeId, serverStart(r.from()), serverStart(r.to().plusDays(1)));
-        long prevScraps = scrapRepository.countByStoreBetween(storeId, serverStart(r.previousFrom()), serverStart(r.previousTo().plusDays(1)));
         List<QuestVisit> visits = visitRepository.findAllByStoreIdAndVisitDateBetween(storeId, r.from(), r.to());
-        long prevVisits = visitRepository.findAllByStoreIdAndVisitDateBetween(storeId, r.previousFrom(), r.previousTo()).size();
+        Long prevViews = null, prevScraps = null, prevVisits = null;
+        if (r.hasPrevious()) {
+            prevViews = viewRepository.countByStoreIdAndViewDateBetween(storeId, r.previousFrom(), r.previousTo());
+            prevScraps = scrapRepository.countByStoreBetween(storeId, serverStart(r.previousFrom()), serverStart(r.previousTo().plusDays(1)));
+            prevVisits = (long) visitRepository.findAllByStoreIdAndVisitDateBetween(storeId, r.previousFrom(), r.previousTo()).size();
+        }
 
         List<ShortformView> memberViews = viewRepository.findAllByStoreIdAndMemberIdIsNotNullAndViewDateBetween(
                 storeId, r.from().minusDays(ATTRIBUTION_DAYS), r.to());
@@ -73,7 +77,7 @@ public class StoreMetricsService {
 
         return new StoreMetricsResponse(store.getId(), store.getName(), period.code,
                 r.from(), r.to(), r.previousFrom(), r.previousTo(),
-                new Count(views, prevViews), new Count(scraps, prevScraps), new Count(visits.size(), prevVisits),
+                new Count(views, prevViews), new Count(scraps, prevScraps), new Count((long) visits.size(), prevVisits),
                 new ViewToVisit(views, visitsAfterView, rate(visitsAfterView, views)),
                 daily(visits, r.from(), r.to()), videos);
     }

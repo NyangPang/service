@@ -58,23 +58,27 @@ class StoreMetricsServiceTest {
 
     @Test
     void 기간_계산() {
-        MetricsPeriod.Range week = MetricsPeriod.of("7d").range(D);
+        MetricsPeriod.Range week = MetricsPeriod.of("7d").range(D, null);
         assertThat(week.from()).isEqualTo(D.minusDays(6));
         assertThat(week.previousTo()).isEqualTo(D.minusDays(7));
         assertThat(week.previousFrom()).isEqualTo(D.minusDays(13));
         assertThat(week.days()).isEqualTo(7);
+        assertThat(week.hasPrevious()).isTrue();
 
-        MetricsPeriod.Range month = MetricsPeriod.of("30d").range(D);
+        MetricsPeriod.Range month = MetricsPeriod.of("30d").range(D, null);
         assertThat(month.days()).isEqualTo(30);
         assertThat(month.previousFrom()).isEqualTo(D.minusDays(59));
 
-        // 이번 달: 3/31 기준이면 지난달(2월)은 말일까지만
-        MetricsPeriod.Range thisMonth = MetricsPeriod.of("month").range(LocalDate.of(2026, 3, 31));
-        assertThat(thisMonth.from()).isEqualTo(LocalDate.of(2026, 3, 1));
-        assertThat(thisMonth.previousFrom()).isEqualTo(LocalDate.of(2026, 2, 1));
-        assertThat(thisMonth.previousTo()).isEqualTo(LocalDate.of(2026, 2, 28));
+        // 전체 기간: 가게 등록일부터 오늘까지, 비교 기간 없음
+        MetricsPeriod.Range all = MetricsPeriod.of("all").range(D, LocalDate.of(2026, 10, 9));
+        assertThat(all.from()).isEqualTo(LocalDate.of(2026, 10, 9));
+        assertThat(all.to()).isEqualTo(D);
+        assertThat(all.hasPrevious()).isFalse();
+        assertThat(all.previousFrom()).isNull();
+        // 등록일을 모르면 오늘 하루
+        assertThat(MetricsPeriod.of("all").range(D, null).from()).isEqualTo(D);
 
         assertThat(MetricsPeriod.of(null)).isEqualTo(MetricsPeriod.WEEK);
-        assertThatThrownBy(() -> MetricsPeriod.of("1y")).isInstanceOf(BusinessException.class);
+        assertThatThrownBy(() -> MetricsPeriod.of("month")).isInstanceOf(BusinessException.class);
     }
 }

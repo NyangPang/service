@@ -24,7 +24,7 @@ public class StoreMetricsController {
 
     @Operation(summary = "성과지표 조회 (사장님)",
             description = "게시물 조회수·스크랩 수·QR 방문 인증 수(이전 기간 대비), 조회 후 방문율, 날짜별 방문 인증, 게시물별 조회·스크랩. "
-                    + "period: 7d(최근 7일, 기본) / 30d(최근 30일) / month(이번 달). 내 가게만 (STORE403_2)")
+                    + "period: 7d(최근 7일, 기본) / 30d(최근 30일) / all(전체 기간, 비교 없음). 내 가게만 (STORE403_2)")
     @GetMapping
     public ApiResponse<StoreMetricsResponse> get(
             @Parameter(hidden = true) @AuthenticationPrincipal Long memberId,
