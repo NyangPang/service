@@ -21,7 +21,7 @@ import java.util.List;
 
 /**
  * 메뉴 확인 화면용 메뉴 읽기: 메뉴판 사진 → {@link MenuExtractor} → 메뉴 목록.
- * 영상 만들 때와 같은 추출기라 화면에서 본 메뉴가 그대로 영상에 들어간다.
+ * 가격과 메뉴 이름을 검증한다. 화면에서 확정한 메뉴를 영상 생성 요청에 사용한다.
  * LLM 호출이 길어(재시도 포함 수십 초) DB 트랜잭션은 잡지 않는다.
  */
 @Slf4j
@@ -53,12 +53,16 @@ public class MenuReadService {
         }
 
         try {
-            MenuData menu = menuExtractor.getObject()
-                    .extract(store.getName(), store.getCategory().name(), null, images).menuData();
-            return menu.menus().stream().map(MenuItemDto::from).toList();
+            List<MenuData.Menu> menus = menuExtractor.getObject()
+                    .readMenuBoards(store.getName(), store.getCategory().name(), images);
+            if (menus.isEmpty()) throw new BusinessException(ErrorCode.MENU_READ_FAILED);
+            return menus.stream().map(MenuItemDto::from).toList();
         } catch (MenuExtractionException e) {
             log.warn("[메뉴 읽기] {} 실패: {}", store.getName(), e.getMessage());
             throw new BusinessException(ErrorCode.MENU_READ_FAILED);
+        } catch (IllegalArgumentException e) {
+            log.warn("[메뉴 읽기] {} 이미지 처리 실패: {}", store.getName(), e.getMessage());
+            throw new BusinessException(ErrorCode.INVALID_INPUT);
         }
     }
 }

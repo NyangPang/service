@@ -41,6 +41,10 @@ interface Narrator {
                 .region(Region.of(region))
                 .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey)))
                 .build();
+        return polly(client, voice, engine);
+    }
+
+    static Narrator polly(PollyClient client, String voice, String engine) {
         Engine pollyEngine = Engine.fromValue(engine);
         if (pollyEngine == Engine.UNKNOWN_TO_SDK_VERSION) {
             throw new IllegalArgumentException("Polly 엔진은 neural | generative | standard | long-form 중 하나예요: " + engine);

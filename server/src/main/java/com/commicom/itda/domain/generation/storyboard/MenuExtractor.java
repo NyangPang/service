@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 /**
  * 메뉴판·사진 → 메뉴 데이터 (A 파트 1단계).
@@ -43,6 +45,14 @@ public class MenuExtractor {
         return extract(storeName, category, extraInfo, input, null);
     }
 
+    public List<MenuData.Menu> readMenuBoards(String storeName, String category, List<Image> boards) {
+        if (boards.isEmpty() || boards.size() > MAX_MENU_BOARDS || boards.stream().anyMatch(i -> i.slot() != Slot.MENU_BOARD)) {
+            throw new IllegalArgumentException("메뉴판 사진은 1~" + MAX_MENU_BOARDS + "장이 필요해요");
+        }
+        return extract(storeName, category, prompt.buildMenuRead(storeName, category), boards,
+                UnaryOperator.identity(), data -> validator.validateMenus(data.menus())).menuData().menus();
+    }
+
     /**
      * @param fixedMenus 사장님이 메뉴 확인 화면에서 확정한 메뉴. 있으면 모델이 쓴 menus 대신 이 목록을 그대로 쓰고
      *                   (사진의 menu_ref도 이 이름 기준으로 검증), 없으면(null·빈 목록) 메뉴판에서 읽은 그대로
@@ -64,9 +74,24 @@ public class MenuExtractor {
         }
 
         List<Slot> slots = images.stream().map(Image::slot).toList();
-        Media[] media = images.stream().map(img -> AiImage.toMedia(img.bytes())).toArray(Media[]::new);
-
         String original = prompt.build(storeName, category, slots, extraInfo, style);
+        return extract(storeName, category, original, images,
+                data -> prepareVideoMenu(data, fixed ? fixedMenus : data.menus(), style.extra()),
+                data -> validator.validateForVideo(data, photoCount, style.extra()));
+    }
+
+    private MenuData prepareVideoMenu(MenuData data, List<MenuData.Menu> menus, int extraImages) {
+        MenuData prepared = new MenuData(data.storeName(), data.category(), menus, data.reviewKeywords(),
+                data.photos(), data.imageRequests());
+        if ((menus != null && menus.isEmpty()) || (prepared.usablePhotoCount() > 0 && !validator.hasValidImageRequests(prepared, extraImages))) {
+            return new MenuData(data.storeName(), data.category(), menus, data.reviewKeywords(), data.photos(), List.of());
+        }
+        return prepared;
+    }
+
+    private Result extract(String storeName, String category, String original, List<Image> images,
+                           UnaryOperator<MenuData> normalize, Function<MenuData, List<String>> validate) {
+        Media[] media = images.stream().map(img -> AiImage.toMedia(img.bytes())).toArray(Media[]::new);
         String request = original;
         List<Attempt> attempts = new ArrayList<>();
 
@@ -78,15 +103,11 @@ public class MenuExtractor {
             List<String> errors;
             MenuData parsed = null;
             try {
-                parsed = StoryboardJson.parseMenu(raw);
-                if (fixed) {
-                    parsed = new MenuData(parsed.storeName(), parsed.category(), fixedMenus, parsed.reviewKeywords(),
-                            parsed.photos(), parsed.imageRequests());
-                }
-                errors = validator.validate(parsed, photoCount, style.extra());
+                parsed = normalize.apply(StoryboardJson.parseMenu(raw));
+                errors = validate.apply(parsed);
             } catch (Exception e) {
                 errors = List.of("JSON으로 읽을 수 없습니다: " + e.getMessage()
-                        + " — menus와 photos가 있는 JSON 객체 하나만, 코드블록이나 설명 없이 출력하세요.");
+                        + " — 요청한 형식의 JSON 객체 하나만 출력하세요.");
             }
             attempts.add(new Attempt(raw, errors));
 

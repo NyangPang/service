@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * 메뉴 데이터 → 장면 JSON (A 파트).
- * LLM 호출 → 검증 → 실패하면 오류 목록을 붙여 최대 2회 재요청. 그래도 실패하면 예외 — B 파트로 넘기지 않는다.
+ * LLM이 만든 장면을 영상 합성에 맞게 보정한다. JSON으로 읽을 수 없거나 장면이 없으면 재요청한다.
  */
 @Slf4j
 @Lazy
@@ -23,7 +23,6 @@ public class StoryboardGenerator {
 
     private final ChatClient chatClient;
     private final StoryboardPrompt prompt;
-    private final StoryboardValidator validator;
 
     public Result generate(MenuData menu, String appeal) {
         return generate(menu, appeal, null);
@@ -49,10 +48,10 @@ public class StoryboardGenerator {
             List<String> errors;
             Storyboard parsed = null;
             try {
-                parsed = StoryboardJson.parseStoryboard(raw);
-                errors = validator.validate(parsed, menu, o, appeal);
+                parsed = StoryboardRenderPreparation.prepare(StoryboardJson.parseStoryboard(raw), menu);
+                errors = List.of();
             } catch (Exception e) {
-                errors = List.of("JSON으로 읽을 수 없습니다: " + e.getMessage()
+                errors = List.of("영상 장면을 준비할 수 없습니다: " + e.getMessage()
                         + " — 장면 JSON 객체 하나만, 코드블록이나 설명 없이 출력하세요.");
             }
             attempts.add(new Attempt(raw, errors));

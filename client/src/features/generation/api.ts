@@ -1,5 +1,5 @@
 import { USE_MOCK } from '@/mocks/db'
-import { api, request } from '@/shared/api/client'
+import { ApiError, api, request } from '@/shared/api/client'
 import { mockExtractMenus, mockGenerationApi, mockShortformApi } from './mock'
 import type { GenerationCreated, GenerationRequest, GenerationState, MenuItem, PlaceInfo, ShortformDetail } from './schema'
 
@@ -115,10 +115,9 @@ export function parseMenuLine(line: string): MenuItem | null {
 
 /**
  * 메뉴판 사진에서 메뉴 읽기 — POST /api/generation/menus (multipart storeId, menuBoards) → MenuItem[].
- * 영상 만들 때와 같은 AI 메뉴 추출기라, 여기서 확정한 메뉴가 그대로 영상에 들어감.
- * 그게 실패하면 예전 OCR(사진마다 POST /api/ocr)로 한 번 더. 지도 링크만 있으면 읽을 API가 없어 직접 입력.
+ * 여기서 확정한 메뉴는 영상에 그대로 전달한다. 메뉴판을 읽지 못하면 사진마다 예전 OCR을 시도한다.
  */
-export async function extractMenus(storeId: number, files: File[], _mapUrl: string): Promise<MenuItem[]> {
+export async function extractMenus(storeId: number, files: File[]): Promise<MenuItem[]> {
   if (USE_MOCK) return mockExtractMenus(storeId)
   if (!files.length) return []
   const boards = files.slice(0, MAX_MENU_BOARDS)
@@ -128,8 +127,11 @@ export async function extractMenus(storeId: number, files: File[], _mapUrl: stri
     boards.forEach((f) => form.append('menuBoards', f))
     // 재시도까지 하면 수십 초 걸릴 수 있음
     return await request<MenuItem[]>(api.post('/api/generation/menus', form, { timeout: 120_000 }))
-  } catch {
-    return extractMenusByOcr(boards)
+  } catch (error) {
+    if (!(error instanceof ApiError) || !['GENERATION502', 'COMMON500', 'COMMON404', 'NETWORK'].includes(error.code)) throw error
+    const menus = await extractMenusByOcr(boards).catch(() => { throw error })
+    if (!menus.length) throw error
+    return menus
   }
 }
 

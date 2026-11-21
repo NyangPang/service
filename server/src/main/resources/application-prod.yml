@@ -12,3 +12,6 @@ spring:
 springdoc:
   swagger-ui:
     enabled: ${SWAGGER_ENABLED:true}
+
+video:
+  polly-in-auto: true

@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 /** 스토리보드 생성·수정 요청 프롬프트를 만든다 (prompts/storyboard*.txt) */
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
 public class StoryboardPrompt {
 
     /** 프롬프트를 바꾸면 올린다 — 결과 JSON의 meta.prompt_version에 남음 */
-    public static final String VERSION = "v16";
+    public static final String VERSION = "v17";
 
     private final String template;
     private final String fixTemplate;
@@ -51,6 +52,7 @@ public class StoryboardPrompt {
                 .replace("{category}", categoryLabel(menu.category()))
                 .replace("{address}", orNone(address))
                 .replace("{appeal}", orNone(appeal))
+                .replace("{scenePhotoRules}", scenePhotoRules(menu))
                 .replace("{menuJson}", StoryboardJson.toPrettyJson(menu.withoutImageRequests()));
     }
 
@@ -70,6 +72,26 @@ public class StoryboardPrompt {
             o.emphases().stream().sorted().forEach(e -> sb.append("\n- ").append(e.label()).append(": ").append(e.hint()));
         }
         return sb.isEmpty() ? "" : "\n" + sb + "\n";
+    }
+
+    private String scenePhotoRules(MenuData menu) {
+        List<MenuData.Photo> photos = menu.photos() == null ? List.of() : menu.photos();
+        List<MenuData.Photo> food = photos.stream().filter(p -> p != null && "food".equals(p.kind())).toList();
+        List<Integer> menuIndices = food.stream().map(MenuData.Photo::index).toList();
+        List<Integer> detailIndices = food.stream().filter(MenuData.Photo::isUpload).map(MenuData.Photo::index).toList();
+        List<String> prices = food.stream().flatMap(p -> menu.findMenu(p.menuRef())
+                .filter(m -> m.price() != null)
+                .map(m -> String.format(Locale.ROOT, "%d번 사진의 %s %,d원", p.index(), m.name(), m.price()))
+                .stream()).toList();
+        String sceneRules = menuIndices.isEmpty()
+                ? "음식 사진이 없으므로 가운데 장면은 전부 review로 구성합니다. 사진과 사장님 설명을 쓰고, 없던 손님 후기는 만들지 마세요."
+                : "menu 장면은 사진 " + menuIndices + "만 사용합니다. " + (detailIndices.isEmpty()
+                        ? "detail 장면은 생략합니다."
+                        : "detail 장면은 사진 " + detailIndices + "만 사용합니다.");
+        String priceRules = prices.isEmpty()
+                ? "가격이 확인된 메뉴와 연결된 사진이 없습니다. 제목·대사·자막에 가격을 쓰지 말고 모든 menu_ref는 null로 둡니다."
+                : "가격은 " + String.join(", ", prices) + " 중 하나만 선택해 그 사진을 쓰는 장면에서만 넣을 수 있습니다.";
+        return sceneRules + "\n" + priceRules;
     }
 
     public String buildFix(String originalPrompt, String previousOutput, List<String> errors) {

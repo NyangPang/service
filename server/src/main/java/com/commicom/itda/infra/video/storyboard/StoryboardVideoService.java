@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.core.exception.SdkException;
+import software.amazon.awssdk.services.polly.PollyClient;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -27,9 +29,8 @@ public class StoryboardVideoService {
     private final String tts;
     private final VideoTemplate templateOverride;
     private final String runwayKey;
-    private final String awsAccessKey;
-    private final String awsSecretKey;
-    private final String awsRegion;
+    private final PollyClient pollyClient;
+    private final boolean tryPollyInAuto;
     private final String pollyVoice;
     private final String pollyMaleVoice;
     private final String pollyMaleEngine;
@@ -45,7 +46,8 @@ public class StoryboardVideoService {
                                   @Value("${runway.api-key:}") String runwayKey,
                                   @Value("${AWS_ACCESS_KEY_ID:}") String awsAccessKey,
                                   @Value("${AWS_SECRET_ACCESS_KEY:}") String awsSecretKey,
-                                  @Value("${aws.region:ap-northeast-2}") String awsRegion,
+                                  @Value("${video.polly-in-auto:false}") boolean pollyInAuto,
+                                  PollyClient pollyClient,
                                   @Value("${aws.polly.voice-id:Seoyeon}") String pollyVoice,
                                   @Value("${aws.polly.male-voice-id:Hyunduk}") String pollyMaleVoice,
                                   @Value("${aws.polly.male-engine:generative}") String pollyMaleEngine,
@@ -61,9 +63,9 @@ public class StoryboardVideoService {
             throw new IllegalArgumentException("video.template-override는 headline | band | card | classic 중 하나여야 합니다");
         }
         this.runwayKey = runwayKey;
-        this.awsAccessKey = awsAccessKey;
-        this.awsSecretKey = awsSecretKey;
-        this.awsRegion = awsRegion;
+        this.pollyClient = pollyClient;
+        this.tryPollyInAuto = pollyInAuto || (!awsAccessKey.isBlank() && !awsSecretKey.isBlank()
+                && !awsAccessKey.startsWith("local-dummy"));
         this.pollyVoice = pollyVoice;
         this.pollyMaleVoice = pollyMaleVoice;
         this.pollyMaleEngine = pollyMaleEngine;
@@ -96,7 +98,16 @@ public class StoryboardVideoService {
         StoryboardRenderer renderer = new StoryboardRenderer(ffmpegPath, workDir.resolve("storyboard-cache"),
                 narrator, runway, log::info);
         long start = System.currentTimeMillis();
-        StoryboardRenderer.Result r = renderer.render(sb, photos, out, templateOverride);
+        StoryboardRenderer.Result r;
+        try {
+            r = renderer.render(sb, photos, out, templateOverride);
+        } catch (SdkException e) {
+            if (!"auto".equals(tts) || narrator == null || !narrator.id().startsWith("polly:")) throw e;
+            log.warn("[영상] Polly 합성 실패, 내레이션 없이 렌더링을 재시도합니다", e);
+            StoryboardRenderer fallback = new StoryboardRenderer(ffmpegPath, workDir.resolve("storyboard-cache"),
+                    null, runway, log::info);
+            r = fallback.render(sb, photos, out, templateOverride);
+        }
         log.info("[영상] 완료 {}초 영상 ({}초 걸림) {}", String.format("%.1f", r.durationSec()),
                 String.format("%.1f", (System.currentTimeMillis() - start) / 1000.0), r.video().toAbsolutePath());
         return new Result(id, r.video(), r.thumbnail(), r.durationSec(), r.scenes());
@@ -109,14 +120,13 @@ public class StoryboardVideoService {
 
     /**
      * video.tts: auto / elevenlabs / polly / say / none.
-     * auto는 StoryboardCli와 같은 순서 — ElevenLabs 키 → AWS 키(Polly) → macOS say → 무음
+     * auto: ElevenLabs 키 → 운영 AWS 자격 증명 또는 로컬 AWS 키(Polly) → macOS say → 내레이션 없음
      */
     private Narrator narrator(NarrationVoice voice) {
         boolean male = voice == NarrationVoice.MALE;
         boolean hasEleven = !elevenLabsKey.isBlank();
-        boolean hasAws = !awsAccessKey.isBlank() && !awsSecretKey.isBlank() && !awsAccessKey.startsWith("local-dummy");
         String mode = !"auto".equals(tts) ? tts
-                : hasEleven ? "elevenlabs" : hasAws ? "polly" : Narrator.macSayAvailable() ? "say" : "none";
+                : hasEleven ? "elevenlabs" : tryPollyInAuto ? "polly" : Narrator.macSayAvailable() ? "say" : "none";
         return switch (mode) {
             case "elevenlabs" -> {
                 if (!hasEleven) throw new IllegalStateException("video.tts=elevenlabs 는 ELEVENLABS_API_KEY 가 필요해요");
@@ -125,9 +135,8 @@ public class StoryboardVideoService {
                         elevenLabsModel);
             }
             case "polly" -> {
-                if (!hasAws) throw new IllegalStateException("video.tts=polly 는 AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY 가 필요해요");
-                Narrator base = Narrator.polly(awsAccessKey, awsSecretKey, awsRegion, pollyVoice);
-                yield male ? Narrator.withFallback(Narrator.polly(awsAccessKey, awsSecretKey, awsRegion, pollyMaleVoice, pollyMaleEngine),
+                Narrator base = Narrator.polly(pollyClient, pollyVoice, "neural");
+                yield male ? Narrator.withFallback(Narrator.polly(pollyClient, pollyMaleVoice, pollyMaleEngine),
                         base, msg -> log.warn("[영상] {}", msg)) : base;
             }
             case "say" -> Narrator.macSay("Yuna");

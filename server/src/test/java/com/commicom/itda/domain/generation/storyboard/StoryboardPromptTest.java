@@ -44,6 +44,28 @@ class StoryboardPromptTest {
     }
 
     @Test
+    void 음식_사진이_없으면_장면과_가격을_제한한다() {
+        var menu = new MenuData("카페", "CAFE_BAKERY_PUB",
+                List.of(new MenuData.Menu("아메리카노", "4,000", 4000, null, false)), List.of(),
+                List.of(new MenuData.Photo(0, "upload", "store", null, "창가 테이블")), List.of());
+
+        assertThat(prompt.build(menu, null))
+                .contains("가운데 장면은 전부 review", "모든 menu_ref는 null")
+                .doesNotContain("{scenePhotoRules}");
+    }
+
+    @Test
+    void 가격은_그_메뉴가_연결된_음식_사진에서만_허용한다() {
+        var menu = new MenuData("카페", "CAFE_BAKERY_PUB",
+                List.of(new MenuData.Menu("아메리카노", "4,000", 4000, null, false)), List.of(),
+                List.of(new MenuData.Photo(0, "upload", "store", null, "창가 테이블"),
+                        new MenuData.Photo(1, "generated", "food", "아메리카노", "아메리카노")), List.of());
+
+        assertThat(prompt.build(menu, null))
+                .contains("menu 장면은 사진 [1]만", "detail 장면은 생략", "1번 사진의 아메리카노 4,000원");
+    }
+
+    @Test
     void 가게_주소가_제목용으로_들어간다() throws IOException {
         MenuData menu = StoryboardJson.parseMenu(
                 Files.readString(Path.of("docs/storyboard-samples/01-donkatsu.menu.json")));

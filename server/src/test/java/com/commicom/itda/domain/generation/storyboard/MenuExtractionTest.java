@@ -41,6 +41,28 @@ class MenuExtractionTest {
         assertThat(validator.validate(menu(sample), imageCount)).isEmpty();
     }
 
+    @Test
+    void 메뉴판_읽기는_영상용_필드_없이_메뉴와_가격을_검증한다() throws IOException {
+        MenuData data = StoryboardJson.parseMenu("""
+                {"menus":[{"name":"라떼","price_text":"4.5","price":4500,"is_signature":false}]}
+                """);
+        assertThat(validator.validateMenus(data.menus())).isEmpty();
+        assertThat(validator.validate(data, 0)).isNotEmpty();
+        assertThat(validator.validateMenus(List.of(new MenuData.Menu("라떼", "4.5", 5000, null, false))))
+                .anyMatch(error -> error.contains("price_text"));
+    }
+
+    @Test
+    void 영상에_쓸_사진이_있으면_AI_이미지_요청이_없어도_영상_생성을_계속한다() {
+        var menus = List.of(new MenuData.Menu("라떼", "4.5", 4500, null, false));
+        var photos = List.of(new MenuData.Photo(0, "upload", "store", null, "창가"));
+        var withPhotos = new MenuData("카페", "CAFE_BAKERY_PUB", menus, List.of(), photos, List.of());
+        var withoutPhotos = new MenuData("카페", "CAFE_BAKERY_PUB", menus, List.of(), List.of(), List.of());
+
+        assertThat(validator.validateForVideo(withPhotos, 1, 0)).isEmpty();
+        assertThat(validator.validateForVideo(withoutPhotos, 0, 0)).isNotEmpty();
+    }
+
     @ParameterizedTest
     @CsvSource(delimiter = '|', value = {
             "12,000|12000", "12,000원|12000", "12000|12000", "₩ 9,500|9500",

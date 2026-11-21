@@ -16,6 +16,7 @@ import {
   fetchGeneration,
   fetchMapPlace,
   fetchShortformDetail,
+  MAX_MENU_BOARDS,
   MAX_POST_PHOTOS,
   postGeneration,
   publishShortform,
@@ -74,7 +75,7 @@ export function CreateShortformFlow() {
   const [editRequest, setEditRequest] = useState('')
   const [modal, setModal] = useState<'cancel' | 'upload' | 'delete' | 'pro' | null>(null)
 
-  const extract = useMutation({ mutationFn: () => extractMenus(storeId, files, mapUrl), onSuccess: (m) => setMenus(m) })
+  const extract = useMutation({ mutationFn: () => extractMenus(storeId, files), onSuccess: (m) => setMenus(m) })
   const fillPlace = (p: { name: string | null; address: string | null } | null) => {
     setPlaceName(p?.name ?? store?.name ?? '')
     setPlaceAddress(p?.address ?? store?.address ?? '')
@@ -188,7 +189,11 @@ export function CreateShortformFlow() {
           mapUrl={mapUrl}
           setMapUrl={setMapUrl}
           files={files}
-          setFiles={setFiles}
+          setFiles={(next) => {
+            setFiles(next)
+            setMenus([])
+            extract.reset()
+          }}
           photos={photos}
           setPhotos={setPhotos}
           onPrev={close}
@@ -199,7 +204,7 @@ export function CreateShortformFlow() {
       {step === 'menus' && (
         <Screen
           hero={<Hero sub={'내 메뉴가 맞는지 확인해요\n아니라면 수정할 수 있어요'} />}
-          prev={{ onClick: () => setStep('source') }}
+          prev={{ onClick: () => setStep('source'), disabled: extract.isPending || lookupPlace.isPending }}
           next={{ onClick: () => setStep('appeal'), disabled: extract.isPending || lookupPlace.isPending }}
         >
           {extract.isPending || lookupPlace.isPending ? (
@@ -210,14 +215,18 @@ export function CreateShortformFlow() {
               </p>
             </div>
           ) : (
-            <StepMenus
-              storeName={placeName}
-              setStoreName={setPlaceName}
-              address={placeAddress}
-              setAddress={setPlaceAddress}
-              menus={menus}
-              setMenus={setMenus}
-            />
+            <>
+              {extract.isError && <ErrorText>{errorMessage(extract.error)}</ErrorText>}
+              {!files.length && <p className="mb-3 text-xs text-gray-2">메뉴판 사진이 없으면 아래에 메뉴를 직접 입력할 수 있어요.</p>}
+              <StepMenus
+                storeName={placeName}
+                setStoreName={setPlaceName}
+                address={placeAddress}
+                setAddress={setPlaceAddress}
+                menus={menus}
+                setMenus={setMenus}
+              />
+            </>
           )}
         </Screen>
       )}
@@ -244,9 +253,12 @@ export function CreateShortformFlow() {
       {step === 'generate' && generation.data?.status !== 'COMPLETED' && (
         <StepWaiting
           startedAt={startedAt}
-          failed={generation.data?.status === 'FAILED' ? (generation.data.errorMessage ?? '게시물을 만들지 못했어요') : null}
+          failed={generation.data?.status === 'FAILED' ? (generation.data.errorMessage ?? '게시물을 만들지 못했어요') : generation.isError ? errorMessage(generation.error) : null}
           onCancel={() => setModal('cancel')}
-          onRetry={() => setStep('appeal')}
+          onRetry={() => {
+            if (generation.isError && generation.data?.status !== 'FAILED') void generation.refetch()
+            else setStep('source')
+          }}
         />
       )}
 
@@ -398,11 +410,11 @@ function StepSource({
   onNext: () => void
 }) {
   const urlInvalid = mapUrl.trim() !== '' && !isMapUrl(mapUrl)
-  const ready = (mapUrl.trim() !== '' && !urlInvalid) || files.length > 0
+  const ready = !urlInvalid && (mapUrl.trim() !== '' || files.length > 0 || photos.length > 0)
 
   return (
     <Screen
-      hero={<Hero sub={'지도 링크나 메뉴판만 올리면\n홍보 게시물이 완성돼요!'} />}
+          hero={<Hero sub={'가게 자료를 올려\n홍보 게시물을 만들어 봐요'} />}
       prev={{ onClick: onPrev }}
       next={{ onClick: onNext, disabled: !ready }}
     >
@@ -422,27 +434,27 @@ function StepSource({
         <p className="mt-1.5 text-xs text-gray-2">네이버 지도, 카카오맵 어느 쪽 링크든 괜찮아요</p>
       )}
 
-      <PhotoPicker label="메뉴판 사진" files={files} setFiles={setFiles} className="mt-7" />
-      <PhotoPicker label="음식·가게 사진 (선택)" files={photos} setFiles={setPhotos} className="mt-6" />
+      <PhotoPicker label="메뉴판 사진" files={files} setFiles={setFiles} limit={MAX_MENU_BOARDS} className="mt-7" />
+      <PhotoPicker label="음식·가게 사진 (선택)" files={photos} setFiles={setPhotos} limit={MAX_POST_PHOTOS} className="mt-6" />
       <p className="mt-2 text-xs leading-relaxed break-keep text-gray-2">
         음식·가게 사진으로 AI가 홍보 영상을 만들어요 ({MAX_POST_PHOTOS}장까지). 사진이 모자라면 메뉴 사진을 AI가 그려 채워요
       </p>
       <p className="mt-6 rounded-xl bg-q-panel px-4 py-3 text-xs leading-relaxed break-keep text-q-muted">
-        지도 링크나 메뉴판 사진 중 하나만 있어도 돼요. 둘 다 올리면 메뉴를 더 정확하게 읽어요.
+        메뉴판 사진에서 메뉴와 가격을 읽어요. 메뉴를 직접 입력할 수도 있어요.
       </p>
     </Screen>
   )
 }
 
 /** 사진 여러 장 고르기 (메뉴판 / 음식·가게 사진 공용) */
-function PhotoPicker({ label, files, setFiles, className = '' }: { label: string; files: File[]; setFiles: (f: File[]) => void; className?: string }) {
+function PhotoPicker({ label, files, setFiles, limit, className = '' }: { label: string; files: File[]; setFiles: (f: File[]) => void; limit: number; className?: string }) {
   const fileRef = useRef<HTMLInputElement>(null)
   return (
     <div className={className}>
       <span className="text-13 font-bold text-ink">{label}</span>
       <div className="mt-1 flex items-center gap-2 border-b-2 border-green-4 pb-1.5">
-        <span className="flex-1 truncate text-15 text-gray-2">{files.length ? `${files.length}장 선택됨` : '사진을 선택해주세요'}</span>
-        <button type="button" onClick={() => fileRef.current?.click()} className="h-10 rounded-lg bg-green-4 px-5 text-sm font-bold text-white">
+        <span className="flex-1 truncate text-15 text-gray-2">{files.length ? `${files.length}/${limit}장 선택됨` : `최대 ${limit}장`}</span>
+        <button type="button" disabled={files.length >= limit} onClick={() => fileRef.current?.click()} className="h-10 rounded-lg bg-green-4 px-5 text-sm font-bold text-white disabled:opacity-50">
           추가
         </button>
         <input
@@ -452,7 +464,8 @@ function PhotoPicker({ label, files, setFiles, className = '' }: { label: string
           multiple
           hidden
           onChange={(e) => {
-            setFiles([...files, ...Array.from(e.target.files ?? [])])
+            const selected = Array.from(e.target.files ?? [])
+            if (selected.length) setFiles([...files, ...selected].slice(0, limit))
             e.target.value = ''
           }}
         />

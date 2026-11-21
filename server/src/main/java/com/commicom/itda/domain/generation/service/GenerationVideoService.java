@@ -66,6 +66,12 @@ public class GenerationVideoService {
         }
     }
 
+    public static class NoUsablePhotoException extends RuntimeException {
+        public NoUsablePhotoException() {
+            super("영상에 쓸 사진을 준비하지 못했어요. 음식이나 가게 사진을 한 장 이상 올려 주세요");
+        }
+    }
+
     /**
      * @param confirmedMenus 사장님이 메뉴 확인 화면에서 확정한 메뉴. 있으면 메뉴판을 다시 읽지 않고 이 메뉴만 쓴다
      * @param photoUrls     게시물 사진 (메뉴판이 섞여 있을 수 있음, 게시물엔 그대로 붙음)
@@ -129,7 +135,9 @@ public class GenerationVideoService {
                 check(canceled);
             }
 
-            // ④ 장면 JSON → mp4 (사진이 하나도 없으면 여기서 IllegalArgumentException → 호출한 쪽이 이미지 게시물로 대체)
+            if (menu.usablePhotoCount() == 0) throw new NoUsablePhotoException();
+
+            // ④ 장면 JSON → mp4
             StoryboardVideoPipeline.Result result = videoPipeline.getObject().make(menu, appeal, photos, useRunway, store.getAddress(), options);
             StoryboardVideoService.Result video = result.video();
             // 크레딧이 실제로 나갔는지 로그만 보고 알 수 있게: 새 클립 = 크레딧 사용, 캐시 = 같은 사진·프롬프트 재사용, 대체 = 줌 효과
