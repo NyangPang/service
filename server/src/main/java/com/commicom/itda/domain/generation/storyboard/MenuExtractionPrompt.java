@@ -44,6 +44,11 @@ public class MenuExtractionPrompt {
      * 사진이 메뉴판보다 앞에 와야 index와 첨부 순서가 어긋나지 않는다 ({@link MenuExtractor}가 정렬함).
      */
     public String build(String storeName, String category, List<Slot> slots, String extraInfo) {
+        return build(storeName, category, slots, extraInfo, StyleImages.NONE);
+    }
+
+    /** @param styleImages 영상 스타일 때문에 더 만들 이미지 규칙 (없으면 {@link StyleImages#NONE}) */
+    public String build(String storeName, String category, List<Slot> slots, String extraInfo, StyleImages styleImages) {
         int[] photoIndex = {0};
         String photoList = slots.isEmpty()
                 ? "(첨부 이미지 없음)"
@@ -56,7 +61,8 @@ public class MenuExtractionPrompt {
                 .replace("{storeName}", orNone(storeName))
                 .replace("{category}", categoryLabel(category))
                 .replace("{photoList}", photoList)
-                .replace("{extraInfo}", orNone(extraInfo));
+                .replace("{extraInfo}", orNone(extraInfo))
+                .replace("{styleImages}", styleImages == null || styleImages.guide().isBlank() ? "" : "\n" + styleImages.guide() + "\n");
     }
 
     public String buildFix(String originalPrompt, String previousOutput, List<String> errors) {

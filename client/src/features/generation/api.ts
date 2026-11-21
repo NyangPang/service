@@ -65,7 +65,7 @@ export async function postGeneration(body: GenerationRequest): Promise<Generatio
       revisionOf: body.revision?.shortformId,
       // 메뉴 확인 화면에서 확정한 메뉴 → 서버는 메뉴판을 다시 읽지 않고 이 메뉴로 영상을 만듦
       menus: confirmedMenus(body),
-      // 생성 느낌 (서버 영상 프롬프트 작업 중 — 아직 모르면 무시됨)
+      // 생성 느낌 → 서버가 스타일별 장면 프롬프트·생성 이미지·나레이션 목소리를 고름 (없으면 기본)
       videoStyle: body.videoStyle,
       emphases: body.emphases?.length ? body.emphases : undefined,
     }),

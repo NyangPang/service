@@ -72,6 +72,9 @@ aws:
     domain: ${AWS_CLOUDFRONT_DOMAIN}
   polly:
     voice-id: ${AWS_POLLY_VOICE_ID:Seoyeon}
+    # 인물 소개·신메뉴 알림 영상의 남자 목소리 (Hyunduk은 generative 엔진에서만 됨)
+    male-voice-id: ${AWS_POLLY_MALE_VOICE_ID:Hyunduk}
+    male-engine: ${AWS_POLLY_MALE_ENGINE:generative}
 
 video:
   ffmpeg-path: ${FFMPEG_PATH:ffmpeg}
