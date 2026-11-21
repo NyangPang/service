@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Navigate, useLocation, useParams, useSearchParams } from 'react-router-dom'
 import { PigeonAlbum } from '@/features/quest/components/PigeonAlbum'
 import { PigeonHistory } from '@/features/quest/components/PigeonHistory'
+import { QrScanner } from '@/features/quest/components/QrScanner'
 import { QuestHome } from '@/features/quest/components/QuestHome'
 import { QuestVisit } from '@/features/quest/components/QuestVisit'
 import { usePigeonAccess, useQuests } from '@/features/quest/hooks'
@@ -38,6 +39,11 @@ export function QuestScanPage() {
   const quest = quests?.find((q) => q.type === 'VISIT' && q.status === 'IN_PROGRESS')
   if (!quest) return <Message>진행 중인 방문 퀘스트가 없어요</Message>
   return <Navigate to={`/quest/${quest.questId}/visit?${params.toString()}`} replace />
+}
+
+/** 바로가기 > QR 인식하기 — 찍으면 /quest/scan 으로 (로그인 확인도 거기서) */
+export function QuestQrPage() {
+  return <QrScanner />
 }
 
 export function PigeonAlbumPage() {

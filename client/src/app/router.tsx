@@ -19,7 +19,7 @@ import {
   QuestStorePage,
 } from '@/pages/OwnerPage'
 import { MyReviewsPage, OwnerNotificationsPage, OwnerReviewsPage, ReviewDrawPage, ReviewEditPage, ReviewWritePage } from '@/pages/ReviewPage'
-import { PigeonAlbumPage, PigeonHistoryPage, QuestPage, QuestScanPage, QuestVisitPage } from '@/pages/QuestPage'
+import { PigeonAlbumPage, PigeonHistoryPage, QuestPage, QuestQrPage, QuestScanPage, QuestVisitPage } from '@/pages/QuestPage'
 import { SearchPage } from '@/pages/SearchPage'
 
 export const router = createBrowserRouter([
@@ -51,6 +51,7 @@ export const router = createBrowserRouter([
       { path: '/quest/history', element: <PigeonHistoryPage />, handle: { title: '성장 기록' } },
       { path: '/quest/album', element: <PigeonAlbumPage />, handle: { title: '비둘기 앨범' } },
       { path: '/quest/scan', element: <QuestScanPage />, handle: { title: '방문 인증' } },
+      { path: '/quest/qr', element: <QuestQrPage />, handle: { title: 'QR 인식하기' } },
       { path: '/quest/:questId/visit', element: <QuestVisitPage />, handle: { title: '방문 인증' } },
       { path: '/coupons', element: <CouponPage />, handle: { title: '내 쿠폰함' } },
       { path: '/scraps', element: <ScrapPage />, handle: { title: '스크랩' } },

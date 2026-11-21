@@ -19,6 +19,7 @@ const TABS: TabItem[] = [
 const MENU: MenuItem[] = [
   { to: '/coupons', label: '내 쿠폰함', icon: '🎟', image: pigeonCouponBox },
   { to: '/quest', label: '내 비둘기·퀘스트', icon: '🕊', image: pigeonQuest },
+  { to: '/quest/qr', label: 'QR 인식하기', icon: '📷', image: OWNER_ILLUST.qr },
   { to: '/profile/reviews', label: '내 리뷰', icon: '✍️', image: pigeonGrowth },
   { to: '/scraps', label: '스크랩한 게시물', icon: '🔖', image: OWNER_ILLUST.videoDownload },
 ]
