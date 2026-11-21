@@ -15,12 +15,11 @@ const TABS: TabItem[] = [
   { to: '/quest', label: '퀘스트', Icon: FlagNavIcon },
 ]
 
-/** 로그인·스크랩·프로필 항목은 담당 팀원이 이어서 추가 */
+/** 바로가기 (계정 영역에는 프로필·로그아웃만) */
 const MENU: MenuItem[] = [
   { to: '/coupons', label: '내 쿠폰함', icon: '🎟', image: pigeonCouponBox },
   { to: '/quest', label: '내 비둘기·퀘스트', icon: '🕊', image: pigeonQuest },
-  { to: '/quest/history', label: '성장 기록', icon: '📈', image: pigeonGrowth },
-  { to: '/quest/album', label: '비둘기 앨범', icon: '🎓', image: pigeonQuest },
+  { to: '/profile/reviews', label: '내 리뷰', icon: '✍️', image: pigeonGrowth },
   { to: '/scraps', label: '스크랩한 게시물', icon: '🔖', image: OWNER_ILLUST.videoDownload },
 ]
 

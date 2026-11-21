@@ -29,7 +29,7 @@ const MODES: { mode: AppMode; label: string; desc: string }[] = [
 ]
 
 /**
- * 계정 (Figma GNB: 로그인X → 로그인·회원가입 / 로그인O → 닉네임 님·로그아웃·스크랩·프로필)
+ * 계정 (Figma GNB: 로그인X → 로그인·회원가입 / 로그인O → 닉네임 님·프로필·로그아웃. 스크랩·내 리뷰는 바로가기에)
  */
 function AccountSection({ onLoggedIn, onLoggedOut }: { onLoggedIn: (mode: AppMode) => void; onLoggedOut: () => void }) {
   const me = useMe()
@@ -79,20 +79,6 @@ function AccountSection({ onLoggedIn, onLoggedOut }: { onLoggedIn: (mode: AppMod
             프로필 <span className="text-q-muted">›</span>
           </Link>
         </li>
-        {!owner && (
-          <li>
-            <Link to="/scraps" className="flex justify-between border-b border-q-line py-3.5">
-              스크랩 <span className="text-q-muted">›</span>
-            </Link>
-          </li>
-        )}
-        {!owner && (
-          <li>
-            <Link to="/profile/reviews" className="flex justify-between border-b border-q-line py-3.5">
-              내 리뷰 <span className="text-q-muted">›</span>
-            </Link>
-          </li>
-        )}
         <li>
           <button
             type="button"
@@ -296,7 +282,12 @@ export function SettingsDrawer({ buttonClassName, items }: { buttonClassName: st
                   setOpen(false)
                   if (role !== mode) navigate(MODE_HOME[role])
                 }}
-                onLoggedOut={() => setOpen(false)}
+                onLoggedOut={() => {
+                  setOpen(false)
+                  // 로그아웃하면 (사장님 모드였어도) 손님 모드 피드로
+                  setMode('USER')
+                  navigate(MODE_HOME.USER, { replace: true })
+                }}
               />
 
               <section className="mt-6 px-5">
