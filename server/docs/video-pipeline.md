@@ -81,10 +81,10 @@ cd server
 ## 서버에서 부르기 (A 파트와 연결)
 
 - `infra/video/storyboard/StoryboardVideoService`: 장면 JSON 문자열 + 로컬 사진 → mp4. 설정은 `video.ffmpeg-path`, `video.work-dir`, `video.tts`, `runway.api-key`
-- `domain/generation/storyboard/StoryboardVideoPipeline`: 메뉴 데이터 + 사진 → (이미지 생성) → 장면 JSON 생성·검증(A) → mp4(B). 검증을 끝내 통과하지 못하면 영상은 만들지 않음
+- `domain/generation/storyboard/StoryboardVideoPipeline`: 메뉴 데이터와 사진으로 장면 JSON을 만들고 MP4로 합성합니다. 장면 시간, 사진 번호와 모션은 합성 전에 보정합니다. 확인할 수 없는 가격이 담긴 자막과 대사는 생략합니다.
   - 메뉴 데이터에 `image_requests`가 있으면 `addGeneratedImages`가 Runway로 이미지를 먼저 만들어 `photos[]`·사진 목록 끝에 붙인 뒤 장면 JSON을 만든다 (`runway=true`와 상관없이, `RUNWAYML_API_SECRET`이 있어야 함)
 - 두 파트는 장면 JSON 문자열로만 주고받는다 (`Storyboard` 레코드가 A·B에 따로 있음)
-- `video.tts` (`VIDEO_TTS`): `auto`(기본, ElevenLabs 키 → AWS 키(Polly) → macOS say → 무음 순, CLI와 같음) / `elevenlabs` / `polly` / `say` / `none`. Polly는 서버 키의 IAM 사용자(`nyang-pang-server`)에 `polly:SynthesizeSpeech` 권한이 있어야 함 (없으면 403)
+- `VIDEO_TTS=auto`는 ElevenLabs 키가 있으면 먼저 사용합니다. 운영에서는 AWS 자격 증명으로 Polly를 호출하고, Polly 호출이 실패하면 자막과 배경음악으로 영상을 완성합니다. `VIDEO_TTS=polly`는 Polly 실패를 오류로 반환합니다.
 - 임시 테스트에서 화면 배치를 고정하려면 서버 시작 인수에 `--video.template-override=headline`을 추가합니다. 인수를 생략하면 장면 JSON의 `meta.template`, 그것도 없으면 `headline`입니다.
 
 로컬 테스트 API (`local` 프로필, 로그인 토큰 필요). `runway=true`를 붙여야 Runway 크레딧을 쓴다.

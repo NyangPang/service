@@ -73,6 +73,17 @@ public class MenuExtractionPrompt {
                 .replace("{errors}", errorList);
     }
 
+    String buildMenuRead(String storeName, String category) {
+        return """
+                가게 %s (%s)의 첨부 메뉴판에서 읽은 메뉴를 JSON 객체 하나로 출력하세요.
+                형식: {"menus":[{"name":"아메리카노","price_text":"4.5","price":4500,"description":null,"is_signature":false}]}
+                메뉴 이름과 설명은 메뉴판에 적힌 내용을 사용하세요. 가격 원문은 price_text, 원 단위 정수는 price에 넣으세요.
+                천 원 단위로 줄인 가격은 4.5를 4500으로 읽으세요. 확신할 수 없는 가격은 null로 두세요.
+                같은 이름은 기본 옵션의 가격으로 한 번만 적고, 대표·추천 표시가 있을 때만 is_signature를 true로 두세요.
+                읽을 수 있는 메뉴가 없으면 {"menus":[]}를 반환하세요. 코드블록이나 부연 설명은 붙이지 마세요.
+                """.formatted(orNone(storeName), categoryLabel(category));
+    }
+
     private static String categoryLabel(String code) {
         if (code == null || code.isBlank()) return "정보 없음";
         try {

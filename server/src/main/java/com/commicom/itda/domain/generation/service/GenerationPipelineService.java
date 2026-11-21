@@ -88,6 +88,9 @@ public class GenerationPipelineService {
         } catch (GenerationVideoService.CanceledException e) {
             log.info("[생성 {}] 사장님이 취소함", generationId);
             finish(generationId, g -> g.fail(CANCELED_MESSAGE));
+        } catch (GenerationVideoService.NoUsablePhotoException e) {
+            log.warn("[생성 {}] {}", generationId, e.getMessage());
+            finish(generationId, g -> g.fail(e.getMessage()));
         } catch (Exception e) {
             // 오류 원문은 로그로만 (LLM 검증·FFmpeg 메시지는 사장님이 읽을 글이 아님)
             log.error("[생성 {}] 실패: {}", generationId, e.getMessage(), e);

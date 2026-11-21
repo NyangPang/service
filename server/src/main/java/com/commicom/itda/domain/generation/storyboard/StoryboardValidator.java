@@ -638,7 +638,13 @@ public class StoryboardValidator {
 
     // ── 7. 영상 프롬프트 ─────────────────────────────────────────
 
-    private void checkVideoPrompt(Scene s, String at, List<String> errors) {
+    static boolean canAnimate(Scene scene) {
+        List<String> errors = new ArrayList<>();
+        checkVideoPrompt(scene, "", errors);
+        return errors.isEmpty();
+    }
+
+    private static void checkVideoPrompt(Scene s, String at, List<String> errors) {
         String p = s.videoPrompt();
         if (isBlank(p)) {
             errors.add(at + " motion이 \"" + s.motion() + "\"이면 video_prompt가 있어야 합니다.");

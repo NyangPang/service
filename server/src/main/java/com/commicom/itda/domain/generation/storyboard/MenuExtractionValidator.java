@@ -38,8 +38,16 @@ public class MenuExtractionValidator {
         return validate(data, photoCount, 0);
     }
 
-    /** @param extraImages 영상 스타일 때문에 기본 개수보다 더 요청해도 되는 생성 이미지 수 ({@link StyleImages#extra()}) */
+    /** @param extraImages 영상 스타일 때문에 더 요청해도 되는 생성 이미지 수 */
     public List<String> validate(MenuData data, int photoCount, int extraImages) {
+        return validate(data, photoCount, extraImages, true);
+    }
+
+    List<String> validateForVideo(MenuData data, int photoCount, int extraImages) {
+        return validate(data, photoCount, extraImages, false);
+    }
+
+    private List<String> validate(MenuData data, int photoCount, int extraImages, boolean requireOptionalImages) {
         List<String> errors = new ArrayList<>();
         if (data == null) {
             errors.add("결과가 비어 있습니다.");
@@ -47,7 +55,20 @@ public class MenuExtractionValidator {
         }
         Set<String> names = checkMenus(data.menus(), errors);
         checkPhotos(data.photos(), photoCount, names, errors);
+        if (requireOptionalImages || data.usablePhotoCount() == 0) checkImageRequests(data, names, Math.max(0, extraImages), errors);
+        return errors;
+    }
+
+    boolean hasValidImageRequests(MenuData data, int extraImages) {
+        List<String> errors = new ArrayList<>();
+        Set<String> names = checkMenus(data.menus(), errors);
         checkImageRequests(data, names, Math.max(0, extraImages), errors);
+        return errors.isEmpty();
+    }
+
+    List<String> validateMenus(List<Menu> menus) {
+        List<String> errors = new ArrayList<>();
+        checkMenus(menus, errors);
         return errors;
     }
 
