@@ -19,8 +19,8 @@
       "image_index": 0, "motion": "zoom_in",
       "video_prompt": null,
       "menu_ref": "모둠꼬치",
-      "narration": "숯불 향 밴 모둠꼬치 18,000원",
-      "caption": { "text": "숯불 향 밴 모둠꼬치 18,000원", "position": "bottom", "emphasis": "price" }
+      "narration": "숯불 향 밴 모둠꼬치가 18,000원이고",
+      "caption": { "text": "숯불 향 밴 모둠꼬치가 18,000원이고", "position": "bottom", "emphasis": "price" }
     },
     {
       "id": 3, "order": 3, "type": "menu", "duration": 3.5,
