@@ -63,12 +63,14 @@ final class RunwayClipClient {
                 .put("duration", CLIP_SECONDS);
         JsonNode task = send(request("/image_to_video").POST(HttpRequest.BodyPublishers.ofString(body.toString())));
         String id = task.path("id").asText();
-        log.accept("    Runway 작업 시작 " + id + " (1~3분)");
+        log.accept("    Runway 작업 시작 " + id + " (" + photo.getFileName() + ", 1~3분)");
+        RunwayStatusLog watch = new RunwayStatusLog("Runway 클립 " + shortId(id) + " (" + photo.getFileName() + ")", log);
 
         long deadline = System.nanoTime() + MAX_WAIT.toNanos();
         while (System.nanoTime() < deadline) {
             Thread.sleep(POLL.toMillis());
             JsonNode status = send(request("/tasks/" + id).GET());
+            watch.update(status.path("status").asText());
             switch (status.path("status").asText()) {
                 case "SUCCEEDED" -> {
                     download(status.path("output").get(0).asText(), outMp4);
@@ -78,7 +80,11 @@ final class RunwayClipClient {
                 default -> { }
             }
         }
-        throw new IOException("Runway 시간 초과 (10분): " + id);
+        throw new IOException("Runway 시간 초과 (10분, 마지막 상태 " + watch.lastStatus() + "): " + id);
+    }
+
+    static String shortId(String id) {
+        return id.length() > 8 ? id.substring(0, 8) : id;
     }
 
     private HttpRequest.Builder request(String path) {

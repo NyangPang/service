@@ -60,11 +60,13 @@ class RunwayImageClient {   // 테스트에서 가짜로 바꿔 끼우려고 fin
         JsonNode task = send(request("/text_to_image").POST(HttpRequest.BodyPublishers.ofString(body.toString())));
         String id = task.path("id").asText();
         log.accept("    Runway 이미지 작업 시작 " + id);
+        RunwayStatusLog watch = new RunwayStatusLog("Runway 이미지 " + RunwayClipClient.shortId(id), log);
 
         long deadline = System.nanoTime() + MAX_WAIT.toNanos();
         while (System.nanoTime() < deadline) {
             Thread.sleep(POLL.toMillis());
             JsonNode status = send(request("/tasks/" + id).GET());
+            watch.update(status.path("status").asText());
             switch (status.path("status").asText()) {
                 case "SUCCEEDED" -> {
                     download(status.path("output").get(0).asText(), outPng);
@@ -74,7 +76,7 @@ class RunwayImageClient {   // 테스트에서 가짜로 바꿔 끼우려고 fin
                 default -> { }
             }
         }
-        throw new IOException("Runway 이미지 시간 초과 (6분): " + id);
+        throw new IOException("Runway 이미지 시간 초과 (6분, 마지막 상태 " + watch.lastStatus() + "): " + id);
     }
 
     private HttpRequest.Builder request(String path) {
