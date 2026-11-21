@@ -180,8 +180,7 @@ public class MenuExtractionValidator {
             errors.add(at + " prompt에 글자·간판·로고 관련 단어(" + String.join(", ", text)
                     + ")가 있습니다. 이미지에 글자가 생기지 않도록 빼세요.");
         }
-        List<String> people = new java.util.ArrayList<>(StoryboardValidator.findAll(StoryboardValidator.PERSON_WORDS, p));
-        people.addAll(StoryboardValidator.findAll(StoryboardValidator.STILL_HAND_WORDS, p));
+        List<String> people = StoryboardValidator.findAll(StoryboardValidator.PERSON_WORDS, p);
         if (!people.isEmpty()) {
             errors.add(at + " prompt에 사람·신체를 가리키는 단어(" + String.join(", ", people)
                     + ")가 있습니다. 생성 이미지에서 사람과 손·얼굴은 뭉개지니 빼고 음식과 배경만 묘사하세요.");

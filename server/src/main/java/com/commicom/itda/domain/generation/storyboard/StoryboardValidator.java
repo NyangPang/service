@@ -75,9 +75,8 @@ public class StoryboardValidator {
                     + "poster|posters|banner|banners|watermark|menu board|chalkboard|neon sign)\\b",
             Pattern.CASE_INSENSITIVE);
     /**
-     * Runway가 사람 전체·얼굴·손가락을 뭉개서 그리므로 사람과 그런 신체를 가리키는 단어 금지.
-     * 손(hand, hands)은 허용한다 — "a gloved hand uses tongs to pick up the bread"처럼 손과 도구만 화면에 나오는 동작이
-     * 카메라 무빙보다 영상을 훨씬 살아 있게 만든다. 손가락·팔처럼 더 드러나는 신체는 여전히 막는다.
+     * Runway가 사람·손·얼굴을 뭉개서 그리므로 사람과 신체를 가리키는 단어 금지.
+     * (손과 도구로 찢는 동작을 허용해 봤더니 포크로 먹는 장면처럼 보여 어색했다 — 음식 자체의 질감으로 보여 준다)
      * mouth-watering(군침 도는)처럼 음식 묘사에 흔한 표현은 뺀다.
      */
     static final Pattern PERSON_WORDS = Pattern.compile(
@@ -85,24 +84,23 @@ public class StoryboardValidator {
                     + "someone|somebody|crowd|crowded|friend|friends|portrait|selfie|"
                     + "chef|chefs|baker|bakers|barista|baristas|bartender|bartenders|waiter|waiters|waitress|waitresses|"
                     + "staff|employee|employees|worker|workers|owner|owners|customer|customers|guest|guests|"
-                    + "finger|fingers|fingertip|fingertips|thumb|thumbs|arm|arms|elbow|elbows|"
+                    + "hand|hands|gloved|glove|gloves|finger|fingers|fingertip|fingertips|thumb|thumbs|wrist|wrists|arm|arms|elbow|elbows|"
                     + "face|faces|mouth(?![-\\s]?watering)|lip|lips)\\b",
             Pattern.CASE_INSENSITIVE);
     /**
-     * 먹기·마시기처럼 입이 있어야 하는 동작을 쓰면 Runway가 얼굴을 그려 넣으므로 금지.
-     * 집기·옮기기·찢기·자르기는 손과 도구(집게·포크·나이프)로 하는 동작이라 허용한다.
+     * 들어 올리기·젓기·먹기처럼 손이나 입이 있어야 하는 동작을 쓰면 Runway가 사람을 그려 넣으므로 금지.
+     * 붓기(pour)는 우유·소스가 위에서 흘러내리는 모습으로 쓸 수 있어 허용한다.
+     * stir-fried(볶음), pour-over(핸드드립)처럼 요리 이름에 쓰이는 표현은 뺀다.
+     * freshly poured / picked처럼 이미 끝난 상태를 말하는 과거형은 허용.
      */
-    static final Pattern MOUTH_ACTION_WORDS = Pattern.compile(
-            "\\b(biting|eat|eats|eating|drinking|sip|sips|sipping|chewing|licking|tasting)\\b",
-            Pattern.CASE_INSENSITIVE);
-    /** 정지 이미지(메뉴 이미지 생성)에는 동작이 없으니 손도 그리지 않는다 — {@link MenuExtractionValidator}에서 씀 */
-    static final Pattern STILL_HAND_WORDS = Pattern.compile("\\b(hand|hands|wrist|wrists)\\b", Pattern.CASE_INSENSITIVE);
-    /** 정지 이미지에서 손이 있어야 하는 동작 (손이 그려진다). freshly poured / picked처럼 끝난 상태는 허용 */
     static final Pattern HAND_ACTION_WORDS = Pattern.compile(
             "\\b(hold|holds|holding|held|lift|lifts|lifting|lifted|pick|picks|picking|grab|grabs|grabbing|grabbed|"
-                    + "stir(?![-\\s]?fr)|stirs|stirring|stirred|scooping|"
-                    + "biting|eat|eats|eating|drinking|sip|sips|sipping)\\b",
+                    + "stir(?![-\\s]?fr)|stirs|stirring|stirred|scooping|tear|tears|tearing|"
+                    + "biting|eat|eats|eating|drinking|sip|sips|sipping|chewing|tasting)\\b",
             Pattern.CASE_INSENSITIVE);
+    /** 포크·나이프·집게가 나오면 손이 따라 그려지고 먹는 장면처럼 보인다 */
+    static final Pattern UTENSIL_WORDS = Pattern.compile(
+            "\\b(fork|forks|knife|knives|tongs|chopsticks|spoon|spoons|spatula)\\b", Pattern.CASE_INSENSITIVE);
 
     public List<String> validate(Storyboard sb, MenuData menu) {
         List<String> errors = new ArrayList<>();
@@ -146,6 +144,7 @@ public class StoryboardValidator {
             }
         }
         checkEveryPhotoMoves(scenes, menu, errors);
+        checkPhotoRuns(scenes, errors);
         if (aiCount > MAX_AI_SCENES) {
             errors.add("motion이 \"ai\"인 장면이 " + aiCount + "개입니다. 최대 " + MAX_AI_SCENES
                     + "개까지만 쓰고, 나머지는 zoom_in / zoom_out / static으로 바꾸세요.");
@@ -574,13 +573,39 @@ public class StoryboardValidator {
         List<String> people = findAll(PERSON_WORDS, p);
         if (!people.isEmpty()) {
             errors.add(at + " video_prompt에 사람·신체를 가리키는 단어(" + String.join(", ", people)
-                    + ")가 있습니다. AI 영상에서 사람·얼굴·손가락은 뭉개져 보이니 빼세요. 동작은 \"a gloved hand uses tongs to pick up the bread\"처럼 "
-                    + "손과 도구만 화면에 나오게 쓰면 됩니다.");
+                    + ")가 있습니다. AI 영상에서 사람과 손·얼굴은 뭉개져 보이니 빼고, 음식 자체의 질감과 카메라 움직임만 묘사하세요.");
         }
-        List<String> actions = findAll(MOUTH_ACTION_WORDS, p);
+        List<String> actions = new ArrayList<>(findAll(HAND_ACTION_WORDS, p));
+        actions.addAll(findAll(UTENSIL_WORDS, p));
         if (!actions.isEmpty()) {
-            errors.add(at + " video_prompt에 입이 있어야 하는 동작(" + String.join(", ", actions)
-                    + ")이 있습니다. 영상에 얼굴이 그려지니, 집게로 집기·포크와 나이프로 찢기·단면 보여 주기처럼 손과 도구로 하는 동작으로 바꾸세요.");
+            errors.add(at + " video_prompt에 손·도구가 있어야 하는 동작이나 도구(" + String.join(", ", actions)
+                    + ")가 있습니다. 손이 그려지고 먹는 장면처럼 보이니, 모찌가 말랑하게 흔들리거나 치즈가 늘어나고 찌개가 끓어오르는 것처럼 "
+                    + "음식이 스스로 움직이는 모습과 카메라 움직임으로 바꾸세요. 붓기는 \"milk pouring into the latte from above\"처럼 흐르는 모습만 쓰면 됩니다.");
+        }
+    }
+
+    /**
+     * 원테이크 영상: 카메라가 한 사진에서 다음 사진으로만 움직이며 이어 찍으므로,
+     * 같은 사진을 쓰는 장면은 붙어 있어야 한다 (다른 사진으로 넘어갔다가 다시 돌아오면 안 됨).
+     */
+    private void checkPhotoRuns(List<Scene> scenes, List<String> errors) {
+        /** 사진 번호 → 그 사진 구간이 끝난 장면 */
+        Map<Integer, String> finished = new HashMap<>();
+        Integer current = null;
+        String lastOfCurrent = null;
+        for (int i = 0; i < scenes.size(); i++) {
+            Scene s = scenes.get(i);
+            if (s == null || s.imageIndex() == null) continue;
+            if (!s.imageIndex().equals(current)) {
+                if (current != null) finished.put(current, lastOfCurrent);
+                String before = finished.get(s.imageIndex());
+                if (before != null) {
+                    errors.add(where(s, i) + " " + s.imageIndex() + "번 사진은 " + before + "까지 쓰고 다른 사진으로 넘어갔습니다. "
+                            + "영상이 한 번에 이어지도록 카메라가 다음 사진으로만 움직이니, 같은 사진을 쓰는 장면은 붙여 두세요.");
+                }
+                current = s.imageIndex();
+            }
+            lastOfCurrent = where(s, i);
         }
     }
 
